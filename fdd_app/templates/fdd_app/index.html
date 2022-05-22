@@ -1,4 +1,23 @@
-
 {% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
 
-<img src="{% static '/fdd_app/images/Steven.png' %}" alt="My image">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample image</title>
+</head>
+<body>
+    <form method = "post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if img_obj %}
+    <h3>Succesfully uploaded</h3>
+    <img src="media/{{ img_obj.image}}" alt="connect" style="max-height:300px">
+    {% endif %}
+
+</body>
+</html>
