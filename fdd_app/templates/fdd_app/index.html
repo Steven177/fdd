@@ -1,5 +1,33 @@
-{% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
+<script>
+
+ function showDiv() {
+    div = document.getElementById('hidden');
+    div.style.display = "block";
+  }
+
+ function drawBoundingBoxes(boxes) {
+    console.log(boxes)
+    var c = document.getElementById("pred_canvas");
+    var ctx = c.getContext("2d");
+    for (let i = 0; i < boxes.length; i++) {
+      ctx.beginPath();
+      ctx.rect(boxes[i].xmin, boxes[i].ymin, boxes[i].width, boxes[i].height);
+      ctx.stroke();
+    }
+  }
+
+  function getBoundingBoxes() {
+    let boxes = []
+    let nodes = document.querySelectorAll(".box");
+    for (let i = 0; i < nodes.length; i++) {
+      box = nodes[i].innerHTML;
+      var coordinates = box.match(/\d+/g)
+      boxes.push({'xmin': parseInt(coordinates[0]), 'ymin': parseInt(coordinates[1]), 'width': parseInt(coordinates[2]) - parseInt(coordinates[0]), 'height': parseInt(coordinates[3]) - parseInt(coordinates[1])});
+    }
+    drawBoundingBoxes(boxes);
+  }
+
+</script>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -7,29 +35,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sample image</title>
+    <title>Samples</title>
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
+
 <body>
 
   <div class="container-fluid">
-    <h1>Data Probes</h1>
-    <h2>Here are all of your data samples. A simple click will feed the sample to the AI model.</h2>
-    <div class="row justify-content-start">
-    {% for sample in samples %}
-      <div class="col-md-2 col-sm-6">
-        <img src="{{sample.image.url}}" class="img-fluid" alt="No image found">
-      </div>
-    {% endfor %}
+    <h1>Model exploration</h1>
+    <h2>Upload a picture</h2>
+    <! -- form -->
+        <form action="." method = "post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
 
-    <form action="." method = "post" enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="btn btn-primary">Upload</button>
-    </form>
+    <div class="row justify-content-start">
+      <div class="col-5">
+         <! -- bbox -->
+        <h2>What are you expecting the model to predict? Draw bounding boxes.</h2>
+        <div id = "canvasWrapper">
+         <canvas id="overlay" width={{sample.image.width}}  height={{sample.image.height}}></canvas>
+         <canvas id="canvas" width={{sample.image.width}}  height={{sample.image.height}}></canvas>
+        </div>
+
+        <! -- image -->
+        <img src="{{sample.image.url}}" class="img">
+
+        <button onclick="javascript:getBoundingBoxes();">Get boxes</button>
+
+        <! -- boxes -->
+        {% for object in model_prediction%}
+          <p class="box white"> {{ object.box }}</p>
+        {% endfor %}
+      </div>
+
+      <div class="col-2">
+        <button class="btn btn-primary" onclick="javascript:showDiv();">Show the prediction of the AI model</button>
+      </div>
+
+      <div id="hidden" class="col-5">
+        <h2>This is the model prediction. What do you think?</h2>
+        <canvas id="pred_canvas"width={{sample.image.width}} height={{sample.image.height}} >
+        Your browser does not support the HTML5 canvas tag.</canvas>
+
+        <! -- image -->
+        <img src="{{sample.image.url}}" class="img">
+
+        {% for object in model_prediction%}
+        <div>
+          <p>{{ object.label }} with certainty {{ object.score }}</p>
+        </div>
+        {% endfor %}
+      </div>
+
+
 
   </div>
-
+  <! -- bbox -->
+  <script src="{% static 'js/bbox.js' %}"></script>
   <! -- Bootstrap-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 </body>

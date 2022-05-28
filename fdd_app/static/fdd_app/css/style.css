@@ -1,3 +1,14 @@
-p {
-  color:  green;
+canvas{
+  position: absolute;
+}
+#canvasWrapper{
+  position:relative;
+}
+
+#hidden {
+  display: none;
+}
+
+.white {
+  color: white;
 }
