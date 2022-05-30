@@ -4,11 +4,16 @@ var overlay = document.getElementById("overlay");
 var ctx = canvas.getContext("2d");
 var ctxo = overlay.getContext("2d");
 
+var colors = ["green", "blue", "red", "yellow", "purple"];
+var colorIndexExp = 0;
+var colorIndexPred = 0;
+var counter = 1;
+
 // style the context
-ctx.strokeStyle = "blue";
-ctx.lineWidth = 3;
-ctxo.strokeStyle = "blue";
-ctxo.lineWidth = 3;
+ctx.strokeStyle = colors[colorIndexExp];
+ctx.lineWidth = 2;
+ctxo.strokeStyle = colors[colorIndexExp];
+ctxo.lineWidth = 2;
 
 // calculate where the canvas is on the window
 // (used to help calculate mouseX/mouseY)
@@ -51,6 +56,9 @@ function handleMouseUp(e) {
     // the drag is over, clear the dragging flag
     isDown = false;
     ctxo.strokeRect(prevStartX, prevStartY, prevWidth, prevHeight);
+    colorIndexExp += 1;
+    ctx.strokeStyle = colors[colorIndexExp];
+    ctxo.strokeStyle = colors[colorIndexExp];
 }
 
 function handleMouseOut(e) {
@@ -88,6 +96,7 @@ function handleMouseMove(e) {
 
     // draw a new rect from the start position
     // to the current mouse position
+
     ctx.strokeRect(startX, startY, width, height);
 
     prevStartX = startX;
@@ -106,8 +115,49 @@ $("#canvas").mousemove(function (e) {
 });
 $("#canvas").mouseup(function (e) {
     handleMouseUp(e);
+    showDiv("label" + counter);
+    counter += 1;
 });
 
 $("#canvas").mouseout(function (e) {
     handleMouseOut(e);
 });
+
+// ----------------------------------------------------------------------
+
+
+function showModelPrediction() {
+    div = document.getElementById('hidden');
+    div.style.display = "block";
+    getBoundingBoxes();
+  }
+
+  function showDiv(div) {
+    div = document.getElementById(div);
+    div.style.display = "block";
+  }
+
+ function drawBoundingBoxes(boxes) {
+    console.log(boxes)
+    var c = document.getElementById("pred_canvas");
+    var ctx = c.getContext("2d");
+    ctx.lineWidth = 2;
+    for (let i = 0; i < boxes.length; i++) {
+      ctx.beginPath();
+      ctx.strokeStyle = colors[colorIndexPred];
+      ctx.rect(boxes[i].xmin, boxes[i].ymin, boxes[i].width, boxes[i].height);
+      colorIndexPred += 1;
+      ctx.stroke();
+    }
+  }
+
+  function getBoundingBoxes() {
+    let boxes = []
+    let nodes = document.querySelectorAll(".box");
+    for (let i = 0; i < nodes.length; i++) {
+      box = nodes[i].innerHTML;
+      var coordinates = box.match(/\d+/g)
+      boxes.push({'xmin': parseInt(coordinates[0]), 'ymin': parseInt(coordinates[1]), 'width': parseInt(coordinates[2]) - parseInt(coordinates[0]), 'height': parseInt(coordinates[3]) - parseInt(coordinates[1])});
+    }
+    drawBoundingBoxes(boxes);
+  }

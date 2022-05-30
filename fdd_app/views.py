@@ -26,6 +26,3 @@ def index(request):
     form = ImageForm(request.POST, request.FILES)
     return render(request, 'fdd_app/index.html', {"form": form })
 
-
-def detail(request):
-  return render(request, 'fdd_app/detail.svelte')
