@@ -12,17 +12,23 @@ def index(request):
 
     if form.is_valid():
       form.save()
-      obj = form.instance
-      model_prediction = query(obj.image.path)
-      sample = Sample.objects.all().last()
+      sample = form.instance
+      model_prediction = query(sample.image.path)
+      colors = ["green", "blue", "red", "yellow", "purple"]
+
       return render(request, 'fdd_app/index.html', {
         'form': form,
-        'obj': obj,
         'sample': sample,
         'model_prediction': model_prediction,
+        'colors': colors,
         })
 
   else:
     form = ImageForm(request.POST, request.FILES)
     return render(request, 'fdd_app/index.html', {"form": form })
 
+def false_observation(request):
+  return render(request, 'fdd_app/false_observation.html')
+
+def failing_to_observe(request):
+  return render(request, 'fdd_app/failing_to_observe.html')

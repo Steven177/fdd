@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Samples</title>
-
     {% load static %}
+    {% load mathfilters %}
+    {% load index %}
     <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
@@ -44,7 +45,7 @@
         <! -- labels -->
         <form action="javascript:void(0);">
           <div id="label1">
-            <i class="fa-solid fa-users-rectangle fa-beat green"></i>
+            <i class="fa-solid fa-users-rectangle green"></i>
             <label for="fname">Label the green object: </label>
             <input type="text" id="fname" name="fname"><br><br>
           </div>
@@ -69,10 +70,6 @@
             <input type="text" id="fname" name="fname"><br><br>
           </div>
          </form>
-        <! -- boxes -->
-        {% for object in model_prediction%}
-          <p class="box white"> {{ object.box }}</p>
-        {% endfor %}
       </div>
 
       <! -- MIDDLE -->
@@ -83,21 +80,29 @@
       <! -- RIGHT -->
       <div id="hidden" class="col-5">
         <h2>This is the model prediction. What do you think?</h2>
-        <canvas id="pred_canvas"width={{sample.image.width}} height={{sample.image.height}} >
-        Your browser does not support the HTML5 canvas tag.</canvas>
-
         <! -- image -->
-        <img src="{{sample.image.url}}" class="img">
+        <div class="position-relative">
+          <svg class="position-absolute" width="{{sample.image.width}}" height="{{sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+          {% for object in model_prediction%}
+             <rect class="{{ forloop.counter0 }}" x={{object.box.xmin}} y={{object.box.ymin}} width={{object.box.xmax|sub:object.box.xmin}} height={{object.box.ymax|sub:object.box.ymin}} style="stroke:{{ colors|index:forloop.counter0}};stroke-width:2;fill-opacity:0"/>
+            </rect>
+          {% endfor %}
+          </svg>
+          <img src="{{sample.image.url}}">
+        </div>
 
         {% for object in model_prediction%}
         <div>
-          <p>{{ object.label }} with certainty {{ object.score | floatformat:3}}</p>
+          <i class="fa-solid fa-users-rectangle" style="color:{{ colors|index:forloop.counter0}}"></i>
+          <p class="{{ forloop.counter0 }}">{{ object.label }} with certainty {{ object.score | floatformat:3}}</p>
         </div>
         {% endfor %}
       </div>
+
   <! -- bbox -->
-  <script src="{% static 'fdd_app/js/bbox.js' %}"></script>
+  <script src="{% static 'fdd_app/js/bbox.js' %}">
   <! -- Bootstrap-->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+  </script>
 </body>
 </html>
