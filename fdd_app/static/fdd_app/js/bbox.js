@@ -4,16 +4,16 @@ var overlay = document.getElementById("overlay");
 var ctx = canvas.getContext("2d");
 var ctxo = overlay.getContext("2d");
 
-var colors = ["green", "blue", "red", "yellow", "purple"];
+var colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"];
 var colorIndexExp = 0;
 var colorIndexPred = 0;
 var counter = 1;
 
 // style the context
 ctx.strokeStyle = colors[colorIndexExp];
-ctx.lineWidth = 2;
+ctx.lineWidth = 1.5;
 ctxo.strokeStyle = colors[colorIndexExp];
-ctxo.lineWidth = 2;
+ctxo.lineWidth = 1.5;
 
 // calculate where the canvas is on the window
 // (used to help calculate mouseX/mouseY)
@@ -125,39 +125,70 @@ $("#canvas").mouseout(function (e) {
 
 // ----------------------------------------------------------------------
 
+function revealB2() {
+  b1 = document.getElementById("b1")
+  b1.classList.add("d-none")
 
-function showModelPrediction() {
+  b2 = document.getElementById("b2")
+  b2.classList.remove("d-none")
+}
+
+function showModelPrediction(e) {
+    revealB2();
     div = document.getElementById('hidden');
     div.style.display = "block";
-    getBoundingBoxes();
+};
+
+function showDiv(div) {
+  div = document.getElementById(div);
+  div.style.display = "block";
+};
+
+function highlightBox(e) {
+  // Get elements
+  var id = e.target.id
+  var highlightBox = document.getElementById(id.toString());
+  var predID = parseInt(id) + 100
+  var highlightPred = document.getElementById(predID.toString())
+
+  boxes = document.querySelectorAll(".box")
+  predictions = document.querySelectorAll(".pred")
+
+  // boxes
+  for (let i = 0; i < boxes.length; i++) {
+    element = boxes[i];
+    element.classList.remove("normalBox");
+    element.classList.add("removeBox");
+  }
+  highlightBox.classList.remove("removeBox")
+  highlightBox.classList.add("normalBox")
+
+  // predictions
+  for (let i = 0; i < predictions.length; i++) {
+    element = predictions[i];
+    element.classList.add("hideDiv");
+  }
+  highlightPred.classList.remove("hideDiv");
+}
+
+function dehighlightBox(e) {
+  // boxes
+  boxes = document.querySelectorAll(".box")
+  for (let i = 0; i < boxes.length; i++) {
+    element = boxes[i]
+    element.classList.remove("removeBox");
+    element.classList.add("normalBox");
   }
 
-  function showDiv(div) {
-    div = document.getElementById(div);
-    div.style.display = "block";
+  // predictions
+  predictions = document.querySelectorAll(".pred")
+  for (let i = 0; i < predictions.length; i++) {
+    pred = predictions[i]
+    pred.classList.remove("hideDiv");
   }
 
- function drawBoundingBoxes(boxes) {
-    console.log(boxes)
-    var c = document.getElementById("pred_canvas");
-    var ctx = c.getContext("2d");
-    ctx.lineWidth = 2;
-    for (let i = 0; i < boxes.length; i++) {
-      ctx.beginPath();
-      ctx.strokeStyle = colors[colorIndexPred];
-      ctx.rect(boxes[i].xmin, boxes[i].ymin, boxes[i].width, boxes[i].height);
-      colorIndexPred += 1;
-      ctx.stroke();
-    }
-  }
+}
 
-  function getBoundingBoxes() {
-    let boxes = []
-    let nodes = document.querySelectorAll(".box");
-    for (let i = 0; i < nodes.length; i++) {
-      box = nodes[i].innerHTML;
-      var coordinates = box.match(/\d+/g)
-      boxes.push({'xmin': parseInt(coordinates[0]), 'ymin': parseInt(coordinates[1]), 'width': parseInt(coordinates[2]) - parseInt(coordinates[0]), 'height': parseInt(coordinates[3]) - parseInt(coordinates[1])});
-    }
-    drawBoundingBoxes(boxes);
-  }
+$(".box").mouseover(highlightBox);
+$(".box").mouseout(dehighlightBox);
+

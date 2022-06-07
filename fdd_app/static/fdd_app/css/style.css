@@ -9,50 +9,24 @@ canvas{
   display: none;
 }
 
-#hidden2 {
-  display: none;
+
+.normalBox {
+  transition-duration: 500ms;
+  stroke-width:2;
 }
 
-.white {
-  color: white;
+.removeBox {
+  transition-duration: 500ms;
+  stroke-width:0;
 }
 
-.green {
-  color: green;
+.hideDiv {
+  transition-duration: 500ms;
+  display:  none;
 }
 
-.blue {
-  color: blue;
+.d-none {
+  transition-duration: 3s;
+  display:  none;
 }
 
-.red {
-  color:  red;
-}
-
-.yellow {
-  color:  yellow;
-}
-
-.purple {
-  color:  purple;
-}
-
-#label1 {
-  display: none;
-}
-
-#label2 {
-  display: none;
-}
-
-#label3 {
-  display: none;
-}
-
-#label4 {
-  display: none;
-}
-
-#label5 {
-  display: none;
-}

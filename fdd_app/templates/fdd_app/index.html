@@ -20,8 +20,8 @@
 <body>
 
   <div class="container-fluid">
-    <h1>&#128171 Model exploration</h1>
-    <h2>Upload a picture</h2>
+    <h1>&#128171 Open Model Exploration</h1>
+    <h3>Upload a picture</h3>
     <! -- form -->
         <form action="." method = "post" enctype="multipart/form-data">
           {% csrf_token %}
@@ -33,7 +33,7 @@
     <div class="row justify-content-start">
       <div class="col-5">
          <! -- bbox -->
-        <h2>What are you expecting the model to predict? Draw bounding boxes.</h2>
+        <h3>What are you expecting? Draw bounding boxes.</h3>
 
         <div id = "canvasWrapper">
          <canvas id="overlay" width={sample.image.width}}  height={{sample.image.height}}></canvas>
@@ -44,57 +44,40 @@
 
         <! -- labels -->
         <form action="javascript:void(0);">
-          <div id="label1">
-            <i class="fa-solid fa-users-rectangle green"></i>
-            <label for="fname">Label the green object: </label>
+          {% for i in '0123456789'|make_list %}
+          <div id="label{{ forloop.counter }}" style="display: none">
+            <i class="fa-solid fa-users-rectangle" style="color: {{ colors|index:forloop.counter0 }}"></i>
+            <label for="fname">Label me: </label>
             <input type="text" id="fname" name="fname"><br><br>
           </div>
-          <div id="label2">
-            <i class="fa-solid fa-users-rectangle blue"></i>
-            <label for="fname">Label the blue object:</label>
-            <input type="text" id="fname" name="fname"><br><br>
-          </div>
-          <div id="label3">
-            <i class="fa-solid fa-users-rectangle red"></i>
-            <label for="fname">Label the red object:</label>
-            <input type="text" id="fname" name="fname"><br><br>
-          </div>
-          <div id="label4">
-            <i class="fa-solid fa-users-rectangle yellow"></i>
-            <label for="fname">Label the yellow object:</label>
-            <input type="text" id="fname" name="fname"><br><br>
-          </div>
-          <div id="label5">
-            <i class="fa-solid fa-users-rectangle purple"></i>
-            <label for="fname">Label the purple object:</label>
-            <input type="text" id="fname" name="fname"><br><br>
-          </div>
+          {% endfor %}
          </form>
       </div>
 
       <! -- MIDDLE -->
       <div class="col-2">
-        <button class="btn btn-primary" onclick="javascript:showModelPrediction();">Show the prediction of the AI model</button>
+        <button id="b1" class="btn btn-secondary" onclick="javascript:showModelPrediction();">Reveal model prediction</button>
+        <button id="b2" class="btn btn-danger d-none">Flag as AI failure</button>
       </div>
 
       <! -- RIGHT -->
       <div id="hidden" class="col-5">
-        <h2>This is the model prediction. What do you think?</h2>
+        <h3>Here the model prediction. What do you think?</h3>
         <! -- image -->
         <div class="position-relative">
           <svg class="position-absolute" width="{{sample.image.width}}" height="{{sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
-          {% for object in model_prediction%}
-             <rect class="{{ forloop.counter0 }}" x={{object.box.xmin}} y={{object.box.ymin}} width={{object.box.xmax|sub:object.box.xmin}} height={{object.box.ymax|sub:object.box.ymin}} style="stroke:{{ colors|index:forloop.counter0}};stroke-width:2;fill-opacity:0"/>
-            </rect>
+          {% for object in model_prediction %}
+             <rect id="{{ forloop.counter0 }}" class="box normalBox" x={{object.box.xmin}} y={{object.box.ymin}} width={{object.box.xmax|sub:object.box.xmin}} height={{object.box.ymax|sub:object.box.ymin}} style="stroke:{{ colors|index:forloop.counter0 }};fill-opacity:0"/>
+            </rect>g
           {% endfor %}
           </svg>
           <img src="{{sample.image.url}}">
         </div>
 
         {% for object in model_prediction%}
-        <div>
+        <div id="{{ forloop.counter0|add:100 }}" class="pred">
           <i class="fa-solid fa-users-rectangle" style="color:{{ colors|index:forloop.counter0}}"></i>
-          <p class="{{ forloop.counter0 }}">{{ object.label }} with certainty {{ object.score | floatformat:3}}</p>
+          <p>{{ object.label|title}} with certainty {{ object.score | floatformat:3}}</p>
         </div>
         {% endfor %}
       </div>
