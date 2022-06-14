@@ -4,7 +4,7 @@ from django.conf import settings
 
 class Sample(models.Model):
   image = models.ImageField(upload_to='images/')
-  # model_prediction =
+  failure = models.BooleanField(default=False)
 
 
 

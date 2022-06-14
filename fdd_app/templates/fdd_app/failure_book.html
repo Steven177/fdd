@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Failure Book</title>
+    {% load static %}
+    {% load mathfilters %}
+    {% load index %}
+    <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+<body>
+  <! -- NAVBAR -->
+  <nav class="navbar bg-light">
+    <h2>XploreAI</h2>
+    <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        DETR: Object detection
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">YOLO: Object detection</a></li>
+        <li><a class="dropdown-item" href="#">FasterRCNN: Object detection</a></li>
+      </ul>
+    </div>
+  </nav>
+
+   <! -- NAVIGATION -->
+  <nav aria-label="...">
+    <ul class="pagination">
+      <li class="page-item">
+        <a class="page-link" href="open_model_exploration" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item"><a class="page-link" href="failing_to_observe">Capabilities & Limitations</a></li>
+      <li class="page-item" aria-current="page">
+        <a class="page-link" href="false_observation">In-distribution Errors</a>
+      </li>
+      <li class="page-item"><a class="page-link" href="violation">Violations</a></li>
+      <li class="page-item"><a class="page-link" href="open_model_exploration">Open Model Exploration</a></li>
+      <li class="page-item active"><a class="page-link" href="failure_book">AI Failure Book</a></li>
+      <li class="page-item">
+        <a class="page-link" href="failing_to_observe" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+    <h1>AI Failure Book</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Sample</th>
+          <th scope="col">Failure Mode</th>
+          <th scope="col">Failure Sources</th>
+          <th scope="col">Failure Effects</th>
+          <th scope="col">Recovery Strategy</th>
+          <th scope="col">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sample in samples %}
+        <tr>
+          <td><img src="{{sample.image.url}}" class="img rounded thumbnail"></td>
+          <td>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                Select failure mode
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="#">Failing to observe</a></li>
+                <li><a class="dropdown-item" href="#">False observation</a></li>
+                <li><a class="dropdown-item" href="#">Incomplete observation</a></li>
+                <li><a class="dropdown-item" href="#">Critical quality</a></li>
+                <li><a class="dropdown-item" href="#">Violation</a></li>
+                <li><a class="dropdown-item" href="#">Other</a></li>
+              </ul>
+            </div>
+          </td>
+         <td>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                Select failure source
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="#">Failing to observe</a></li>
+                <li><a class="dropdown-item" href="#">False observation</a></li>
+                <li><a class="dropdown-item" href="#">Incomplete observation</a></li>
+                <li><a class="dropdown-item" href="#">Critical quality</a></li>
+                <li><a class="dropdown-item" href="#">Violation</a></li>
+                <li><a class="dropdown-item" href="#">Other</a></li>
+              </ul>
+            </div>
+          </td>
+          <td>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                Select failure effect
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="#">Physical harm</a></li>
+                <li><a class="dropdown-item" href="#">Psychological or emotional harm</a></li>
+                <li><a class="dropdown-item" href="#">Financial damage</a></li>
+                <li><a class="dropdown-item" href="#">Reputational damage</a></li>
+                <li><a class="dropdown-item" href="#">Personal privacy violation</a></li>
+                <li><a class="dropdown-item" href="#">Discrimination</a></li>
+                <li><a class="dropdown-item" href="#">Exclusion</a></li>
+                <li><a class="dropdown-item" href="#">Harmful content</a></li>
+                <li><a class="dropdown-item" href="#">Public misinformation</a></li>
+                <li><a class="dropdown-item" href="#">Political conflicts</a></li>
+                <li><a class="dropdown-item" href="#">Legal breech</a></li>
+                <li><a class="dropdown-item" href="#">Economic damage</a></li>
+                <li><a class="dropdown-item" href="#">Public privacy breech</a></li>
+                <li><a class="dropdown-item" href="#">Reliability issue</a></li>
+                <li><a class="dropdown-item" href="#">Other</a></li>
+              </ul>
+            </div>
+          </td>
+          <td>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                Select Recovery stragegy
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="#">Communicate quality of output to user</a></li>
+                <li><a class="dropdown-item" href="#">Handover control to user</a></li>
+                <li><a class="dropdown-item" href="#">Collect implicit feedback</a></li>
+                <li><a class="dropdown-item" href="#">Collect explicit feedback</a></li>
+                <li><a class="dropdown-item" href="#">Allow user correction</a></li>
+                <li><a class="dropdown-item" href="#">Provide local explanation</a></li>
+                <li><a class="dropdown-item" href="#">Other</a></li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+<! -- Bootstrap-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+  </script>
+
+</body>
+</html>

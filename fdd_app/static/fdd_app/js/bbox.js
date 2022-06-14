@@ -7,7 +7,7 @@ var ctxo = overlay.getContext("2d");
 var colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"];
 var colorIndexExp = 0;
 var colorIndexPred = 0;
-var counter = 1;
+var counter = 0;
 
 // style the context
 ctx.strokeStyle = colors[colorIndexExp];
@@ -115,7 +115,7 @@ $("#canvas").mousemove(function (e) {
 });
 $("#canvas").mouseup(function (e) {
     handleMouseUp(e);
-    showDiv("label" + counter);
+    removeHidden("label" + counter);
     counter += 1;
 });
 
@@ -125,24 +125,26 @@ $("#canvas").mouseout(function (e) {
 
 // ----------------------------------------------------------------------
 
-function revealB2() {
-  b1 = document.getElementById("b1")
-  b1.classList.add("d-none")
+function clearCanvas() {
+  // clear the canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.beginPath();
+};
 
-  b2 = document.getElementById("b2")
-  b2.classList.remove("d-none")
+function removeHidden(id) {
+  var div = document.getElementById(id);
+  div.classList.remove("d-none");
 }
 
-function showModelPrediction(e) {
-    revealB2();
-    div = document.getElementById('hidden');
-    div.style.display = "block";
-};
-
-function showDiv(div) {
-  div = document.getElementById(div);
+function showDiv(id) {
+  var div = document.getElementById(id);
   div.style.display = "block";
 };
+
+function revealHidden(id) {
+  var div = document.getElementById(id);
+  div.classList.remove("v-hidden");
+}
 
 function highlightBox(e) {
   // Get elements
@@ -169,7 +171,7 @@ function highlightBox(e) {
     element.classList.add("hideDiv");
   }
   highlightPred.classList.remove("hideDiv");
-}
+};
 
 function dehighlightBox(e) {
   // boxes
@@ -186,9 +188,10 @@ function dehighlightBox(e) {
     pred = predictions[i]
     pred.classList.remove("hideDiv");
   }
-
-}
+};
 
 $(".box").mouseover(highlightBox);
 $(".box").mouseout(dehighlightBox);
+
+$("#hidden0").prop("disabled", true);
 

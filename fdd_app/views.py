@@ -6,7 +6,7 @@ from .utils import *
 import requests
 import json
 
-def index(request):
+def open_model_exploration(request):
   if request.method == 'POST':
     form = ImageForm(request.POST, request.FILES)
 
@@ -16,7 +16,7 @@ def index(request):
       model_prediction = query(sample.image.path)
       colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
 
-      return render(request, 'fdd_app/index.html', {
+      return render(request, 'fdd_app/open_model_exploration.html', {
         'form': form,
         'sample': sample,
         'model_prediction': model_prediction,
@@ -25,10 +25,8 @@ def index(request):
 
   else:
     form = ImageForm(request.POST, request.FILES)
-    return render(request, 'fdd_app/index.html', {"form": form })
+    return render(request, 'fdd_app/open_model_exploration.html', {"form": form })
 
-def false_observation(request):
-  return render(request, 'fdd_app/false_observation.html')
-
-def failing_to_observe(request):
-  return render(request, 'fdd_app/failing_to_observe.html')
+def failure_book(request):
+  samples = Sample.objects.filter(failure=True)
+  return render(request, 'fdd_app/failure_book.html', {'samples': samples})

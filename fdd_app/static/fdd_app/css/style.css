@@ -5,11 +5,12 @@ canvas{
   position:relative;
 }
 
-#hidden {
-  display: none;
+#hidden0 {
+  display:  none;
 }
-
-
+#hidden1 {
+  display:  none;
+}
 .normalBox {
   transition-duration: 500ms;
   stroke-width:2;
@@ -28,5 +29,17 @@ canvas{
 .d-none {
   transition-duration: 3s;
   display:  none;
+}
+
+.thumbnail {
+  max-height:  200px;
+}
+
+.d-none {
+  display:  none;
+}
+
+.v-hidden {
+  visibility: hidden;
 }
 
