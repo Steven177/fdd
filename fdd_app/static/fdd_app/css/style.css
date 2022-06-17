@@ -1,9 +1,32 @@
-canvas{
-  position: absolute;
+/* CANVAS */
+#screenshot {
+  position:absolute;
+  z-index:1;
+
 }
-#canvasWrapper{
-  position:relative;
+#draw {
+  position:absolute;
+  z-index:2;
+  pointer-events:none;
 }
+#draw #boxes {
+  stroke-width:2;
+  fill-opacity:0;
+  stroke-opacity:0.9;
+}
+#draw #marquee {
+  fill:white;
+  stroke:red;
+  stroke-width:1;
+  stroke-dasharray:5,5;
+  stroke-opacity:0.9;
+  fill-opacity:0.2;
+}
+#draw #marquee.hide {
+  display:none;
+}
+
+/* MY ELEMENTS */
 
 #hidden0 {
   display:  none;
@@ -42,4 +65,44 @@ canvas{
 .v-hidden {
   visibility: hidden;
 }
+
+.padding20px {
+  padding: 20px !important;
+}
+
+.margin-top-bottom-20px {
+  margin-top:  20px !important;
+  margin-bottom: 20px !important;
+}
+
+/* TABLE */
+#page_container {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+#accordion_search_bar_container {
+    position: relative;
+}
+#accordion_search_bar_container:after {
+    content: "\e003";
+    font-family: Glyphicons Halflings;
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}
+#accordion_search_bar_container #accordion_search_bar {
+    display: block;
+    margin: 10px auto;
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid #cacaca;
+    border-radius: 25px;
+    outline: 0;
+}
+.panel-title a {
+    display: block;
+}
+
 

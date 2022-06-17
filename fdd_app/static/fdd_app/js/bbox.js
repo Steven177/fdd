@@ -1,135 +1,116 @@
-// get references to the canvas and context
-var canvas = document.getElementById("canvas");
-var overlay = document.getElementById("overlay");
-var ctx = canvas.getContext("2d");
-var ctxo = overlay.getContext("2d");
-
-var colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"];
-var colorIndexExp = 0;
-var colorIndexPred = 0;
 var counter = 0;
+var colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"];
+const $ = document.querySelector.bind(document);
 
-// style the context
-ctx.strokeStyle = colors[colorIndexExp];
-ctx.lineWidth = 1.5;
-ctxo.strokeStyle = colors[colorIndexExp];
-ctxo.lineWidth = 1.5;
+/**
+ * Collection of rectangles defining user generated regions
+ */
+var rectangles = [];
 
-// calculate where the canvas is on the window
-// (used to help calculate mouseX/mouseY)
-var $canvas = $("#canvas");
-var canvasOffset = $canvas.offset();
-var offsetX = canvasOffset.left;
-var offsetY = canvasOffset.top;
-var scrollX = $canvas.scrollLeft();
-var scrollY = $canvas.scrollTop();
+// DOM elements
+const $screenshot = $('#screenshot');
+const $draw = $('#draw');
+const $marquee = $('#marquee');
+const $boxes = $('#boxes');
 
-// this flage is true when the user is dragging the mouse
-var isDown = false;
+// Temp variables
+let startX = 0;
+let startY = 0;
+const marqueeRect = {
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0,
+};
 
-// these vars will hold the starting mouse position
-var startX;
-var startY;
+$marquee.classList.add('hide');
+$screenshot.addEventListener('pointerdown', startDrag);
 
-var prevStartX = 0;
-var prevStartY = 0;
-
-var prevWidth  = 0;
-var prevHeight = 0;
-
-function handleMouseDown(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // save the starting x/y of the rectangle
-    startX = parseInt(e.clientX - offsetX);
-    startY = parseInt(e.clientY - offsetY);
-
-    // set a flag indicating the drag has begun
-    isDown = true;
-}
-
-function handleMouseUp(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // the drag is over, clear the dragging flag
-    isDown = false;
-    ctxo.strokeRect(prevStartX, prevStartY, prevWidth, prevHeight);
-    colorIndexExp += 1;
-    ctx.strokeStyle = colors[colorIndexExp];
-    ctxo.strokeStyle = colors[colorIndexExp];
-}
-
-function handleMouseOut(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // the drag is over, clear the dragging flag
-    isDown = false;
-}
-
-function handleMouseMove(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // if we're not dragging, just return
-    if (!isDown) {
-        return;
+function startDrag(ev) {
+  // middle button delete rect
+  if (ev.button === 1) {
+    const rect = hitTest(ev.layerX, ev.layerY);
+    if (rect) {
+      rectangles.splice(rectangles.indexOf(rect), 1);
+      redraw();
     }
-
-    // get the current mouse position
-    mouseX = parseInt(e.clientX - offsetX);
-    mouseY = parseInt(e.clientY - offsetY);
-
-    // Put your mousemove stuff here
-
-
-
-    // calculate the rectangle width/height based
-    // on starting vs current mouse position
-    var width = mouseX - startX;
-    var height = mouseY - startY;
-
-    // clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // draw a new rect from the start position
-    // to the current mouse position
-
-    ctx.strokeRect(startX, startY, width, height);
-
-    prevStartX = startX;
-    prevStartY = startY;
-
-    prevWidth  = width;
-    prevHeight = height;
+    return;
+  }
+  window.addEventListener('pointerup', stopDrag);
+  $screenshot.addEventListener('pointermove', moveDrag);
+  $marquee.classList.remove('hide');
+  startX = ev.layerX;
+  startY = ev.layerY;
+  drawRect($marquee, startX, startY, 0, 0);
 }
 
-// listen for mouse events
-$("#canvas").mousedown(function (e) {
-    handleMouseDown(e);
-});
-$("#canvas").mousemove(function (e) {
-    handleMouseMove(e);
-});
-$("#canvas").mouseup(function (e) {
-    handleMouseUp(e);
-    removeHidden("label" + counter);
+function stopDrag(ev) {
+  $marquee.classList.add('hide');
+  window.removeEventListener('pointerup', stopDrag);
+  $screenshot.removeEventListener('pointermove', moveDrag);
+  if (ev.target === $screenshot && marqueeRect.width && marqueeRect.height) {
+    rectangles.push(Object.assign({}, marqueeRect));
+    redraw();
+  }
+  removeHidden("label" + counter);
     counter += 1;
-});
+}
 
-$("#canvas").mouseout(function (e) {
-    handleMouseOut(e);
-});
+function moveDrag(ev) {
+  let x = ev.layerX;
+  let y = ev.layerY;
+  let width = startX - x;
+  let height = startY - y;
+  if (width < 0) {
+    width *= -1;
+    x -= width;
+  }
+  if (height < 0) {
+    height *= -1;
+    y -= height;
+  }
+  Object.assign(marqueeRect, { x, y, width, height });
+  drawRect($marquee, marqueeRect);
+}
 
-// ----------------------------------------------------------------------
+function hitTest(x, y) {
+  return rectangles.find(rect => (
+    x >= rect.x &&
+    y >= rect.y &&
+    x <= rect.x + rect.width &&
+    y <= rect.y + rect.height
+  ));
+}
+
+function redraw() {
+  boxes.innerHTML = '';
+  var colorCounter = 0;
+  rectangles.forEach((data) => {
+    var newRect = drawRect(document.createElementNS("http://www.w3.org/2000/svg", 'rect'), data);
+    newRect.style.stroke = colors[colorCounter];
+    boxes.appendChild(newRect);
+    colorCounter += 1;
+  });
+}
+
+function drawRect(rect, data) {
+  const { x, y, width, height } = data;
+  rect.setAttributeNS(null, 'width', width);
+  rect.setAttributeNS(null, 'height', height);
+  rect.setAttributeNS(null, 'x', x);
+  rect.setAttributeNS(null, 'y', y);
+  return rect;
+}
 
 function clearCanvas() {
   // clear the canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.beginPath();
+  rectangles = [];
+  redraw();
 };
+
+// ----------------------------------------------------------------------
+
+
 
 function removeHidden(id) {
   var div = document.getElementById(id);
@@ -194,4 +175,8 @@ $(".box").mouseover(highlightBox);
 $(".box").mouseout(dehighlightBox);
 
 $("#hidden0").prop("disabled", true);
+
+// ----------------------------------------------------------------------
+
+
 

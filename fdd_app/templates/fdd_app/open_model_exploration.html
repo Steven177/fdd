@@ -10,17 +10,12 @@
     {% load index %}
     {% load to_int %}
     <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
-    <script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
   <! -- NAVBAR -->
-  <nav class="navbar bg-light">
+  <nav class="navbar bg-light padding20px">
     <h2>XploreAI</h2>
     <div class="dropdown">
       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -35,7 +30,6 @@
 
   <div class="container">
     <h1>&#128171 Guided Failure Exploration</h1>
-
     <h2>Upload your image</h2>
     <h3>See how the model behaves on your data probes.</h3>
     <! -- IMAGE UPLOAD -->
@@ -45,21 +39,25 @@
           <button type="submit" class="btn btn-primary">Upload</button>
         </form>
 
-    <! -- LEFT -->
+
     <div class="row justify-content-start">
       {% if sample.image %}
+
+      <! -- LEFT -->
       <div id="" class="col-6">
         <h2>User Expectation</h2>
         <h3>What does your user expect?</h3>
         <! -- canvas -->
-        <div id = "canvasWrapper">
-         <canvas id="overlay" width={{sample.image.width}}  height={{sample.image.height}}></canvas>
-         <canvas id="canvas" width={{sample.image.width}}  height={{sample.image.height}}></canvas>
+        <div class="position-relative" style="width: {{sample.image.width}}px; height: {{sample.image.height}}px">
+          <img class="rounded" width="{{sample.image.width}}" height="{{sample.image.height}}" src="{{sample.image.url}}" id="screenshot" draggable="false">
+          <svg width="{{sample.image.width}}" height="{{sample.image.height}}" viewBox="0 0 {{sample.image.width}} {{sample.image.height}}" id="draw" xmlns="http://www.w3.org/2000/svg">
+          <rect id="marquee" x="0" y="0" width="{{sample.image.width}}" height="{{sample.image.height}}" />
+          <g id="boxes"></g>
+          </svg>
         </div>
-        <! -- image -->
-        <img src="{{sample.image.url}}" class="img rounded">
 
         <! -- labels -->
+        <div>
         <form action="javascript:void(0);">
           <div id="label0" class="d-none" style="color: {{ colors.0 }}">
             <i class="fa-solid fa-square"></i>
@@ -111,10 +109,16 @@
             <label for="fname" class="form-label">Label me: </label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
-          <button id="b1" class="btn btn-primary" onclick="javascript:showDiv('hidden1')"> Save </button>
-          <button class="btn btn-secondary" onclick="javascript:clearCanvas()">Redraw</button>
+
+          <div class="margin-top-bottom-20px">
+            <button id="b1" class="btn btn-primary" onclick="javascript:showDiv('hidden1')"> Save </button>
+            <button class="btn btn-secondary" onclick="javascript:clearCanvas()">Restart</button>
+          </div>
          </form>
+        </div>
+        <! -- end labels -->
       </div>
+      <! -- END LEFT -->
       {% endif %}
 
       <! -- RIGHT -->
@@ -125,7 +129,7 @@
         <div class="position-relative">
           <svg class="position-absolute" width="{{sample.image.width}}" height="{{sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
           {% for object in model_prediction %}
-             <rect id="{{ forloop.counter0 }}" class="box normalBox" x={{object.box.xmin}} y={{object.box.ymin}} width={{object.box.xmax|sub:object.box.xmin}} height={{object.box.ymax|sub:object.box.ymin}} style="stroke:{{ colors|index:forloop.counter0 }};fill-opacity:0"/>
+             <rect id="{{ forloop.counter0 }}" class="normalBox" x={{object.box.xmin}} y={{object.box.ymin}} width={{object.box.xmax|sub:object.box.xmin}} height={{object.box.ymax|sub:object.box.ymin}} style="stroke:{{ colors|index:forloop.counter0 }};fill-opacity:0"/>
             </rect>
           {% endfor %}
           </svg>
@@ -134,18 +138,113 @@
 
         {% for object in model_prediction%}
         <div id="{{ forloop.counter0|add:100 }}" class="pred">
-          <div class="d-flex align-items-center" style="color:{{ colors|index:forloop.counter0 }}">
-            <i class="fa-solid fa-square"></i>
+          <i class="fa-solid fa-square" style="color:{{ colors|index:forloop.counter0 }}"></i>
+          <div class="d-flex justify-content-between align-items-center border-bottom">
+            <p> {{ object.label|title}} </p>
+            <p> {{ object.score | floatformat:3}} </p>
           </div>
-          <p class="border">{{ object.label|title}} with certainty {{ object.score | floatformat:3}}</p>
         </div>
         {% endfor %}
-     </div>
-  </div>
+        <button class="btn btn-primary">View Explanation</button>
 
-  <! -- bbox -->
-  <script src="{% static 'fdd_app/js/bbox.js' %}">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
-  </script>
+      </div>
+       <! -- END RIGHT -->
+
+
+     <! -- EXPLANATION -->
+     <div class="">
+      <h1>Explanation</h1>
+      <p>Heatmap or shap values</p>
+     </div>
+
+     <! -- FAILURE CLASSIFICATION -->
+
+
+
+     <! -- FAILURE MODE -->
+      <div>
+        <h1>Failure Mode</h1>
+        <h2>Let's drill down to what kind of failure we are dealing with.</h2>
+
+        <! -- CLASS TABLE -->
+        <div id="page_container">
+          <div id="accordion_search_bar_container">
+              <input type="search" id="accordion_search_bar" placeholder="Search" />
+          </div>
+
+          <div class="accordion" id="accordionPanelsStayOpenExample">
+            <div class="accordion-item" id="collapseOne_container">
+              <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                  Person
+                </button>
+              </h2>
+              <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+                <div class="accordion-body">
+                 Person
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item" id="collapseTwo_container">
+              <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                  Vehicle
+                </button>
+              </h2>
+              <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+                <div class="accordion-body">
+                  <p>Bicycle</p>
+                  <p>Car</p>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item" id="collapseThree_container">
+              <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                  Traffic
+                </button>
+              </h2>
+              <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+                <div class="accordion-body">
+                  <p>Stop sign</p>
+                  <p>Something</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <! -- END CLASS TABLE -->
+      </div>
+      <! -- Failure MODE-->
+
+
+
+
+      <! -- FAILURE EFFECTS -->
+      <div>
+        <h1>Failure Effects</h1>
+        <h2>Let's assess what the effects of this failure are on our user.</h2>
+
+        <p>Classification</p>
+        <p>Severity</p>
+      </div>
+      <! -- END FAILURE EFFECTS -->
+
+      <! -- FAILURE RECOVERY -->
+      <div>
+        <h1>Failure Recovery</h1>
+        <h2>Based on the given information we selected these recoveries. Select all that could work.</h2>
+      </div>
+      <! -- END FAILURE RECOVERY -->
+
+  </div>
 </body>
 </html>
+
+<! -- external -->
+    <script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"> </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <! -- mine -->
+    <script src="{% static 'fdd_app/js/bbox.js' %}"></script>
+    <script src="{% static 'fdd_app/js/table.js' %}"></script>
