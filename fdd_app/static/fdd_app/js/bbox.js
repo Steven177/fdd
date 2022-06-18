@@ -106,11 +106,16 @@ function clearCanvas() {
   // clear the canvas
   rectangles = [];
   redraw();
+  labels = document.querySelectorAll(".label");
+  for (let i=0; i<labels.length; i++) {
+    label = labels[i];
+    console.log(label)
+    label.classList.add("d-none");
+  }
+  counter = 0;
 };
 
 // ----------------------------------------------------------------------
-
-
 
 function removeHidden(id) {
   var div = document.getElementById(id);
@@ -124,7 +129,7 @@ function showDiv(id) {
 
 function revealHidden(id) {
   var div = document.getElementById(id);
-  div.classList.remove("v-hidden");
+  div.classList.remove("d-none");
 }
 
 function highlightBox(e) {
