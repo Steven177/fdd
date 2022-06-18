@@ -105,4 +105,13 @@
     display: block;
 }
 
+/* CAROUSSEL */
+.min-height {
+  height:100px;
+  width: auto;
+}
+
+.darkbackground {
+  background-color: rgba(0, 0, 0, 0.7);;
+}
 

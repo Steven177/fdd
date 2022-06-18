@@ -30,20 +30,107 @@
 
   <div class="container">
     <h1>&#128171 Guided Failure Exploration</h1>
-    <h2>Upload your image</h2>
-    <h3>See how the model behaves on your data probes.</h3>
-    <! -- IMAGE UPLOAD -->
+
+    <! -- ROW-->
+    <div class="row justify-content-start">
+      <! -- IMAGE UPLOAD -->
+      <div class="col-4">
+        <h2>Upload your image</h2>
+        <h3>See how the model behaves on your data probes.</h3>
         <form action="." method = "post" enctype="multipart/form-data" class="form-control form-label">
           {% csrf_token %}
           {{ form.as_p }}
           <button type="submit" class="btn btn-primary">Upload</button>
         </form>
+      </div>
+      <! -- LIMITATIONS -->
+      <div id="" class="col-8">
+        <h2>Limitations</h2>
+        <h3>Challenge the model with common failure sources. </h3>
 
+        <! -- CAROUSEL ../../../media/limitations/false_observation.png -->
+        <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="false">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="3" aria-label="Slide 4"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="4" aria-label="Slide 5"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="5" aria-label="Slide 6"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="6" aria-label="Slide 7"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="7" aria-label="Slide 8"></button>
+          </div>
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="../../../media/limitations/blur.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h2>Blur</h2>
+                <p>Blurry images or rapid movement between frames due to motion can lead to errors. </p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/limitations/clutter.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h2>Clutter</h2>
+                <p>Computer vision systems tend to struggle with cluttered images.</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/limitations/lighting.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h2>Lighting</h2>
+                <p>Poor lighting or high contrast illumination (e.g. nighttime) may lead to wrong predictions.</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/limitations/object_size.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h2>Object size</h2>
+                <p>If objects become very small, the vision system may struggle to detect it. </p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/limitations/occlusion.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h2>Occlusions</h2>
+                <p>Partially occluded objects may not be detected.</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/limitations/resolution.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h2>Resolution</h2>
+                <p>Images of low resolution could lead to errors.</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/limitations/similar.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h2>Similar objects</h2>
+                <p>Objects that are similar in shape can be difficult to distinguish for the computer vision system.</p>
+              </div>
+            </div>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+        <! -- END CAROUSEL -->
+      </div>
+      <! -- END LIMITATIONS -->
+    </div>
+    <! -- END ROW-->
 
+    <! -- ROW-->
     <div class="row justify-content-start">
       {% if sample.image %}
 
-      <! -- LEFT -->
+      <! -- EXPECTATION -->
       <div id="" class="col-6">
         <h2>User Expectation</h2>
         <h3>What does your user expect?</h3>
@@ -61,52 +148,52 @@
         <form action="javascript:void(0);">
           <div id="label0" class="d-none" style="color: {{ colors.0 }}">
             <i class="fa-solid fa-square"></i>
-            <label for="fname" class="form-label" >Label me: </label>
+            <label for="fname" class="form-label" ></label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
           <div id="label1" class="d-none" style="color:{{ colors.1 }}">
             <i class="fa-solid fa-square"></i>
-            <label for="fname" class="form-label">Label me: </label>
+            <label for="fname" class="form-label"></label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
           <div id="label2" class="d-none" style="color:{{ colors.2 }}">
             <i class="fa-solid fa-square"></i>
-            <label for="fname" class="form-label">Label me: </label>
+            <label for="fname" class="form-label"></label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
           <div id="label3" class="d-none" style="color:{{ colors.3 }}">
             <i class="fa-solid fa-square"></i>
-            <label for="fname" class="form-label">Label me: </label>
+            <label for="fname" class="form-label"></label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
           <div id="label4" class="d-none" style="color:{{ colors.4 }}">
             <i class="fa-solid fa-square"></i>
-            <label for="fname" class="form-label" >Label me:</label>
+            <label for="fname" class="form-label" ></label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
           <div id="label5" class="d-none" style="color:{{ colors.5 }}">
             <i class="fa-solid fa-square"></i>
-            <label for="fname" class="form-label">Label me: </label>
+            <label for="fname" class="form-label"></label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
           <div id="label6" class="d-none" style="color:{{ colors.6 }}">
             <i class="fa-solid fa-square"></i>
-            <label for="fname" class="form-label">Label me: </label>
+            <label for="fname" class="form-label"></label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
           <div id="label7" class="d-none" style="color:{{ colors.7 }}">
             <i class="fa-solid fa-square"></i>
-            <label for="fname" class="form-label">Label me: </label>
+            <label for="fname" class="form-label"></label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
           <div id="label8" class="d-none" style="color:{{ colors.8 }}">
             <i class="fa-solid fa-square"></i>
-            <label for="fname" class="form-label">Label me: </label>
+            <label for="fname" class="form-label"></label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
           <div id="label9" class="d-none" style="color:{{ colors.9 }}">
             <i class="fa-solid fa-square"></i>
-            <label for="fname" class="form-label">Label me: </label>
+            <label for="fname" class="form-label"></label>
             <input type="text" id="fname" name="fname" class="form-control">
           </div>
 
@@ -118,10 +205,10 @@
         </div>
         <! -- end labels -->
       </div>
-      <! -- END LEFT -->
+      <! -- END EXPECTATION -->
       {% endif %}
 
-      <! -- RIGHT -->
+      <! -- PREDICTION -->
       <div id="hidden1" class="col-6">
         <h2>Model Prediction</h2>
         <h3>This is what the model predicts!</h3>
@@ -146,98 +233,108 @@
         </div>
         {% endfor %}
         <button class="btn btn-primary">View Explanation</button>
-
       </div>
-       <! -- END RIGHT -->
+       <! -- END PREDICTION -->
+    </div>
+    <! -- END ROW-->
 
-
+    <! -- ROW-->
+    <div class="row justify-content-start">
      <! -- EXPLANATION -->
-     <div class="">
-      <h1>Explanation</h1>
+     <div class="col-12">
+      <h2>Explanation</h2>
+      <h3>Now you can ponder.</h3>
       <p>Heatmap or shap values</p>
      </div>
+    </div>
+    <! -- END ROW-->
 
-     <! -- FAILURE CLASSIFICATION -->
-
-
-
+    <! -- ROW-->
+    <div class="row justify-content-start">
      <! -- FAILURE MODE -->
-      <div>
-        <h1>Failure Mode</h1>
-        <h2>Let's drill down to what kind of failure we are dealing with.</h2>
+      <h2>Failure Mode</h2>
+      <h3>Let's drill down to what kind of failure we are dealing with.</h3>
+      <div class="col-6">
 
-        <! -- CLASS TABLE -->
-        <div id="page_container">
-          <div id="accordion_search_bar_container">
-              <input type="search" id="accordion_search_bar" placeholder="Search" />
+      <! -- CLASS TABLE -->
+      <div id="page_container">
+        <div id="accordion_search_bar_container">
+            <input type="search" id="accordion_search_bar" placeholder="Search" />
+        </div>
+
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+          <div class="accordion-item" id="collapseOne_container">
+            <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                Person
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+              <div class="accordion-body">
+               Person
+              </div>
+            </div>
           </div>
-
-          <div class="accordion" id="accordionPanelsStayOpenExample">
-            <div class="accordion-item" id="collapseOne_container">
-              <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
-                  Person
-                </button>
-              </h2>
-              <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
-                <div class="accordion-body">
-                 Person
-                </div>
+          <div class="accordion-item" id="collapseTwo_container">
+            <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                Vehicle
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+              <div class="accordion-body">
+                <p>Bicycle</p>
+                <p>Car</p>
               </div>
             </div>
-            <div class="accordion-item" id="collapseTwo_container">
-              <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
-                  Vehicle
-                </button>
-              </h2>
-              <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
-                <div class="accordion-body">
-                  <p>Bicycle</p>
-                  <p>Car</p>
-                </div>
-              </div>
-            </div>
-            <div class="accordion-item" id="collapseThree_container">
-              <h2 class="accordion-header" id="panelsStayOpen-headingThree">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
-                  Traffic
-                </button>
-              </h2>
-              <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
-                <div class="accordion-body">
-                  <p>Stop sign</p>
-                  <p>Something</p>
-                </div>
+          </div>
+          <div class="accordion-item" id="collapseThree_container">
+            <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                Traffic
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+              <div class="accordion-body">
+                <p>Stop sign</p>
+                <p>Something</p>
               </div>
             </div>
           </div>
         </div>
-        <! -- END CLASS TABLE -->
       </div>
-      <! -- Failure MODE-->
-
-
-
-
-      <! -- FAILURE EFFECTS -->
-      <div>
-        <h1>Failure Effects</h1>
-        <h2>Let's assess what the effects of this failure are on our user.</h2>
-
-        <p>Classification</p>
-        <p>Severity</p>
+      <! -- END CLASS TABLE -->
       </div>
+    </div>
+    <! -- END ROW-->
+
+    <! -- ROW-->
+    <div class="row justify-content-start">
+     <! -- FAILURE EFFECTS  -->
+     <div class="col-12">
+      <h2>Failure Effects</h2>
+      <h3>Let's assess.</h3>
+      <p>Classification</p>
+      <p>Severity</p>
+     </div>
       <! -- END FAILURE EFFECTS -->
+    </div>
+    <! -- END ROW-->
 
-      <! -- FAILURE RECOVERY -->
-      <div>
-        <h1>Failure Recovery</h1>
-        <h2>Based on the given information we selected these recoveries. Select all that could work.</h2>
-      </div>
+    <! -- ROW-->
+    <div class="row justify-content-start">
+     <! -- FAILURE RECOVERY  -->
+     <div class="col-12">
+      <h2>Failure Recovery</h2>
+      <h3>Let's choose.</h3>
+      <p>Classification</p>
+      <p>Severity</p>
+     </div>
       <! -- END FAILURE RECOVERY -->
+    </div>
+    <! -- END ROW-->
 
-  </div>
+  </div> <! -- CONTAINER-->
 </body>
 </html>
 
