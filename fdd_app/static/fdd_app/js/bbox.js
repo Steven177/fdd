@@ -109,7 +109,6 @@ function clearCanvas() {
   labels = document.querySelectorAll(".label");
   for (let i=0; i<labels.length; i++) {
     label = labels[i];
-    console.log(label)
     label.classList.add("d-none");
   }
   counter = 0;
@@ -120,17 +119,17 @@ function clearCanvas() {
 function removeHidden(id) {
   var div = document.getElementById(id);
   div.classList.remove("d-none");
-}
-
-function showDiv(id) {
-  var div = document.getElementById(id);
-  div.style.display = "block";
 };
 
 function revealHidden(id) {
   var div = document.getElementById(id);
   div.classList.remove("d-none");
-}
+};
+
+function showDiv(id) {
+  var div = document.getElementById(id);
+  div.style.display = "block";
+};
 
 function highlightBox(e) {
   // Get elements
@@ -176,10 +175,12 @@ function dehighlightBox(e) {
   }
 };
 
-$(".box").mouseover(highlightBox);
-$(".box").mouseout(dehighlightBox);
+var bboxes = document.querySelectorAll('.box');
+for (let i = 0; i < bboxes.length; i++) {
+  bboxes[i].addEventListener("mouseover", highlightBox);
+  bboxes[i].addEventListener("mouseout", dehighlightBox);
+}
 
-$("#hidden0").prop("disabled", true);
 
 // ----------------------------------------------------------------------
 

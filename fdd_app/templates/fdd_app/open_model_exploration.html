@@ -216,7 +216,7 @@
         <div class="position-relative">
           <svg class="position-absolute" width="{{sample.image.width}}" height="{{sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
           {% for object in model_prediction %}
-             <rect id="{{ forloop.counter0 }}" class="normalBox" x={{object.box.xmin}} y={{object.box.ymin}} width={{object.box.xmax|sub:object.box.xmin}} height={{object.box.ymax|sub:object.box.ymin}} style="stroke:{{ colors|index:forloop.counter0 }};fill-opacity:0"/>
+             <rect id="{{ forloop.counter0 }}" class="box normalBox" x={{object.box.xmin}} y={{object.box.ymin}} width={{object.box.xmax|sub:object.box.xmin}} height={{object.box.ymax|sub:object.box.ymin}} style="stroke:{{ colors|index:forloop.counter0 }};fill-opacity:0"/>
             </rect>
           {% endfor %}
           </svg>
@@ -327,8 +327,7 @@
      <div class="col-12">
       <h2>Failure Recovery</h2>
       <h3>Let's choose.</h3>
-      <p>Classification</p>
-      <p>Severity</p>
+      <p>Select out of pre-defined options. </p>
      </div>
       <! -- END FAILURE RECOVERY -->
     </div>
@@ -336,12 +335,13 @@
 
   </div> <! -- CONTAINER-->
 </body>
+<! -- external scripts -->
+<script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"> </script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<! -- mine -->
+<script src="{% static 'fdd_app/js/bbox.js' %}"></script>
+<script src="{% static 'fdd_app/js/table.js' %}"></script>
 </html>
 
-<! -- external -->
-    <script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"> </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <! -- mine -->
-    <script src="{% static 'fdd_app/js/bbox.js' %}"></script>
-    <script src="{% static 'fdd_app/js/table.js' %}"></script>
+

@@ -49,11 +49,6 @@
   display:  none;
 }
 
-.d-none {
-  transition-duration: 3s;
-  display:  none;
-}
-
 .thumbnail {
   max-height:  200px;
 }
