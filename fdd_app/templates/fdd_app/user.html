@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Open Model Exporation</title>
+    {% load static %}
+    {% load mathfilters %}
+    {% load index %}
+    {% load to_int %}
+    <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <! -- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;700&display=swap" rel="stylesheet">
+    <! -- external scripts -->
+    <script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"> </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body class="font">
+  <! -- NAVBAR -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+           <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/">&#128171 Failure Exploration</a>
+            <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">&#128218 AI Failure Book</a>
+        </div>
+      </div>
+
+      <div class="margin-right">
+        <h4 class="white">&#129489 Use Case</h4>
+        <div class="dropdown whitebackground border-radius">
+          <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            Tourist persona
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" href="#">xxx</a></li>
+            <li><a class="dropdown-item" href="#">xxx</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="margin-right">
+        <h4 class="white">&#128065 AI Model</h4>
+        <div class="dropdown whitebackground border-radius">
+        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+          DETR: Object detection
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li><a class="dropdown-item" href="#">YOLO: Object detection</a></li>
+          <li><a class="dropdown-item" href="#">FasterRCNN: Object detection</a></li>
+        </ul>
+        </div>
+      </div>
+
+
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="border-bottom margin-top-large">&#128171 Failure Exploration: User</h1>
+
+    {% if write_expectation %}
+      <! -- ROW-->
+      <div class="row justify-content-start">
+        <! -- EXPECTATION -->
+        <div id="" class="col-6">
+          <h2 class="purple-color margin-top-large">User Expectation</h2>
+          <h3 class="font-size-15">Let's set expectations. </h3>
+          <div class="alert light-purple-background border-radius" role="alert">
+            &#128073 Put yourself into the shoes of your user... What would he or she expect for this image?
+          </div>
+          <! -- canvas -->
+          <div class="position-relative" style="width: {{sample.image.width}}px; height: {{sample.image.height}}px">
+            <img class="border-radius" width="{{sample.image.width}}" height="{{sample.image.height}}" src="{{sample.image.url}}" id="screenshot" draggable="false">
+            <svg width="{{sample.image.width}}" height="{{sample.image.height}}" viewBox="0 0 {{sample.image.width}} {{sample.image.height}}" id="draw" xmlns="http://www.w3.org/2000/svg">
+            <rect id="marquee" x="0" y="0" width="{{sample.image.width}}" height="{{sample.image.height}}" />
+            <g id="boxes"></g>
+            </svg>
+          </div>
+
+          <! -- labels -->
+          <div>
+          <form method="post">
+            {% csrf_token %}
+            <div id="label0" class="label d-none" style="color: {{ colors.0 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c0" name="class0" class="border-radius form-control">
+            </div>
+            <div id="label1" class="label d-none" style="color: {{ colors.1 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c1" name="class1" class="border-radius form-control">
+            </div>
+            <div id="label2" class="label d-none" style="color: {{ colors.2 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c2" name="class2" class="border-radius form-control">
+            </div>
+            <div id="label3" class="label d-none" style="color: {{ colors.3 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c3" name="class3" class="border-radius form-control">
+            </div>
+            <div id="label4" class="label d-none" style="color: {{ colors.4 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c4" name="class4" class="border-radius form-control">
+            </div>
+            <div id="label5" class="label d-none" style="color: {{ colors.5 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c5" name="class5" class="border-radius form-control">
+            </div>
+            <div id="label6" class="label d-none" style="color: {{ colors.6 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c6" name="class6" class="border-radius form-control">
+            </div>
+            <div id="label7" class="label d-none" style="color: {{ colors.7 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c7" name="class7" class="border-radius form-control">
+            </div>
+            <div id="label8" class="label d-none" style="color: {{ colors.8 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c8" name="class8" class="border-radius form-control">
+            </div>
+            <div id="label9" class="label d-none" style="color: {{ colors.9 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c9" name="class9" class="border-radius form-control">
+            </div>
+
+            <div class="d-flex">
+              <input id="b4" name="expectation_submit" type="submit" value="&#128076 Save" class="btn primary margin-top-small">
+            </div>
+            </div>
+          </form>
+          <div class="d-flex align-items-center">
+           <button id="b2" class="btn primary margin-right margin-top-small" onclick="javascript:saveBoxes()"> Review</button>
+           <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app/user">Start over</a> </button>
+          </div>
+          </div>
+          <! -- end labels -->
+        </div>
+        <! -- END EXPECTATION -->
+      </div>
+      <! -- END ROW -->
+    {% endif %}
+
+    {% if read_expectation %}
+      <! -- ROW -->
+      <div class="row justify-content-start">
+        <! -- EXPECTATION PREFILLED -->
+        <div id="" class="col-6">
+          <h2 class="purple-color margin-top-large">User Expectation</h2>
+          <h3 class="font-size-15">Let's set expectations. </h3>
+          <div class="alert light-purple-background border-radius" role="alert">
+            &#128079 Great! <br> This is what the user expects.
+          </div>
+          <! -- canvas -->
+          <div class="position-relative" style="width: {{sample.image.width}}px; height: {{sample.image.height}}px">
+            <img class="border-radius" width="{{sample.image.width}}" height="{{sample.image.height}}" src="{{sample.image.url}}" id="screenshot" draggable="false">
+            <svg width="{{sample.image.width}}" height="{{sample.image.height}}" viewBox="0 0 {{sample.image.width}} {{sample.image.height}}" id="draw" xmlns="http://www.w3.org/2000/svg">
+            <rect id="marquee" x="0" y="0" width="{{sample.image.width}}" height="{{sample.image.height}}" />
+            {% for exp in expectations %}
+              <g id="boxes"></g>
+              <rect class="bbox" x="{{exp.xmin}}" y="{{exp.ymin}}" width="{{exp.xmax|sub:exp.xmin}}" height="{{exp.ymax|sub:exp.ymin}}" style="stroke:{{ colors|index:forloop.counter0 }};" c/>
+            {% endfor %}
+            </svg>
+          </div>
+
+          <! -- labels -->
+          <div>
+          {% for exp in expectations %}
+            <div class="label">
+              <i class="fa-solid fa-square" style="color:{{ colors|index:forloop.counter0 }};"></i>
+              <p class="form-like-p">{{exp.label}}</p>
+            </div>
+          {% endfor %}
+
+            <div class="margin-top-bottom-20px">
+              <button id="b3" class="btn primary" onclick="javascript:showModelPrediction('hidden1')"> Reveal model prediction </button>
+            </div>
+          </div>
+          <! -- end labels -->
+        </div>
+        <! -- EXPECTATION PREFILLED -->
+
+        <! -- PREDICTION -->
+        <div id="hidden1" class="col-6">
+          <h2 class="purple-color margin-top-large">Model Prediction</h2>
+          <h3 class="font-size-15">Let's view the prediction of the model. </h3>
+          <div class="alert light-purple-background border-radius" role="alert">
+            &#128073 This is what the AI model predicts. Assess if the AI can live up to the standards of your user.
+          </div>
+          <! -- image -->
+          <div class="position-relative">
+            <svg class="position-absolute" width="{{sample.image.width}}" height="{{sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+            {% for pred in model_predictions %}
+               <rect id="{{ forloop.counter0 }}" class="box normalBox" x={{pred.xmin}} y={{pred.ymin}} width={{pred.xmax|sub:pred.xmin}} height={{pred.ymax|sub:pred.ymin}} style="stroke:{{ colors|index:forloop.counter0 }};fill-opacity:0"/>
+              </rect>
+            {% endfor %}
+            </svg>
+            <img src="{{sample.image.url}}" class="border-radius">
+          </div>
+
+          {% for pred in model_predictions %}
+          <div id="{{ forloop.counter0|add:100 }}" class="pred">
+            <i class="fa-solid fa-square" style="color:{{ colors|index:forloop.counter0 }}"></i>
+            <div class="d-flex justify-content-between align-items-center border-bottom">
+              <div class="d-flex justify-content-between">
+                <p> {{ pred.label|title}} </p>
+                <p class="margin-left"> {{ pred.score | mul:100 | floatformat:0 }} %  </p>
+              </div>
+
+              <button id="b5" class="btn secondary" onclick="loadExplanation('{{ forloop.counter0|add:200 }}')">Explanation </button>
+            </div>
+            <div id="{{ forloop.counter0|add:300 }}" class="d-none d-flex align-items-center">
+              <img class="fixed-height rounded" src="" alt="" id="{{ forloop.counter0|add:200 }}">
+              <p>Here we visualize the attention of the AI. This corresponds to visualizing which part of the image the AI focuses on when making a prediction. </p>
+            </div>
+          </div>
+          {% endfor %}
+          <button id="b6" class="btn primary" onclick=""> Start failure analysis  </button>
+        </div>
+        <! -- END PREDICTION -->
+      </div>
+      <! -- END ROW -->
+
+
+    <! --  ROW -->
+    <div id="hidden2" class="row justify-content-start d-none">
+        <! -- FAILURE ANALYSIS -->
+        <div class="col-6">
+          <h3>It's matching time!</h3>
+
+          {{matches}}
+          {% for match in matches%}
+            <p>{{match.expectation.label}} was matched to {{match.model_prediction.label}}</p>
+          {% endfor %}
+
+          <button class="btn primary margin-top-small">&#9889 Add failure</button>
+          <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app">&#129303 Continue exploring</a> </button>
+        </div>
+        <! -- END FAILURE ANALYSIS-->
+    </div>
+    <! -- END ROW -->
+
+    <! -- ROW-->
+    <div class="row justify-content-start">
+     <! -- DOMAIN -->
+      <h2 class="purple-color margin-top-large">Domain</h2>
+      <h3 class="font-size-15">Let's see if the problem lies within the capabilities of the model.</h3>
+
+      <div class="col-6">
+        <p>PLACEHOLDER hierarchical domain</p>
+      </div>
+      <div class="col-6">
+        <div class="alert light-purple-background border-radius" role="alert">
+          &#128073 The object that is causing the failure - Is it a class the model has been trained on? Use the table to find out.
+        </div>
+        <! -- failure form -->
+        <form action="/fdd_app/user" method="post">
+          {% csrf_token %}
+          <div class="d-flex align-items-center">
+            {{ failure_form.indistribution_error}}
+            <label class="margin-left" for="In-distribution error"><b>In-distribution problem:</b> Yes, the model has not been trained on this class. </label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.outofdistribution_error}}</div>
+            <label class="margin-left" for="Out-of-distribution error"><b>Out-of-distribution problem:</b> No, the model has not been trained on this class. </label>
+          </div>
+        <button class="btn primary margin-top-small">Next</button>
+      </div>
+      <! -- END DOMAIN -->
+    </div>
+    <! -- END ROW-->
+
+    <! -- ROW-->
+    <div class="row justify-content-start">
+     <! -- FAILURE MODE  -->
+      <h2 class="purple-color margin-top-large">Failure Mode</h2>
+      <h3 class="font-size-15">Let's categorize the failure.</h3>
+      <div class="col-4">
+
+        <! -- CAROUSEL  -->
+        <div id="carouselExampleCaptions1" class="carousel slide" data-bs-ride="false">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleCaptions1" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions1" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions1" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions1" data-bs-slide-to="3" aria-label="Slide 4"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions1" data-bs-slide-to="4" aria-label="Slide 5"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions1" data-bs-slide-to="5" aria-label="Slide 6"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions1" data-bs-slide-to="6" aria-label="Slide 7"></button>
+          </div>
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="../../../media/failure_pics/false_observation.png" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h3>False Observation</h3>
+                <p>Computer vision system generates output error. </p>
+                <span class="badge text-bg-light">Example</span>
+                <p>Object detector misclassifies a tennis rack as a baseball bat.</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/failure_pics/failing_to_observe.png" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h3>Failing to observe</h3>
+                <p>Computer vision system is unable to provide an output due to a limitation of the system.</p>
+                <span class="badge text-bg-light">Example</span>
+                <p>Object detector fails to detect any object for a given image. </p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/failure_pics/incomplete_information.png" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h3>Incomplete observation</h3>
+                <p>Computer vision system misses certain visual information.</p>
+                <span class="badge text-bg-light">Example</span>
+                <p>Object detector detects some objects correctly but misses at least one critical object. </p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/failure_pics/critical_quality_output_box.png" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h3>Critical quality of bounding boxes</h3>
+                <p>The output of the computer vision system bears intolerable uncertainty or quality issues. </p>
+                <span class="badge text-bg-light">Example</span>
+                <p>The detector's bounding boxes are imprecise. </p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/failure_pics/critical_quality_output_score.png" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h2>Critical quality of confidence score</h2>
+                <p>The output of the computer vision system bears intolerable uncertainty or quality issues.</p>
+                <span class="badge text-bg-light">Example</span>
+                <p>The uncertainty of a prediction is too high. </p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/failure_pics/violation.png" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h2>Violation</h2>
+                <p>Computer vision system’s output stands in conflict with ethical standards, rules, or regulations.</p>
+                <p>Example: The object detector classifies a person as a toilet.  </p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="../../../media/failure_pics/violation.png" class="d-block w-100 img-fluid min-height" alt="...">
+              <div class="carousel-caption d-none d-md-block darkbackground">
+                <h2>Context error</h2>
+                <p>System works as intended but the behavior of the system stands in conflict with the needs, goals or preferences of its user in a given context.</p>
+                <span class="badge text-bg-light">Example</span>
+                <p>Object detector detects a person but the user was interested in a person's clothing. </p>
+              </div>
+            </div>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions1" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions1" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+        <! -- END CAROUSEL -->
+      </div>
+      <div class="col-2">
+      </div>
+      <div class="col-6">
+        <div class="alert light-purple-background border-radius" role="alert">
+          &#128073 What kind of failure are we dealing with? Select all that apply for this image.
+        </div>
+        <! -- form -->
+        <div class="d-flex align-items-center">
+          <div>{{ failure_form.false_observation}}</div>
+          <label class="margin-left" for="false_observation">False observation</label>
+        </div>
+        <div class="d-flex align-items-center">
+          <div>{{ failure_form.failing_to_oberserve}}</div>
+          <label class="margin-left" for="">Failing to observe</label>
+        </div>
+        <div class="d-flex align-items-center">
+          <div>{{ failure_form.incomplete_observation}}</div>
+          <label class="margin-left" for="">Incomplete Observation</label>
+        </div>
+        <div class="d-flex align-items-center">
+          <div>{{ failure_form.critical_quality}}</div>
+          <label class="margin-left" for="">Critical quality</label>
+        </div>
+        <div class="d-flex align-items-center">
+          <div>{{ failure_form.violation}}</div>
+          <label class="margin-left" for="">Violation</label>
+        </div>
+        <div class="d-flex align-items-center">
+          <div>{{ failure_form.context_error}}</div>
+          <label class="margin-left" for="">Context error</label>
+        </div>
+        <div class="d-flex align-items-center">
+          <label class="form-label margin-right" for="">Other</label>
+          <div>{{ failure_form.other_mode}}</div>
+        </div>
+        <button class="btn primary margin-top-small">Next</button>
+        <! -- endform -->
+      </div>
+      <! -- END FAILURE MODE -->
+    </div>
+    <! -- END ROW-->
+
+    <! -- ROW-->
+    <div class="row justify-content-start">
+     <! -- FAILURE EFFECTS  -->
+      <h2 class="purple-color margin-top-large">Failure Effects</h2>
+     <div class="col-6">
+      <h3 class="font-size-15">Let's assess the effects of this failure on the user. </h3>
+
+      <! -- Accordion  -->
+      <div class="accordion" id="accordionPanelsStayOpenExample">
+          <div class="accordion-item" id="collapseOne_container">
+            <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                <h5>&#128583 Individual Level</h5>
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+              <div class="accordion-body">
+               <p>Physical harm</p>
+               <p>Psychological or emotional harm</p>
+               <p>Financial damage</p>
+               <p>Reputational damage</p>
+               <p>Personal privacy violation</p>
+               <p>Annoyance / poor user experience</p>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item" id="collapseTwo_container">
+            <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                &#128101 Community Level
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+              <div class="accordion-body">
+                <p>Discrimination (against race, ethnicity, religion, gender, sexual orientation)</p>
+                <p>Exclusion or denied access</p>
+                <p>Harmful content</p>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item" id="collapseThree_container">
+            <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                &#127760 Society Level
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+              <div class="accordion-body">
+                <p>Public misinformation</p>
+                <p>Political conflicts</p>
+                <p>Legal breech</p>
+                <p>Economic damage</p>
+                <p>Public privacy breech</p>
+              </div>
+            </div>
+          </div>
+          </div>
+          <! -- End Accordion  -->
+        </div>
+        <div class="col-6">
+          <div class="alert light-purple-background border-radius" role="alert">
+            &#128073 In what way(s) is this failure harming the user?
+          </div>
+           <! -- form -->
+          <p class="margin-top-small">&#128583 Individual Level</p>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.physical_harm}}</div>
+            <label class="margin-left" for="Physical harm">Physical harm</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.psychological_harm}}</div>
+            <label class="margin-left" for="Psychological harm">Psychological harm</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.financial_damage}}</div>
+            <label class="margin-left" for="Financial damage">Financial damage</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.reputational_damage}}</div>
+            <label class="margin-left" for="Reputational damage">Reputational damage</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.personal_privacy_violation}}</div>
+            <label class="margin-left" for="Personal privacy violation">Personal privacy violation</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.annoyance}}</div>
+            <label class="margin-left" for="Annoyance">Annoyance</label>
+          </div>
+          <p class="margin-top-small"> &#128101 Community Level </p>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.discrimination}}</div>
+            <label class="margin-left" for="Discrimination">Discrimination</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.exclusion}}</div>
+            <label class="margin-left" for="Exclusion">Exclusion</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.harmful_content}}</div>
+            <label class="margin-left" for="Harmful content">Harmful content</label>
+          </div>
+          <p class="margin-top-small"> &#127760 Society Level </p>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.public_misinformation}}</div>
+            <label class="margin-left" for="Public misinformation">Public misinformation</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.political_conflict}}</div>
+            <label class="margin-left" for="Political conflict">Political conflict</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.legal_breech}}</div>
+            <label class="margin-left" for="Legal breech">Legal breech</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.economic_damage}}</div>
+            <label class="margin-left" for="Economic damage">Economic damage</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.public_privacy_breech}}</div>
+            <label class="margin-left" for="Public privacy breech">Public privacy breech</label>
+          </div>
+
+          <! -- end form -->
+          <div class="alert light-purple-background border-radius margin-top-small" role="alert">
+          &#128073 How severe would you rate the effects of this failure from an user's perspective?
+        </div>
+
+          <p>Failure severity</p>
+          <div class="slidecontainer">
+            <input type="range" min="1" max="10" value="5" class="slider" id="myRange">
+          </div>
+
+          <div class="range-wrap">
+            <div class="range-value" id="rangeV"></div>
+            <input id="range" type="range" min="0" max="10" value="5" step="1">
+          </div>
+          <div>{{ failure_form.failure_severity}}</div>
+          <input name="failure_submit" type="submit" value="&#128218 Save to AI failure book" class="btn primary margin-top-small">
+        </div>
+      <! -- END FAILURE EFFECTS -->
+    </div>
+    <! -- END ROW-->
+
+    {% endif %}
+
+  </div> <! -- Container -->
+
+<! -- Bootstrap-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+  </script>
+
+</body>
+<! -- internal scripts -->
+<script src="{% static 'fdd_app/js/bbox.js' %}"></script>
+<script src="{% static 'fdd_app/js/table.js' %}"></script>
+<script src="{% static 'fdd_app/js/slider.js' %}"></script>
+<script src="{% static 'fdd_app/js/explanation.js' %}"></script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 var counter = 0;
 var colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"];
-const $ = document.querySelector.bind(document);
+var dollar = document.querySelector.bind(document);
 
 /**
  * Collection of rectangles defining user generated regions
@@ -8,10 +8,10 @@ const $ = document.querySelector.bind(document);
 var rectangles = [];
 
 // DOM elements
-const $screenshot = $('#screenshot');
-const $draw = $('#draw');
-const $marquee = $('#marquee');
-const $boxes = $('#boxes');
+const $screenshot = dollar('#screenshot');
+const $draw = dollar('#draw');
+const $marquee = dollar('#marquee');
+const $boxes = dollar('#boxes');
 
 // Temp variables
 let startX = 0;
@@ -53,7 +53,7 @@ function stopDrag(ev) {
     redraw();
   }
   removeHidden("label" + counter);
-    counter += 1;
+  counter += 1;
 }
 
 function moveDrag(ev) {
@@ -114,7 +114,9 @@ function clearCanvas() {
   counter = 0;
 };
 
+
 // ----------------------------------------------------------------------
+
 
 function removeHidden(id) {
   var div = document.getElementById(id);
@@ -126,9 +128,16 @@ function revealHidden(id) {
   div.classList.remove("d-none");
 };
 
-function showDiv(id) {
+function showModelPrediction(id) {
+  // model prediction
   var div = document.getElementById(id);
   div.style.display = "block";
+
+  // hide button
+  document.getElementById("b3").disabled = true;
+
+  // Show failure section
+  revealHidden("hidden2");
 };
 
 function highlightBox(e) {
@@ -179,10 +188,24 @@ var bboxes = document.querySelectorAll('.box');
 for (let i = 0; i < bboxes.length; i++) {
   bboxes[i].addEventListener("mouseover", highlightBox);
   bboxes[i].addEventListener("mouseout", dehighlightBox);
-}
+};
 
 
 // ----------------------------------------------------------------------
 
+// https://stackoverflow.com/questions/25862798/how-to-send-the-javascript-list-of-dictionaries-object-to-django-ajax
+function saveBoxes() {
 
+  var expBoxes = JSON.stringify(rectangles);
+  console.log(expBoxes);
+  $.ajax({
+    "url": "/fdd_app/user",
+    "type": "POST",
+    "data": {'expBoxes[]': expBoxes},
+ });
 
+  //var b2 = document.getElementById("b2");
+  //b2.classList.add("d-none");
+  //var b4 document.getElementById("b4");
+  //b4.classList.remove("d-none");
+}

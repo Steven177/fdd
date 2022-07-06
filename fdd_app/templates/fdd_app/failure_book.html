@@ -9,136 +9,164 @@
     {% load index %}
     <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <! -- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+
+<body class="font">
   <! -- NAVBAR -->
-  <nav class="navbar bg-light">
-    <h2>XploreAI</h2>
-    <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-        DETR: Object detection
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item" href="#">YOLO: Object detection</a></li>
-        <li><a class="dropdown-item" href="#">FasterRCNN: Object detection</a></li>
-      </ul>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+           <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/">&#128171 Failure Exploration</a>
+            <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">&#128218 AI Failure Book</a>
+        </div>
+      </div>
+      <div class="dropdown whitebackground border-radius">
+        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fa-solid fa-microchip"></i>
+          DETR: Object detection
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li><a class="dropdown-item" href="#">YOLO: Object detection</a></li>
+          <li><a class="dropdown-item" href="#">FasterRCNN: Object detection</a></li>
+        </ul>
+      </div>
     </div>
   </nav>
 
-   <! -- NAVIGATION -->
-  <nav aria-label="...">
-    <ul class="pagination">
-      <li class="page-item">
-        <a class="page-link" href="open_model_exploration" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-      <li class="page-item"><a class="page-link" href="failing_to_observe">Capabilities & Limitations</a></li>
-      <li class="page-item" aria-current="page">
-        <a class="page-link" href="false_observation">In-distribution Errors</a>
-      </li>
-      <li class="page-item"><a class="page-link" href="violation">Violations</a></li>
-      <li class="page-item"><a class="page-link" href="open_model_exploration">Open Model Exploration</a></li>
-      <li class="page-item active"><a class="page-link" href="failure_book">AI Failure Book</a></li>
-      <li class="page-item">
-        <a class="page-link" href="failing_to_observe" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
+  <div class="container">
+    <h1 class="border-bottom margin-top-large">&#128218 AI Failure Book</h1>
+   <! -- ROW-->
+    <div class="row justify-content-start">
+     <! -- FAILURE RECOVERY  -->
+     <div class="col-12">
+      <h2 class="purple-color margin-top-large">Failure Recovery</h2>
+      <h3 class="font-size-15">Let's see in what ways we can recover from failures.</h3>
+      <p>Select out of pre-defined options. </p>
+     </div>
+      <! -- END FAILURE RECOVERY -->
+    </div>
+    <! -- END ROW-->
 
-    <h1>AI Failure Book</h1>
+    <h2 class="purple-color margin-top-large">Your personal failure book</h2>
+    <h3 class="font-size-15">Something</h3>
     <table class="table">
       <thead>
         <tr>
           <th scope="col">Sample</th>
+          <th scope="col">Domain</th>
           <th scope="col">Failure Mode</th>
-          <th scope="col">Failure Sources</th>
-          <th scope="col">Failure Effects</th>
+          <th scope="col">Failure Effects & Severity</th>
           <th scope="col">Recovery Strategy</th>
           <th scope="col">Notes</th>
         </tr>
       </thead>
       <tbody>
-        {% for sample in samples %}
+        {% for failure in failures %}
         <tr>
-          <td><img src="{{sample.image.url}}" class="img rounded thumbnail"></td>
           <td>
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                Select failure mode
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a class="dropdown-item" href="#">Failing to observe</a></li>
-                <li><a class="dropdown-item" href="#">False observation</a></li>
-                <li><a class="dropdown-item" href="#">Incomplete observation</a></li>
-                <li><a class="dropdown-item" href="#">Critical quality</a></li>
-                <li><a class="dropdown-item" href="#">Violation</a></li>
-                <li><a class="dropdown-item" href="#">Other</a></li>
-              </ul>
-            </div>
+            {{failure.sample}}
+            <img src="{{failure.sample.image.url}}" class="img rounded thumbnail">
+          </td>
+          <td>
+            {% if failure.indistribution_error %}
+              <span class="badge bg-secondary">In-distribution</span>
+            {% elif failure.outofdistribution_error %}
+              <span class="badge bg-secondary">Out-of-distribution</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if failure.false_observation %}
+              <span class="badge bg-secondary">False observation</span>
+            {% endif %}
+            {% if failure.failing_to_oberserve %}
+              <span class="badge bg-secondary">Failing to observe</span>
+            {% endif %}
+            {% if failure.incomplete_observation %}
+              <span class="badge bg-secondary">Incomplete observation</span>
+            {% endif %}
+            {% if failure.critical_quality %}
+              <span class="badge bg-secondary">Critical quality output</span>
+            {% endif %}
+            {% if failure.violation %}
+              <span class="badge bg-secondary">Violation</span>
+            {% endif %}
+            {% if failure.context_error %}
+              <span class="badge bg-secondary">Context error</span>
+            {% endif %}
+            {% if failure.other_mode %}
+              <span class="badge bg-secondary">Other {{failure.other_mode}}</span>
+            {% endif %}
           </td>
          <td>
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                Select failure source
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a class="dropdown-item" href="#">Failing to observe</a></li>
-                <li><a class="dropdown-item" href="#">False observation</a></li>
-                <li><a class="dropdown-item" href="#">Incomplete observation</a></li>
-                <li><a class="dropdown-item" href="#">Critical quality</a></li>
-                <li><a class="dropdown-item" href="#">Violation</a></li>
-                <li><a class="dropdown-item" href="#">Other</a></li>
-              </ul>
-            </div>
+            {% if failure.physical_harm %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Physical harm</span>
+            {% endif %}
+            {% if failure.psychological_harm %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Psychological harm</span>
+            {% endif %}
+            {% if failure.financial_damage %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Financial damage</span>
+            {% endif %}
+            {% if failure.reputational_damage %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Reputational damage</span>
+            {% endif %}
+            {% if failure.personal_privacy_violation %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Personal privacy violation</span>
+            {% endif %}
+            {% if failure.annoyance %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Annoyance</span>
+            {% endif %}
+            {% if failure.discrimination %}
+              <span class="badge bg-secondary">&#128101 Community Level: Discrimination</span>
+            {% endif %}
+            {% if failure.exclusion %}
+              <span class="badge bg-secondary">&#128101 Community Level: Exclusion</span>
+            {% endif %}
+            {% if failure.harmful_content %}
+              <span class="badge bg-secondary">&#128101 Community Level: Harmful content</span>
+            {% endif %}
+            {% if failure.public_misinformation %}
+              <span class="badge bg-secondary">&#127760 Society Level: Public misinformation</span>
+            {% endif %}
+            {% if failure.political_conflict %}
+              <span class="badge bg-secondary">&#127760 Society Level: Political conflict</span>
+            {% endif %}
+            {% if failure.legal_breech %}
+              <span class="badge bg-secondary">&#127760 Society Level: Legal breech</span>
+            {% endif %}
+            {% if failure.economic_damage %}
+              <span class="badge bg-secondary">&#127760 Society Level: Economic damage</span>
+            {% endif %}
+            {% if failure.public_privacy_breech %}
+              <span class="badge bg-secondary">&#127760 Society Level: Public privacy breech</span>
+            {% endif %}
+            {% if failure.failure_severity < 3 %}
+              <span class="badge bg-success">{{failure.failure_severity }}</span>
+            {% elif failure.failure_severity < 7 %}
+              <span class="badge bg-warning">{{failure.failure_severity }}</span>
+            {% else %}
+              <span class="badge bg-danger">{{failure.failure_severity }}</span>
+            {% endif %}
+
           </td>
           <td>
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                Select failure effect
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a class="dropdown-item" href="#">Physical harm</a></li>
-                <li><a class="dropdown-item" href="#">Psychological or emotional harm</a></li>
-                <li><a class="dropdown-item" href="#">Financial damage</a></li>
-                <li><a class="dropdown-item" href="#">Reputational damage</a></li>
-                <li><a class="dropdown-item" href="#">Personal privacy violation</a></li>
-                <li><a class="dropdown-item" href="#">Discrimination</a></li>
-                <li><a class="dropdown-item" href="#">Exclusion</a></li>
-                <li><a class="dropdown-item" href="#">Harmful content</a></li>
-                <li><a class="dropdown-item" href="#">Public misinformation</a></li>
-                <li><a class="dropdown-item" href="#">Political conflicts</a></li>
-                <li><a class="dropdown-item" href="#">Legal breech</a></li>
-                <li><a class="dropdown-item" href="#">Economic damage</a></li>
-                <li><a class="dropdown-item" href="#">Public privacy breech</a></li>
-                <li><a class="dropdown-item" href="#">Reliability issue</a></li>
-                <li><a class="dropdown-item" href="#">Other</a></li>
-              </ul>
-            </div>
+
           </td>
           <td>
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                Select Recovery stragegy
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a class="dropdown-item" href="#">Communicate quality of output to user</a></li>
-                <li><a class="dropdown-item" href="#">Handover control to user</a></li>
-                <li><a class="dropdown-item" href="#">Collect implicit feedback</a></li>
-                <li><a class="dropdown-item" href="#">Collect explicit feedback</a></li>
-                <li><a class="dropdown-item" href="#">Allow user correction</a></li>
-                <li><a class="dropdown-item" href="#">Provide local explanation</a></li>
-                <li><a class="dropdown-item" href="#">Other</a></li>
-              </ul>
-            </div>
+
           </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+</div> <! -- Container -->
 
 <! -- Bootstrap-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
