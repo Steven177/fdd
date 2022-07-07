@@ -32,19 +32,21 @@ class Match(models.Model):
   pred_idx = models.IntegerField(default=-1, blank=True)
 
   true_positive = models.BooleanField(default=False, blank=True)
+  failing_to_detect = models.BooleanField(default=False, blank=True)
   false_detection = models.BooleanField(default=False, blank=True)
   indistribution = models.BooleanField(default=False, blank=True)
   missing_detection = models.BooleanField(default=False, blank=True)
-  additional_detection = models.BooleanField(default=False, blank=True)
+  unnecessary_detection = models.BooleanField(default=False, blank=True)
   critical_quality_box = models.BooleanField(default=False, blank=True)
   critical_quality_score = models.BooleanField(default=False, blank=True)
 
+  failure_severity = models.IntegerField(default=0, blank=True)
 
 class Failure(models.Model):
   # samples = models.ManyToManyField(Sample, blank=True)
   # sample = models.ForeignKey(Sample, on_delete=models.CASCADE, default=False, blank=True)
-  sample = models.OneToOneField(Sample, on_delete=models.CASCADE, primary_key=True, blank=True)
-  # sample_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  # sample = models.ForeignKey(Sample, on_delete=models.CASCADE, default=-1, blank=True)
+  sample_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
   # In- or Out-of-distribution error
   indistribution_error = models.BooleanField(default=False, blank=True)
@@ -52,12 +54,11 @@ class Failure(models.Model):
 
   # failure mode
   false_observation = models.BooleanField(default=False, blank=True)
-  failing_to_oberserve = models.BooleanField(default=False, blank=True)
   incomplete_observation = models.BooleanField(default=False, blank=True)
   critical_quality = models.BooleanField(default=False, blank=True)
   violation = models.BooleanField(default=False,blank=True)
   context_error = models.BooleanField(default=False, blank=True)
-  other_mode = models.CharField(max_length = 200, blank=True)
+  other_mode = models.CharField(default=False, max_length = 200, blank=True)
 
   # failure effects
   physical_harm = models.BooleanField(default=False, blank=True)

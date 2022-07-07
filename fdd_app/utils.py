@@ -128,13 +128,13 @@ def check_if_match(exp_label, pred_label):
 
 def check_if_indistribution(exp_label):
   for i in coco_distribution:
-    if exp_label == i:
+    if exp_label.lower() == i:
       return True
   return False
 
-def check_quality_of_box(exp, pred , threshold=0.75):
+def check_quality_of_box(exp, pred , threshold=0.7):
   iou = calculate_iou(exp, pred)
-  return True if iou >= threshold else False
+  return True if iou <= threshold else False
 
 def calculate_iou(exp, pred):
   """
@@ -161,39 +161,6 @@ def calculate_iou(exp, pred):
   return iou
 
 def check_quality_of_score(score, threshold=0.95):
-  return True if score >= threshold else False
-
-
-"""
-
-# TESTS
-# test 1: exp < pred
-boxes_exp = [[ 87,  25, 220, 143]]
-boxes_pred = [[ 79,  13, 273, 183], [132, 167, 162, 184]]
-boxes_exp = np.matrix(boxes_exp)
-boxes_pred = np.matrix(boxes_pred)
-
-boxes_exp, boxes_pred = padd_boxes(boxes_exp, boxes_pred)
-l1_cost_mat = calculate_l1_loss(boxes_exp, boxes_pred)
-print("L1 COST MAT")
-print(l1_cost_mat)
-
-# assert l1_cost_mat == [[113, 286], [548, 645]]
-
-giou_cost_mat = generalized_box_iou_loss(boxes_exp, boxes_pred)
-
-
-print("giou_cost_mat")
-print(giou_cost_mat)
-#print(giou_cost_mat.shape)
-
-lamda_iou = 0.5
-lamda_l1 = 0.5
-
-loss_box = calculate_box_loss(giou_cost_mat, l1_cost_mat)
-print("loss_box")
-print(loss_box)
-
-"""
+  return True if score <= threshold else False
 
 

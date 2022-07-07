@@ -6,6 +6,10 @@
   --light: #F9FAFB;
   --light-puple: #efe6f5;
   --black: #000000;
+  --red:  red;
+  --yellow:  yellow;
+  --green:  green;
+  --blue:  blue;
 }
 
 /* fonts */
@@ -14,7 +18,7 @@ body.font {
 }
 
 .border-bottom {
-  border-bottom: 0.3px solid #7207B7 !important;
+  border-bottom: 0.3px solid var(----purple) !important;
 }
 
 .font-size-15 {
@@ -25,6 +29,10 @@ body.font {
   border:  0.5px solid var(--black);
   padding:  10px;
   border-radius: 5px;
+}
+
+.text-align-center {
+  text-align:  center;
 }
 
 /* colors */
@@ -41,6 +49,34 @@ body.font {
 
 .light {
   color:  var(--light) !important;
+}
+
+.tag {
+  padding:  10px !important;
+  border-radius: 2px !important;
+  color:  var(--black);
+  width:  100%;
+}
+
+.error {
+  background-color: rgba(255, 0, 0, .1);
+}
+
+.info {
+  background-color: rgba(114, 160, 196, .1);
+}
+
+.warning {
+  background-color: rgba(255, 203, 0, .1);
+}
+
+.ok {
+  background-color: rgba(0, 189, 0, .1);
+}
+
+.border {
+  border:  0.3px solid var(----purple)
+  border-radius:  2px;
 }
 
 /* buttons */
@@ -118,6 +154,10 @@ body.font {
   height: 150px;
 }
 
+.padding-small {
+  padding: 10px;
+}
+
 /* padding & margin*/
 .padding20px {
   padding: 20px !important;
@@ -151,6 +191,10 @@ body.font {
 
 .margin-right {
   margin-right:  10px;
+}
+
+.margin-top-zero {
+  margin:  0px;
 }
 
 /* padding & margin*/

@@ -108,10 +108,10 @@ def user(request):
 
     # ---------------------------
     # MODEL PREDICTION
-    # model_prediction = query(sample.image.path) # AI model prediction
+    model_prediction = query(sample.image.path) # AI model prediction
     # pil_image_obj = Image.open(sample.image)
     # model_prediction = predict(pil_image_obj)
-    model_prediction = [{'score': 0.9308645725250244, 'label': 'person', 'box': {'xmin': 79, 'ymin': 13, 'xmax': 273, 'ymax': 183}}, {'score': 0.9893394112586975, 'label': 'tie', 'box': {'xmin': 132, 'ymin': 167, 'xmax': 162, 'ymax': 184}}]
+    # model_prediction = [{'score': 0.9308645725250244, 'label': 'person', 'box': {'xmin': 79, 'ymin': 13, 'xmax': 273, 'ymax': 183}}, {'score': 0.9893394112586975, 'label': 'tie', 'box': {'xmin': 132, 'ymin': 167, 'xmax': 162, 'ymax': 184}}]
     for obj in model_prediction:
       new_pred = Model_Prediction(sample=sample, label=obj['label'], score=obj['score'], xmin=obj['box']['xmin'], ymin=obj['box']['ymin'], xmax=obj['box']['xmax'], ymax=obj['box']['ymax'] )
       new_pred.save()
@@ -122,7 +122,7 @@ def user(request):
     # COST
 
     l1_cost_mat = calculate_l1_loss(expectations, model_predictions, sample)
-    giou_cost_mat= generalized_box_iou_loss(expectations, model_predictions)
+    giou_cost_mat = generalized_box_iou_loss(expectations, model_predictions)
     loss_box = calculate_box_loss(giou_cost_mat, l1_cost_mat)
 
     # labels_exp, labels_pred = padd_labels(labels_exp, labels_pred)
@@ -141,17 +141,20 @@ def user(request):
       pred_idx = np.int64(pred_ind[i]).item()
       exp = expectations[exp_idx]
       pred = model_predictions[pred_idx]
-      new_match = Match(sample=sample, expectation=exp, exp_idx=exp_idx, model_prediction=pred, pred_idx=pred_idx)
-      new_match.save()
+
+      # boxes need at least 0.2 IoU to be a match
+      iou = calculate_iou(exp, pred)
+      print("iou {}".format(iou))
+      if iou >= 0.2:
+        new_match = Match(sample=sample, expectation=exp, exp_idx=exp_idx, model_prediction=pred, pred_idx=pred_idx)
+        new_match.save()
 
     for exp_idx, exp in enumerate(expectations):
-      print(len(Match.objects.filter(expectation=exp.id)))
       if len(Match.objects.filter(expectation=exp.id)) == 0:
         new_match = Match(sample=sample, expectation=exp, exp_idx=exp_idx)
         new_match.save()
 
     for pred_idx, pred in enumerate(model_predictions):
-      print(len(Match.objects.filter(model_prediction=pred.id)))
       if len(Match.objects.filter(model_prediction=pred.id)) == 0:
         new_match = Match(sample=sample, model_prediction=pred, pred_idx=pred_idx)
         new_match.save()
@@ -180,31 +183,45 @@ def user(request):
     print("pred_ind")
     print(pred_ind)
 
+    print(" --------------------------------------")
+    print(" --------------------------------------")
+
     # ---------------------------
     # ERROR ANALYSIS
+    matches = Match.objects.filter(sample=sample.id)
 
-    print(matches)
     for match in matches:
-      if match.model_prediction == None:
+      # Failing to detect
+      if len(model_predictions) == 0:
+        match.failing_to_detect = True
+        match.save()
+
+      # Missing detection
+      elif match.model_prediction == None:
         match.missing_detection = True
         match.indistribution = check_if_indistribution(match.expectation.label)
+        match.save()
+
+      # Unnecessary detection
       elif match.expectation == None:
-        match.additional_detection = True
+        match.unnecessary_detection = True
         match.critical_quality_score = check_quality_of_score(match.model_prediction.score)
+        match.save()
+
+      # False detection
       elif match.expectation.label != match.model_prediction.label:
-        match.false_observation = True
+        match.false_detection = True
         match.indistribution = check_if_indistribution(match.expectation.label)
         match.critical_quality_box = check_quality_of_box(match.expectation, match.model_prediction)
         match.critical_quality_score = check_quality_of_score(match.model_prediction.score)
+        match.save()
+
+      # True positive
       else:
         match.true_positive = True
         match.critical_quality_box = check_quality_of_box(match.expectation, match.model_prediction)
         match.critical_quality_score = check_quality_of_score(match.model_prediction.score)
-
-
-    print(" --------------------------------------")
-    print(" --------------------------------------")
-    matches = []
+        match.save()
 
     return render(request, 'fdd_app/user.html', {
       'colors': colors,
