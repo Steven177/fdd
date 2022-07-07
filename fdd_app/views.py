@@ -121,19 +121,27 @@ def user(request):
     # ---------------------------
     # COST
 
-    l1_cost_mat = calculate_l1_loss(expectations, model_predictions, sample)
-    giou_cost_mat = generalized_box_iou_loss(expectations, model_predictions)
-    loss_box = calculate_box_loss(giou_cost_mat, l1_cost_mat)
+    if len(expectations) > 0 and len(model_predictions) > 0:
+      l1_cost_mat = calculate_l1_loss(expectations, model_predictions, sample)
+      print("l1_cost_mat {}".format(l1_cost_mat))
+      giou_cost_mat = generalized_box_iou_loss(expectations, model_predictions)
+      print("giou_cost_mat {}".format(giou_cost_mat))
+      loss_box = calculate_box_loss(giou_cost_mat, l1_cost_mat)
+      print("loss_box {}".format(loss_box))
 
-    # labels_exp, labels_pred = padd_labels(labels_exp, labels_pred)
-    loss_labels = calculate_class_loss(expectations, model_predictions)
+      # labels_exp, labels_pred = padd_labels(labels_exp, labels_pred)
+      loss_labels = calculate_class_loss(expectations, model_predictions)
+      print("loss_labels {}".format(loss_labels))
 
-    loss_matching = calculate_matching_loss(loss_box, loss_labels)
+      loss_matching = calculate_matching_loss(loss_box, loss_labels)
+      print("loss_matching {}".format(loss_matching))
+      # Hungarian algorithm
+      exp_ind, pred_ind = linear_sum_assignment(loss_matching)
+      matching_cost = loss_matching[exp_ind, pred_ind].sum()
 
-    # Hungarian algorithm
-    exp_ind, pred_ind = linear_sum_assignment(loss_matching)
-    matching_cost = loss_matching[exp_ind, pred_ind].sum()
-
+    else:
+      exp_ind = []
+      pred_ind = []
     # ---------------------------
     # MATCHES
     for i, exp_idx in enumerate(exp_ind):
@@ -162,21 +170,6 @@ def user(request):
     print(" --------------------------------------")
     print(" --------------------------------------")
 
-    print("l1_cost_mat")
-    print(l1_cost_mat)
-
-    print("giou_cost_mat")
-    print(giou_cost_mat)
-
-    print("loss_box")
-    print(loss_box)
-
-    print("loss_labels")
-    print(loss_labels)
-
-    print("loss_matching")
-    print(loss_matching)
-
     print("exp_ind")
     print(exp_ind)
 
@@ -191,13 +184,14 @@ def user(request):
     matches = Match.objects.filter(sample=sample.id)
 
     for match in matches:
+      print("match {}".format(match))
       # Failing to detect
       if len(model_predictions) == 0:
         match.failing_to_detect = True
         match.save()
 
       # Missing detection
-      elif match.model_prediction == None:
+      if match.model_prediction == None:
         match.missing_detection = True
         match.indistribution = check_if_indistribution(match.expectation.label)
         match.save()

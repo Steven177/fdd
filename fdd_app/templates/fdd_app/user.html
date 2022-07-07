@@ -237,10 +237,19 @@
         <h3 class="font-size-15">Let's see if the model could live up to the expectation of the user. </h3>
 
         <! --  MATCH -->
+        {% if model_predictions|length == 0 %}
+          <div class="border margin-top-small padding-small">
+            <h5 class="text-align-center">Failure Analysis</h5>
+            <p class="tag error text-align-center">&#10060 Failing to observe</p>
+            <p class="text-align-center">The model did not make any prediction for this image. </p>
+            <br>
+          </div>
+        {% endif %}
+
         {% for match in matches%}
         <div class="border margin-top-small">
-
           <div class="row border-bottom padding-small" padding-small>
+            <h4 class="text-align-center">Failure {{forloop.counter}}/{{matches|length}}</h4>
             <div class="col-6">
               <h4 class="text-align-center">Expectation</h4>
               <div class="d-flex justify-content-center align-items-center">
