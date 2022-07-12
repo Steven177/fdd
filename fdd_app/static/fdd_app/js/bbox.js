@@ -118,28 +118,6 @@ function clearCanvas() {
 // ----------------------------------------------------------------------
 
 
-function removeHidden(id) {
-  var div = document.getElementById(id);
-  div.classList.remove("d-none");
-};
-
-function revealHidden(id) {
-  var div = document.getElementById(id);
-  div.classList.remove("d-none");
-};
-
-function showModelPrediction(id) {
-  // model prediction
-  var div = document.getElementById(id);
-  div.style.display = "block";
-
-  // hide button
-  document.getElementById("b3").disabled = true;
-
-  // Show failure section
-  revealHidden("hidden2");
-};
-
 function highlightBox(e) {
   // Get elements
   var id = e.target.id
@@ -195,6 +173,13 @@ for (let i = 0; i < bboxes.length; i++) {
 
 // https://stackoverflow.com/questions/25862798/how-to-send-the-javascript-list-of-dictionaries-object-to-django-ajax
 function saveBoxes() {
+  var div_review = document.getElementById("div_review");
+  var div_save = document.getElementById("div_save");
+  div_review.classList.add("d-none");
+  div_save.classList.remove("d-none");
+
+  console.log(div_review)
+  console.log(div_save)
 
   var expBoxes = JSON.stringify(rectangles);
   console.log(expBoxes);
@@ -203,6 +188,7 @@ function saveBoxes() {
     "type": "POST",
     "data": {'expBoxes[]': expBoxes},
  });
+
 
   //var b2 = document.getElementById("b2");
   //b2.classList.add("d-none");

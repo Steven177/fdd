@@ -362,6 +362,23 @@
 
 
 
+<div class="alert light-purple-background border-radius margin-top-small" role="alert">
+          &#128073 How severe would you rate the effects of this failure from an user's perspective?
+          </div>
+
+
+<p>Failure severity</p>
+          <div class="slidecontainer">
+            <input type="range" min="1" max="10" value="5" class="slider" id="myRange">
+          </div>
+
+          <div class="range-wrap">
+            <div class="range-value" id="rangeV"></div>
+            <input id="range" type="range" min="0" max="10" value="5" step="1">
+          </div>
+          <div>{{ failure_form.failure_severity}}</div>
+          <input name="failure_submit" type="submit" value="&#128218 Save to AI failure book" class="btn primary margin-top-small">
+        </div>
 
 
 
@@ -373,10 +390,268 @@
 
 
 
+ {% for failure in failures %}
+        <tr>
+          <td>
+            {{failure.sample}}
+            <img src="{{failure.sample.image.url}}" class="img rounded thumbnail">
+          </td>
+          <td>
+            {% if failure.indistribution_error %}
+              <span class="badge bg-secondary">In-distribution</span>
+            {% elif failure.outofdistribution_error %}
+              <span class="badge bg-secondary">Out-of-distribution</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if failure.false_observation %}
+              <span class="badge bg-secondary">False observation</span>
+            {% endif %}
+            {% if failure.failing_to_oberserve %}
+              <span class="badge bg-secondary">Failing to observe</span>
+            {% endif %}
+            {% if failure.incomplete_observation %}
+              <span class="badge bg-secondary">Incomplete observation</span>
+            {% endif %}
+            {% if failure.critical_quality %}
+              <span class="badge bg-secondary">Critical quality output</span>
+            {% endif %}
+            {% if failure.violation %}
+              <span class="badge bg-secondary">Violation</span>
+            {% endif %}
+            {% if failure.context_error %}
+              <span class="badge bg-secondary">Context error</span>
+            {% endif %}
+            {% if failure.other_mode %}
+              <span class="badge bg-secondary">Other {{failure.other_mode}}</span>
+            {% endif %}
+          </td>
+         <td>
+            {% if failure.physical_harm %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Physical harm</span>
+            {% endif %}
+            {% if failure.psychological_harm %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Psychological harm</span>
+            {% endif %}
+            {% if failure.financial_damage %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Financial damage</span>
+            {% endif %}
+            {% if failure.reputational_damage %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Reputational damage</span>
+            {% endif %}
+            {% if failure.personal_privacy_violation %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Personal privacy violation</span>
+            {% endif %}
+            {% if failure.annoyance %}
+              <span class="badge bg-secondary">&#128583 Individual Level: Annoyance</span>
+            {% endif %}
+            {% if failure.discrimination %}
+              <span class="badge bg-secondary">&#128101 Community Level: Discrimination</span>
+            {% endif %}
+            {% if failure.exclusion %}
+              <span class="badge bg-secondary">&#128101 Community Level: Exclusion</span>
+            {% endif %}
+            {% if failure.harmful_content %}
+              <span class="badge bg-secondary">&#128101 Community Level: Harmful content</span>
+            {% endif %}
+            {% if failure.public_misinformation %}
+              <span class="badge bg-secondary">&#127760 Society Level: Public misinformation</span>
+            {% endif %}
+            {% if failure.political_conflict %}
+              <span class="badge bg-secondary">&#127760 Society Level: Political conflict</span>
+            {% endif %}
+            {% if failure.legal_breech %}
+              <span class="badge bg-secondary">&#127760 Society Level: Legal breech</span>
+            {% endif %}
+            {% if failure.economic_damage %}
+              <span class="badge bg-secondary">&#127760 Society Level: Economic damage</span>
+            {% endif %}
+            {% if failure.public_privacy_breech %}
+              <span class="badge bg-secondary">&#127760 Society Level: Public privacy breech</span>
+            {% endif %}
+            {% if failure.failure_severity < 3 %}
+              <span class="badge bg-success">{{failure.failure_severity }}</span>
+            {% elif failure.failure_severity < 7 %}
+              <span class="badge bg-warning">{{failure.failure_severity }}</span>
+            {% else %}
+              <span class="badge bg-danger">{{failure.failure_severity }}</span>
+            {% endif %}
+
+          </td>
+          <td>
+
+          </td>
+          <td>
+
+          </td>
+        </tr>
+        {% endfor %}
 
 
 
 
+        <! -- ROW-->
+    <div class="row justify-content-start">
+     <! -- FAILURE EFFECTS  -->
+      <h2 class="purple-color margin-top-large">Failure Effects</h2>
+     <div class="col-6">
+      <h3 class="font-size-15">Let's assess the effects of this failure on the user. </h3>
+
+      <! -- Accordion  -->
+      <div class="accordion" id="accordionPanelsStayOpenExample">
+          <div class="accordion-item" id="collapseOne_container">
+            <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                <h5>&#128583 Individual Level</h5>
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+              <div class="accordion-body">
+               <p>Physical harm</p>
+               <p>Psychological or emotional harm</p>
+               <p>Financial damage</p>
+               <p>Reputational damage</p>
+               <p>Personal privacy violation</p>
+               <p>Annoyance / poor user experience</p>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item" id="collapseTwo_container">
+            <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                &#128101 Community Level
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+              <div class="accordion-body">
+                <p>Discrimination (against race, ethnicity, religion, gender, sexual orientation)</p>
+                <p>Exclusion or denied access</p>
+                <p>Harmful content</p>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item" id="collapseThree_container">
+            <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                &#127760 Society Level
+              </button>
+            </h2>
+            <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+              <div class="accordion-body">
+                <p>Public misinformation</p>
+                <p>Political conflicts</p>
+                <p>Legal breech</p>
+                <p>Economic damage</p>
+                <p>Public privacy breech</p>
+              </div>
+            </div>
+          </div>
+          </div>
+          <! -- End Accordion  -->
+        </div>
+        <div class="col-6">
+          <div class="alert light-purple-background border-radius" role="alert">
+            &#128073 In what way(s) is this failure harming the user?
+          </div>
+           <! -- form -->
+          <p class="margin-top-small">&#128583 Individual Level</p>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.physical_harm}}</div>
+            <label class="margin-left" for="Physical harm">Physical harm</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.psychological_harm}}</div>
+            <label class="margin-left" for="Psychological harm">Psychological harm</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.financial_damage}}</div>
+            <label class="margin-left" for="Financial damage">Financial damage</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.reputational_damage}}</div>
+            <label class="margin-left" for="Reputational damage">Reputational damage</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.personal_privacy_violation}}</div>
+            <label class="margin-left" for="Personal privacy violation">Personal privacy violation</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.annoyance}}</div>
+            <label class="margin-left" for="Annoyance">Annoyance</label>
+          </div>
+          <p class="margin-top-small"> &#128101 Community Level </p>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.discrimination}}</div>
+            <label class="margin-left" for="Discrimination">Discrimination</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.exclusion}}</div>
+            <label class="margin-left" for="Exclusion">Exclusion</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.harmful_content}}</div>
+            <label class="margin-left" for="Harmful content">Harmful content</label>
+          </div>
+          <p class="margin-top-small"> &#127760 Society Level </p>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.public_misinformation}}</div>
+            <label class="margin-left" for="Public misinformation">Public misinformation</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.political_conflict}}</div>
+            <label class="margin-left" for="Political conflict">Political conflict</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.legal_breech}}</div>
+            <label class="margin-left" for="Legal breech">Legal breech</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.economic_damage}}</div>
+            <label class="margin-left" for="Economic damage">Economic damage</label>
+          </div>
+          <div class="d-flex align-items-center">
+            <div>{{ failure_form.public_privacy_breech}}</div>
+            <label class="margin-left" for="Public privacy breech">Public privacy breech</label>
+          </div>
+
+          <! -- end form -->
+
+      <! -- END FAILURE EFFECTS -->
+
+
+
+
+  <! -- -->
+    <button class="btn primary margin-top-small">&#9889 Add failure</button>
+    <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app">&#129303 Continue exploring</a> </button>
+
+
+<div class="margin-top-bottom-20px">
+              <button id="b3" class="btn primary" onclick="javascript:showModelPrediction('hidden1')"> Show model prediction </button>
+            </div>
+
+
+
+
+<div class="container">
+    <h1 class="border-bottom margin-top-large">&#129489  Use Case</h1>
+    <h2 class="purple-color margin-top-large">Persona </h2>
+    <h3 class="font-size-15">Let's define our user and use case. </h3>
+    <div class="alert light-purple-background border-radius" role="alert">
+      &#128073 Provide your user with a name. Then use the canvas to define <br><br>
+      How to use the canvas? <br>
+      Click: Click anywhere on the whiteboard at any time to create a new sticky note and start editing <br>
+      Double click: Delete a sticky note <br>
+      While editing, enter submits changes and esc cancels changes <br>
+      Hover over a sticky note + y, b, r, g, p, m, c, t, or w let's you change the color
+    </div>
+
+    <div id="whiteboard" class="row justify-content-start">
+      <img  src="../../../media/persona/persona_canvas.jpg" alt="Persona"class="border-radius width100">
+    </div>
+
+
+  </div>
 
 
 

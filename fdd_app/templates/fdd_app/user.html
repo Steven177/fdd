@@ -17,9 +17,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;700&display=swap" rel="stylesheet">
+
     <! -- external scripts -->
     <script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
+    <! -- Bootstrap-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"> </script>
+    <! -- jquery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
@@ -30,40 +35,37 @@
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
+            <a class="nav-link light" aria-current="page" href="/fdd_app/persona">&#129489 User Research</a>
            <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/">&#128171 Failure Exploration</a>
             <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">&#128218 AI Failure Book</a>
         </div>
       </div>
 
-      <div class="margin-right">
+       <div class="margin-right">
         <h4 class="white">&#129489 Use Case</h4>
         <div class="dropdown whitebackground border-radius">
-          <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-            Tourist persona
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-            <li><a class="dropdown-item" href="#">xxx</a></li>
-            <li><a class="dropdown-item" href="#">xxx</a></li>
-          </ul>
+          <select class="form-select border-radius" aria-label="Default select example">
+            {% for persona in personas reversed %}
+              <option class="border-radius" value="persona{{forloop.counter}}">{{persona.name}}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
 
       <div class="margin-right">
         <h4 class="white">&#128065 AI Model</h4>
         <div class="dropdown whitebackground border-radius">
-        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-          DETR: Object detection
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-          <li><a class="dropdown-item" href="#">YOLO: Object detection</a></li>
-          <li><a class="dropdown-item" href="#">FasterRCNN: Object detection</a></li>
-        </ul>
+        <select class="form-select border-radius" aria-label="Default select example">
+        {% for ai in ais %}
+          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
+        {% endfor %}
+        </select
         </div>
       </div>
 
-
     </div>
   </nav>
+  <! -- END NAVBAR -->
 
   <div class="container">
     <h1 class="border-bottom margin-top-large">&#128171 Failure Exploration</h1>
@@ -76,7 +78,7 @@
           <h2 class="purple-color margin-top-large">User Expectation</h2>
           <h3 class="font-size-15">Let's set expectations. </h3>
           <div class="alert light-purple-background border-radius" role="alert">
-            &#128073 Put yourself into the shoes of your user... What would he or she expect for this image?
+            &#128073 Put yourself into the shoes of your user... What would he or she expect for this image? Draw bounding boxes and label the objects.
           </div>
           <! -- canvas -->
           <div class="position-relative" style="width: {{sample.image.width}}px; height: {{sample.image.height}}px">
@@ -132,13 +134,13 @@
               <input type="text" id="c9" name="class9" class="border-radius form-control">
             </div>
 
-            <div class="d-flex">
-              <input id="b4" name="expectation_submit" type="submit" value="&#128076 Save" class="btn primary margin-top-small">
+            <div id="div_save" class="d-flex d-none">
+              <input id="b4" name="expectation_submit" type="submit" value="&#128076 Reveal Model Prediction" class="btn primary margin-top-small">
             </div>
             </div>
           </form>
-          <div class="d-flex align-items-center">
-           <button id="b2" class="btn primary margin-right margin-top-small" onclick="javascript:saveBoxes()"> Review</button>
+          <div id="div_review" class="d-flex align-items-center">
+           <button id="b2" class="btn primary margin-right margin-top-small" onclick="javascript:saveBoxes()"> Save</button>
            <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app/user">Start over</a> </button>
           </div>
           </div>
@@ -157,7 +159,7 @@
           <h2 class="purple-color margin-top-large">User Expectation</h2>
           <h3 class="font-size-15">Let's set expectations. </h3>
           <div class="alert light-purple-background border-radius" role="alert">
-            &#128079 Great! <br> This is what the user expects.
+            &#128079 Got it! <br> This is what the user expects.
           </div>
           <! -- canvas -->
           <div class="position-relative" style="width: {{sample.image.width}}px; height: {{sample.image.height}}px">
@@ -180,16 +182,14 @@
             </div>
           {% endfor %}
 
-            <div class="margin-top-bottom-20px">
-              <button id="b3" class="btn primary" onclick="javascript:showModelPrediction('hidden1')"> Reveal model prediction </button>
-            </div>
+
           </div>
           <! -- end labels -->
         </div>
-        <! -- EXPECTATION PREFILLED -->
+        <! -- END EXPECTATION PREFILLED -->
 
         <! -- PREDICTION -->
-        <div id="hidden1" class="col-6">
+        <div id="" class="col-6">
           <h2 class="purple-color margin-top-large">Model Prediction</h2>
           <h3 class="font-size-15">Let's view the prediction of the model. </h3>
           <div class="alert light-purple-background border-radius" role="alert">
@@ -223,7 +223,7 @@
             </div>
           </div>
           {% endfor %}
-          <button id="b6" class="btn primary" onclick=""> Run failure analysis  </button>
+          <button id="b6" class="btn primary margin-top-small" onclick="javascript:runFailureAnalysis(failures)"> Run failure analysis  </button>
         </div>
         <! -- END PREDICTION -->
       </div>
@@ -231,13 +231,13 @@
 
 
     <! --  ROW -->
-    <div id="hidden2" class="row justify-content-start d-none">
+    <div id="failures" class="row justify-content-start d-none">
         <! -- FAILURE ANALYSIS -->
         <h2 class="purple-color margin-top-large">Failure Analysis </h2>
         <h3 class="font-size-15">Let's see if the model could live up to the expectation of the user. </h3>
 
         <! --  MATCH -->
-        {% if model_predictions|length == 0 %}
+        {% if model_predictions|length == 0 and expectations|length > 0 %}
           <div class="border margin-top-small padding-small">
             <h5 class="text-align-center">Failure Analysis</h5>
             <p class="tag error text-align-center">&#10060 Failing to observe</p>
@@ -249,7 +249,7 @@
         {% for match in matches%}
         <div class="border margin-top-small">
           <div class="row border-bottom padding-small" padding-small>
-            <h4 class="text-align-center">Failure {{forloop.counter}}/{{matches|length}}</h4>
+            <h4 class="text-align-center"> {{forloop.counter}}/{{matches|length}}</h4>
             <div class="col-6">
               <h4 class="text-align-center">Expectation</h4>
               <div class="d-flex justify-content-center align-items-center">
@@ -268,9 +268,17 @@
                 <p class="margin-top-zero margin-left-small">{{match.model_prediction.label|title}}</p>
               </div>
             </div>
+            <div class="d-flex justify-content-center align-items-center">
+              <button id="b7" class="btn secondary width50 margin-top-small" type="button" data-bs-toggle="collapse" data-bs-target="#failure{{forloop.counter}}" aria-expanded="false" aria-controls="failure{{forloop.counter}}" onclick="javascript:hide(b7)">View in detail
+            </button>
+
+            </div>
+
           </div>
 
-          <div class="row padding-small">
+
+
+          <div id="failure{{forloop.counter}}" class="collapse">
             <h5 class="text-align-center">Failure Analysis</h5>
             <div class="padding-small">
               <div>
@@ -344,7 +352,14 @@
                 {% if match.missing_detection or match.unnecessary_detection  or match.false_detection or match.failing_to_detect %}
                   <div class="alert light-purple-background border-radius" role="alert"> &#128073 How severe is this problem from a user's point of view?
                   </div>
-                  <p> Rate from 1-5</p>
+                  <! --  failure severity form -->
+                  <form id="{{match.id}}" class="failure_severity_form" action="" method="POST">
+                    {% csrf_token %}
+                    <label for="severity">Rate from 1 (low) to 5 (high)</label><br>
+                    <input type="number" step="1" name="failure_severity">
+                    <input value = "{{match.id}}" type="hidden" name="match_id">
+                  <! --  end failure severity form -->
+
                 {% endif %}
               </div>
             </div>
@@ -352,179 +367,37 @@
 
         </div>
         {% endfor %}
+
+        {% if matches|length > 0 %}
+          <input type="submit" value="&#128218 Save to AI failure book" class="btn primary margin-top-small" style="width: 50%">
+          </form>
+        {% else %}
+          <p> &#128579 Everthing fine! No failures detected</p>
+          <a class="btn primary atag-btn-black" style="width: 50%" href="/fdd_app">&#129303 Continue exploring</a>
+        {% endif %}
+
+
         <! --  END MATCH -->
 
       <! -- END FAILURE ANALYSIS-->
     </div>
     <! -- END ROW -->
 
-
-    <! -- ROW-->
-    <div class="row justify-content-start">
-     <! -- FAILURE EFFECTS  -->
-      <h2 class="purple-color margin-top-large">Failure Effects</h2>
-     <div class="col-6">
-      <h3 class="font-size-15">Let's assess the effects of this failure on the user. </h3>
-
-      <! -- Accordion  -->
-      <div class="accordion" id="accordionPanelsStayOpenExample">
-          <div class="accordion-item" id="collapseOne_container">
-            <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
-                <h5>&#128583 Individual Level</h5>
-              </button>
-            </h2>
-            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
-              <div class="accordion-body">
-               <p>Physical harm</p>
-               <p>Psychological or emotional harm</p>
-               <p>Financial damage</p>
-               <p>Reputational damage</p>
-               <p>Personal privacy violation</p>
-               <p>Annoyance / poor user experience</p>
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item" id="collapseTwo_container">
-            <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
-                &#128101 Community Level
-              </button>
-            </h2>
-            <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
-              <div class="accordion-body">
-                <p>Discrimination (against race, ethnicity, religion, gender, sexual orientation)</p>
-                <p>Exclusion or denied access</p>
-                <p>Harmful content</p>
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item" id="collapseThree_container">
-            <h2 class="accordion-header" id="panelsStayOpen-headingThree">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
-                &#127760 Society Level
-              </button>
-            </h2>
-            <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
-              <div class="accordion-body">
-                <p>Public misinformation</p>
-                <p>Political conflicts</p>
-                <p>Legal breech</p>
-                <p>Economic damage</p>
-                <p>Public privacy breech</p>
-              </div>
-            </div>
-          </div>
-          </div>
-          <! -- End Accordion  -->
-        </div>
-        <div class="col-6">
-          <div class="alert light-purple-background border-radius" role="alert">
-            &#128073 In what way(s) is this failure harming the user?
-          </div>
-           <! -- form -->
-          <p class="margin-top-small">&#128583 Individual Level</p>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.physical_harm}}</div>
-            <label class="margin-left" for="Physical harm">Physical harm</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.psychological_harm}}</div>
-            <label class="margin-left" for="Psychological harm">Psychological harm</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.financial_damage}}</div>
-            <label class="margin-left" for="Financial damage">Financial damage</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.reputational_damage}}</div>
-            <label class="margin-left" for="Reputational damage">Reputational damage</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.personal_privacy_violation}}</div>
-            <label class="margin-left" for="Personal privacy violation">Personal privacy violation</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.annoyance}}</div>
-            <label class="margin-left" for="Annoyance">Annoyance</label>
-          </div>
-          <p class="margin-top-small"> &#128101 Community Level </p>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.discrimination}}</div>
-            <label class="margin-left" for="Discrimination">Discrimination</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.exclusion}}</div>
-            <label class="margin-left" for="Exclusion">Exclusion</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.harmful_content}}</div>
-            <label class="margin-left" for="Harmful content">Harmful content</label>
-          </div>
-          <p class="margin-top-small"> &#127760 Society Level </p>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.public_misinformation}}</div>
-            <label class="margin-left" for="Public misinformation">Public misinformation</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.political_conflict}}</div>
-            <label class="margin-left" for="Political conflict">Political conflict</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.legal_breech}}</div>
-            <label class="margin-left" for="Legal breech">Legal breech</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.economic_damage}}</div>
-            <label class="margin-left" for="Economic damage">Economic damage</label>
-          </div>
-          <div class="d-flex align-items-center">
-            <div>{{ failure_form.public_privacy_breech}}</div>
-            <label class="margin-left" for="Public privacy breech">Public privacy breech</label>
-          </div>
-
-          <! -- end form -->
-          <div class="alert light-purple-background border-radius margin-top-small" role="alert">
-          &#128073 How severe would you rate the effects of this failure from an user's perspective?
-        </div>
-
-          <p>Failure severity</p>
-          <div class="slidecontainer">
-            <input type="range" min="1" max="10" value="5" class="slider" id="myRange">
-          </div>
-
-          <div class="range-wrap">
-            <div class="range-value" id="rangeV"></div>
-            <input id="range" type="range" min="0" max="10" value="5" step="1">
-          </div>
-          <div>{{ failure_form.failure_severity}}</div>
-          <input name="failure_submit" type="submit" value="&#128218 Save to AI failure book" class="btn primary margin-top-small">
-        </div>
-      <! -- END FAILURE EFFECTS -->
     </div>
     <! -- END ROW-->
-
-
-
-    <button class="btn primary margin-top-small">&#9889 Add failure</button>
-    <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app">&#129303 Continue exploring</a> </button>
 
     {% endif %}
 
   </div> <! -- Container -->
 
-<! -- Bootstrap-->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
-  </script>
-
 </body>
+</html>
 <! -- internal scripts -->
 <script src="{% static 'fdd_app/js/bbox.js' %}"></script>
 <script src="{% static 'fdd_app/js/table.js' %}"></script>
 <script src="{% static 'fdd_app/js/slider.js' %}"></script>
 <script src="{% static 'fdd_app/js/explanation.js' %}"></script>
-</html>
-
+<script src="{% static 'fdd_app/js/hide.js' %}"></script>
 
 
 

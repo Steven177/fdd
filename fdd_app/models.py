@@ -4,8 +4,15 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 import uuid
 
+class Persona(models.Model):
+  name = models.CharField(max_length=100, blank=True)
+
+class Ai(models.Model):
+  name = models.CharField(max_length=100, blank=True)
+
 class Sample(models.Model):
   image = models.ImageField(upload_to='images/')
+  has_failure = models.BooleanField(default=False, blank=True)
 
 class Model_Prediction(models.Model):
   sample = models.ForeignKey(Sample, on_delete=models.CASCADE, blank=True)

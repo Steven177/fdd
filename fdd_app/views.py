@@ -12,21 +12,38 @@ from django.shortcuts import redirect
 from scipy.optimize import linear_sum_assignment
 
 from .forms import ImageForm
-from .forms import FailureForm
+# from .forms import FailureForm
+from .forms import PersonaForm
 
 from .models import Sample
 from .models import Failure
 from .models import Expectation
 from .models import Model_Prediction
 from .models import Match
+from .models import Persona
+from .models import Ai
 
 from .utils import *
 from .ai import *
+# from .seed import *
 
+def persona(request):
+  ais = Ai.objects.all()
+  persona_form = PersonaForm(request.POST)
+  # POST persona
+  if request.method == "POST":
+    print("persona_form.is_valid() {}".format(persona_form.is_valid()))
+    if persona_form.is_valid():
+      persona_form.save()
+      return redirect('/fdd_app')
+  # GET persona
+  return render(request, 'fdd_app/persona.html', {'persona_form': persona_form, 'ais': ais})
 
 @csrf_exempt
 def input(request):
   image_form = ImageForm(request.POST, request.FILES)
+  personas = Persona.objects.all()
+  ais = Ai.objects.all()
   # POST input
   if request.method == "POST":
     if image_form.is_valid():
@@ -35,13 +52,15 @@ def input(request):
 
   # GET input
   else:
-    return render(request, 'fdd_app/input.html', {"image_form": image_form})
+    return render(request, 'fdd_app/input.html', {"image_form": image_form, 'personas': personas, 'ais': ais})
 
 
 @csrf_exempt
 def user(request):
+  personas = Persona.objects.all()
+  ais = Ai.objects.all()
   # expectation_form = ExpectationForm(request.POST)
-  failure_form = FailureForm(request.POST)
+  # failure_form = FailureForm(request.POST)
 
   # template control
   write_expectation = True
@@ -71,10 +90,11 @@ def user(request):
     return render(request, 'fdd_app/user.html', {
       'exp_boxes': exp_boxes,
       'sample': sample,
-      'failure_form': failure_form,
       'colors': colors,
       'write_expectation': write_expectation,
-      'read_expectation': read_expectation
+      'read_expectation': read_expectation,
+      'personas': personas,
+      'ais': ais
     })
 
   # POST user (submit expectation)
@@ -152,7 +172,7 @@ def user(request):
 
       # boxes need at least 0.2 IoU to be a match
       iou = calculate_iou(exp, pred)
-      print("iou {}".format(iou))
+
       if iou >= 0.2:
         new_match = Match(sample=sample, expectation=exp, exp_idx=exp_idx, model_prediction=pred, pred_idx=pred_idx)
         new_match.save()
@@ -184,31 +204,39 @@ def user(request):
     matches = Match.objects.filter(sample=sample.id)
 
     for match in matches:
-      print("match {}".format(match))
       # Failing to detect
       if len(model_predictions) == 0:
         match.failing_to_detect = True
         match.save()
+        sample.has_failure = True
+        sample.save()
+
 
       # Missing detection
       if match.model_prediction == None:
         match.missing_detection = True
         match.indistribution = check_if_indistribution(match.expectation.label)
         match.save()
+        sample.has_failure = True
+        sample.save()
 
       # Unnecessary detection
       elif match.expectation == None:
         match.unnecessary_detection = True
         match.critical_quality_score = check_quality_of_score(match.model_prediction.score)
         match.save()
+        sample.has_failure = True
+        sample.save()
 
       # False detection
-      elif match.expectation.label != match.model_prediction.label:
+      elif match.expectation.label.lower() != match.model_prediction.label:
         match.false_detection = True
         match.indistribution = check_if_indistribution(match.expectation.label)
         match.critical_quality_box = check_quality_of_box(match.expectation, match.model_prediction)
         match.critical_quality_score = check_quality_of_score(match.model_prediction.score)
         match.save()
+        sample.has_failure = True
+        sample.save()
 
       # True positive
       else:
@@ -221,30 +249,27 @@ def user(request):
       'colors': colors,
       'sample': sample,
       'model_predictions': model_predictions,
-      'failure_form': failure_form,
       'expectations': expectations,
       'write_expectation': write_expectation,
       'read_expectation': read_expectation,
       'matches': matches,
+      'personas': personas,
+      'ais': ais
     })
 
   # POST Failure form
   elif request.method == "POST":
-    print("FAILURE SUBMIT")
-    print(failure_form.is_valid())
-    failure_form.save(commit=False)
-    sample = Sample.objects.latest('id')
-    print("SAMPLE --------------------------------------")
-    print(sample)
-    print("FAILURE --------------------------------------")
-    sample = Failure.objects.latest('id')
-    print(failure)
-    print("FAILURE SAMPLE BEFORE --------------------------------------")
-    print(failure.sample)
-    failure.sample = sample
-    failure.save()
-    print("FAILURE SAMPLE AFTER --------------------------------------")
-    print(failure.sample)
+    response = request.POST
+    failure_severities = response.getlist('failure_severity')
+    match_ids = response.getlist('match_id')
+
+    # Update failure severity
+    for idx, sev in enumerate(failure_severities):
+      match_id = match_ids[idx]
+      match = Match.objects.get(id=match_id)
+      match.failure_severity = int(sev)
+      match.save()
+
     return redirect('/fdd_app/failure_book')
 
   # GET user
@@ -253,17 +278,12 @@ def user(request):
     return render(request, 'fdd_app/user.html', {
       'sample': sample,
       'colors': colors,
-      'failure_form': failure_form,
       'write_expectation': write_expectation,
-      'read_expectation': read_expectation
+      'read_expectation': read_expectation,
+      'personas': personas,
+      'ais': ais
     })
 
-@csrf_exempt
-def model(request):
-  if request.method == "POST":
-    pass
-  else:
-    return render(request, 'fdd_app/model.html')
 
 @csrf_exempt
 def failure(request):
@@ -272,16 +292,8 @@ def failure(request):
     if failure_form.is_valid():
       failure_form.save()
       sample = Sample.objects.latest('id')
-      print("SAMPLE --------------------------------------")
-      print(sample)
       failure = failure_form.instance
-      print("FAILURE --------------------------------------")
-      print(failure)
-      print("FAILURE SAMPLE BEFORE --------------------------------------")
-      print(failure.sample)
       failure.sample.add(sample)
-      print("FAILURE SAMPLE AFTER --------------------------------------")
-      print(failure.sample)
       return render(request, 'fdd_app/open_model_exploration.html', {
         'image_form': image_form,
         'failure_form': failure_form,
@@ -291,9 +303,93 @@ def failure(request):
 
 @csrf_exempt
 def failure_book(request):
-  samples = Sample.objects.filter(failure=True)
-  failures = Failure.objects.all()
-  print(samples)
-  return render(request, 'fdd_app/failure_book.html', {'samples': samples, 'failures': failures})
+  # GET failure_book
+  samples = Sample.objects.filter(has_failure=True)
+  personas = Persona.objects.all()
+  ais = Ai.objects.all()
+
+  data = []
+  for sample in samples:
+
+    expectations = sample.expectation_set.all()
+    model_predictions = sample.model_prediction_set.all()
+    matches = sample.match_set.all()
+
+    total_severity = 0
+    num_of_errors = 0
+    num_of_warn = 0
+
+    recoveries = [
+    "Quality of output",
+    "N-best options",
+    "Hand-over of control",
+    "Implicit feedback",
+    "Explicit feedback",
+    "Corrections by the user",
+    "Local explanation",
+    "Global explanation"
+    ]
+    print(matches)
+    rec_ind = []
+    for match in matches:
+      if match.failing_to_detect or match.false_detection or match.missing_detection or match.unnecessary_detection:
+        num_of_errors += 1
+
+      if match.critical_quality_score and match.critical_quality_box:
+        num_of_warn += 2
+      elif match.critical_quality_score or match.critical_quality_box:
+        num_of_warn += 1
+
+      total_severity += match.failure_severity
+
+      # ---------------------------
+      # FAILURE RECOVERY
+
+      if match.failing_to_detect:
+        rec_ind.append([2, 7, 3])
+      if match.false_detection and match.indistribution:
+        rec_ind.append([5, 6, 1])
+      if match.false_detection and not match.indistribution:
+        rec_ind.append([7, 4, 2])
+      if match.missing_detection and match.indistribution:
+        rec_ind.append([4, 5, 2])
+      if match.missing_detection and  not match.indistribution:
+        rec_ind.append([7, 4, 2])
+      if match.unnecessary_detection:
+        rec_ind.append([4])
+      if match.critical_quality_score:
+        rec_ind.append([0, 1, 2, 4])
+      if match.critical_quality_box:
+        rec_ind.append([0, 4, 5])
+
+    print(" --------------------------------------")
+    print(" --------------------------------------")
+
+    print(rec_ind)
+
+    print(" --------------------------------------")
+    print(" --------------------------------------")
+
+    data.append({
+      "sample": sample,
+      "matches": matches,
+      "expectations": expectations,
+      "model_predictions": model_predictions,
+      "total_severity": total_severity,
+      "num_of_errors": num_of_errors,
+      "num_of_warn": num_of_warn,
+      'personas': personas,
+      'ais': ais
+      })
+
+  return render(request, 'fdd_app/failure_book.html',
+    {
+    'samples': samples,
+    "data": data,
+    "recoveries": recoveries,
+    "rec_ind": rec_ind,
+    'personas': personas,
+    'ais': ais
+    })
 
 

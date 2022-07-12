@@ -2,6 +2,7 @@ from django import forms
 from django.forms import formset_factory
 from .models import Sample
 from .models import Failure
+from .models import Persona
 # from .models import Expectation
 
 
@@ -15,6 +16,11 @@ class FailureForm(forms.ModelForm):
     model = Failure
     fields = '__all__'
     exlude = ('sample',)
+
+class PersonaForm(forms.ModelForm):
+  class Meta:
+    model = Persona
+    fields = '__all__'
 
 """
 class ExpectationForm(forms.ModelForm):

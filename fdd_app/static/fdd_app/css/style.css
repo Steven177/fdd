@@ -154,6 +154,14 @@ body.font {
   height: 150px;
 }
 
+.width50 {
+  width:  50% !important;
+}
+
+.max-width {
+  max-width:  150px;
+}
+
 .padding-small {
   padding: 10px;
 }

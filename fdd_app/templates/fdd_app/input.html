@@ -28,6 +28,7 @@
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
+            <a class="nav-link light" aria-current="page" href="/fdd_app/persona">&#129489 User Research</a>
            <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/">&#128171 Failure Exploration</a>
             <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">&#128218 AI Failure Book</a>
         </div>
@@ -36,31 +37,28 @@
        <div class="margin-right">
         <h4 class="white">&#129489 Use Case</h4>
         <div class="dropdown whitebackground border-radius">
-          <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-            Tourist persona
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-            <li><a class="dropdown-item" href="#">xxx</a></li>
-            <li><a class="dropdown-item" href="#">xxx</a></li>
-          </ul>
+          <select class="form-select border-radius" aria-label="Default select example">
+            {% for persona in personas reversed %}
+              <option class="border-radius" value="persona{{forloop.counter}}">{{persona.name}}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
 
       <div class="margin-right">
         <h4 class="white">&#128065 AI Model</h4>
         <div class="dropdown whitebackground border-radius">
-        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-          DETR: Object detection
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-          <li><a class="dropdown-item" href="#">YOLO: Object detection</a></li>
-          <li><a class="dropdown-item" href="#">FasterRCNN: Object detection</a></li>
-        </ul>
+        <select class="form-select border-radius" aria-label="Default select example">
+        {% for ai in ais %}
+          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
+        {% endfor %}
+        </select
         </div>
       </div>
 
     </div>
   </nav>
+  <! -- END NAVBAR -->
 
   <div class="container">
     <h1 class="border-bottom margin-top-large">&#128171 Failure Exploration</h1>
@@ -166,6 +164,10 @@
     <! -- END ROW-->
 
 
+
+
+
+
   </div> <! -- CONTAINER-->
 </body>
 
@@ -174,6 +176,9 @@
 <script src="{% static 'fdd_app/js/table.js' %}"></script>
 <script src="{% static 'fdd_app/js/slider.js' %}"></script>
 <script src="{% static 'fdd_app/js/explanation.js' %}"></script>
+<script src="{% static 'fdd_app/js/hide.js' %}"></script>
 </html>
+
+
 
 
