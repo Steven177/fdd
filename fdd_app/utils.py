@@ -1,9 +1,18 @@
 import json
 import numpy as np
 import torch
+import requests
 from torchvision.ops.boxes import _box_inter_union
 from torchvision.ops.boxes import box_area
-import requests
+from serpapi import GoogleSearch
+import urllib.request
+# from .models import Sample
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from io import StringIO
+from django.core.files.base import ContentFile
+import io
+
+
 
 API_TOKEN = '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'
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
@@ -163,4 +172,25 @@ def calculate_iou(exp, pred):
 def check_quality_of_score(score, threshold=0.95):
   return True if score <= threshold else False
 
+def call_google_api(q):
+  params = {
+  "api_key": "29c4697ac11caf960f16371bafa039aa7510c41cbe9acd0fe5bb6293d7f6f0e1",
+  "engine": "google",
+  "q": q,
+  "location": "Austin, Texas, United States",
+  "google_domain": "google.com",
+  "gl": "us",
+  "hl": "en",
+  "tbm": "isch"
+  }
 
+  search = GoogleSearch(params)
+  return search.get_dict()
+
+
+def augment_image(img):
+  img_io = io.BytesIO()
+  img.save(fp=img_io, format='JPEG')
+  img_pil = ContentFile(img_io.getvalue())
+  img_file = InMemoryUploadedFile(img_pil, None, 'foo.jpg', 'image/jpeg', img_pil.tell, None)
+  return img_file

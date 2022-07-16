@@ -171,27 +171,28 @@ for (let i = 0; i < bboxes.length; i++) {
 
 // ----------------------------------------------------------------------
 
+
 // https://stackoverflow.com/questions/25862798/how-to-send-the-javascript-list-of-dictionaries-object-to-django-ajax
 function saveBoxes() {
+
+  console.log("hello")
   var div_review = document.getElementById("div_review");
   var div_save = document.getElementById("div_save");
   div_review.classList.add("d-none");
   div_save.classList.remove("d-none");
 
-  console.log(div_review)
-  console.log(div_save)
-
   var expBoxes = JSON.stringify(rectangles);
-  console.log(expBoxes);
+
+  var path = window.location.href
+  console.log(path)
+  var sample_id = path.split('fdd_app/')[1]
+  console.log(sample_id)
+
+  // http://localhost:8000/fdd_app/sample%3D$%7Bsample_id%7D
+
   $.ajax({
-    "url": "/fdd_app/user",
+    "url": "/fdd_app/sample=${sample_id}",
     "type": "POST",
     "data": {'expBoxes[]': expBoxes},
  });
-
-
-  //var b2 = document.getElementById("b2");
-  //b2.classList.add("d-none");
-  //var b4 document.getElementById("b4");
-  //b4.classList.remove("d-none");
 }

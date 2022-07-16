@@ -8,11 +8,22 @@
     {% load mathfilters %}
     {% load index %}
     <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
     <! -- fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;700&display=swap" rel="stylesheet">
+
+    <! -- external scripts -->
+    <script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
+    <! -- Bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+    </script>
+    <! -- jquery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
 </head>
 
 <body class="font">
@@ -60,91 +71,270 @@
     <div class="row justify-content-start">
       <! -- FAILURE RECOVERY  -->
       <div class="col-12">
-        <h2 class="purple-color margin-top-large">Failure Recovery</h2>
+        <h2 class="purple-color margin-top-large">Overview</h2>
         <h3 class="font-size-15">Let's see in what ways we can recover from failures.</h3>
-        <p>Select out of pre-defined options. </p>
+        <p> Number of false_detections: {{ false_detections|length }} </p>
+        <p>Total severity false_detections: {{sev_false_detections}}</p>
+
+        <p> Number of failing_to_detect: {{ failing_to_detect|length }} </p>
+        <p>Total severity failing_to_detect: {{sev_failing_to_detect}}</p>
+        <p> Number of missing_detection: {{ missing_detections|length }} </p>
+        <p>Total severity missing_detections: {{sev_missing_detections}}</p>
+        <p> Number of unnecessary_detection: {{ unnecessary_detections|length }} </p>
+        <p>Total severity unnecessary_detections: {{sev_unnecessary_detections}}</p>
+
+        <p> Number of critical_quality_score: {{ critical_quality_scores|length }} </p>
+        <p> Number of critical_quality_box: {{ critical_quality_boxes|length }} </p>
+
       </div>
       <! -- END FAILURE RECOVERY -->
     </div>
     <! -- END ROW-->
 
-    <h2 class="purple-color margin-top-large">Failures and Recovery Options</h2>
+    <h2 class="purple-color margin-top-large">Failures Modes</h2>
     <h3 class="font-size-15">All of your failure at a glance.</h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Sample</th>
-          <th scope="col">Failure Modes & Failure Recovery</th>
-          <th scope="col">Failure Effects & Severity</th>
-          <th scope="col">Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for d in data %}
-        <tr>
-          <td>
-            <img src="{{d.sample.image.url}}" class="img border-radius max-width">
-          </td>
-          <td>
-            <p>Number of errors: {{d.num_of_errors}}</p>
-            <p>Number of warnings: {{d.num_of_warn}}</p>
-          {% for match in d.matches %}
-            <div class="border-bottom">
-              <h5>{{forloop.counter}}/{{d.matches|length}}</h5>
-              {% if match.failing_to_detect %}
-              <p class="tag error text-align-center">&#10060 Failing to detect</p>
-              {% endif %}
-              {% if match.missing_detection %}
-                <p class="tag error text-align-center">&#10060 Missing detection</p>
-                {% if match.indistitribution %}
-                  <p class="tag info text-align-center">ℹ️ In-distribution</p>
-                {% else %}
-                  <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
-                {% endif %}
-              {% endif %}
-              {% if match.unnecessary_detection %}
-                <p class="tag error text-align-center">&#10060 Unnecessary detection</p>
-              {% endif %}
-              {% if match.false_detection %}
-                <p class="tag error text-align-center">&#10060 False detection</p>
-                {% if match.indistitribution %}
-                  <p class="tag info text-align-center">ℹ️ In-distribution</p>
-                {% else %}
-                  <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
-                {% endif %}
-              {% endif %}
-
-              {% if match.critical_quality_box %}
-                <p class="tag warning text-align-center">⚠️ Critical quality box</p>
-              {% endif %}
-              {% if match.critical_quality_score %}
-                <p class="tag warning text-align-center">⚠️ Critical quality score</p>
-              {% endif %}
-
-            </div>
-
-          {% endfor %}
-          </td>
-
-          <td>
-            <p>{{d.total_severity}}</p>
-          </td>
-          <td>
-            <p>Your notes</p>
-          </td>
 
 
-        {% endfor %}
-        </tr>
+<div class="m-4">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="nav-item">
+            <a href="#false_detections" class="nav-link active colorblack" data-bs-toggle="tab">False Detections</a>
+        </li>
+        <li class="nav-item">
+            <a href="#failing_to_detect" class="nav-link colorblack" data-bs-toggle="tab">Failing to detect</a>
+        </li>
+        <li class="nav-item">
+            <a href="#missing_detection" class="nav-link colorblack" data-bs-toggle="tab">Missing detections</a>
+        </li>
+        <li class="nav-item">
+            <a href="#unnecessary_detection" class="nav-link colorblack" data-bs-toggle="tab">Unnecessary detections</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <! -- FALSE DETECTIONS  -->
+        <div class="tab-pane fade show active" id="false_detections">
 
-      </tbody>
-    </table>
-  </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">User Expectation</th>
+                <th scope="col">Model Prediction</th>
+                <th scope="col">Failure Severity & Tags</th>
+                <th scope="col">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            {% for match in false_detections %}
+              <tr>
+                <! -- Expectation -->
+                <td>
+                  <! -- Exp Box -->
+                  <div class="position-relative">
+                    <svg class="position-absolute" width="{{match.sample.image.width}}" height="{{match.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+                    <rect id="" class="box normalBox" x={{match.expectation.xmin}} y={{match.expectation.ymin}} width={{match.expectation.xmax|sub:match.expectation.xmin}} height={{match.expectation.ymax|sub:match.expectation.ymin}} style="stroke:green;fill-opacity:0">
+                    </rect>
+                    </svg>
+                    <img src="{{match.sample.image.url}}" class="border-radius">
+                  </div>
+                  <! -- Exp Label -->
+                  <i class="fa-solid fa-square" style="color: green"></i>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between">
+                      <p> {{ match.expectation.label|title}} </p>
+                    </div>
+                  </div>
+                </td>
+
+                <! -- Model prediction -->
+                <td>
+                  <! -- Pred Box -->
+                  <div class="position-relative">
+                    <svg class="position-absolute" width="{{match.sample.image.width}}" height="{{match.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+                    <rect id="" class="box normalBox" x={{match.model_prediction.xmin}} y={{match.model_prediction.ymin}} width={{match.model_prediction.xmax|sub:match.model_prediction.xmin}} height={{match.model_prediction.ymax|sub:match.model_prediction.ymin}} style="stroke:blue;fill-opacity:0">
+                    </rect>
+                    </svg>
+                    <img src="{{match.sample.image.url}}" class="border-radius">
+                  </div>
+                  <! -- Pred Label -->
+                  <i class="fa-solid fa-square" style="color: blue"></i>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between">
+                      <p> {{ match.model_prediction.label|title}} </p>
+                    </div>
+                  </div>
+                </td>
+                <! -- Failure Severity -->
+                <td>
+                  <p>{{ match.failure_severity }}</p>
+                  {% if match.indistitribution %}
+                        <p class="tag info text-align-center">ℹ️ In-distribution</p>
+                  {% else %}
+                    <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
+                  {% endif %}
+
+                  {% if match.critical_quality_box %}
+                    <p class="tag warning text-align-center">⚠️ Critical quality box</p>
+                  {% endif %}
+                  {% if match.critical_quality_score %}
+                    <p class="tag warning text-align-center">⚠️ Critical quality score</p>
+                  {% endif %}
+                </td>
+
+                <! -- Notes -->
+                <td>
+
+                </td>
+              </tr>
+            {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <! -- END FALSE DETECTIONS  -->
+        <! -- FAILING TO OBSERVE  -->
+        <div class="tab-pane fade" id="failing_to_detect">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Sample</th>
+                <th scope="col">Failure Severity & Tags</th>
+                <th scope="col">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            {% for match in failing_to_detect %}
+              <tr>
+                <td>
+                <! -- Sample -->
+                  <img src="{{match.sample.image.url}}" class="border-radius">
+                </td>
+                <! -- Failure Severity -->
+                <td>
+                  <p>{{ match.failure_severity }}</p>
+                </td>
+
+                <! -- Notes -->
+                <td>
+
+                </td>
+              </tr>
+            {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <! -- END FAILING TO OBSERVE  -->
+        <! -- MISSING DETECTIONS -->
+        <div class="tab-pane fade" id="missing_detection">
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">User Expectation</th>
+                <th scope="col">Failure Severity & Tags</th>
+                <th scope="col">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            {% for match in missing_detections %}
+              <tr>
+                <! -- Expectation -->
+                <td>
+                  <! -- Exp Box -->
+                  <div class="position-relative">
+                    <svg class="position-absolute" width="{{match.sample.image.width}}" height="{{match.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+                    <rect id="" class="box normalBox" x={{match.expectation.xmin}} y={{match.expectation.ymin}} width={{match.expectation.xmax|sub:match.expectation.xmin}} height={{match.expectation.ymax|sub:match.expectation.ymin}} style="stroke:green;fill-opacity:0">
+                    </rect>
+                    </svg>
+                    <img src="{{match.sample.image.url}}" class="border-radius">
+                  </div>
+                  <! -- Exp Label -->
+                  <i class="fa-solid fa-square" style="color: green"></i>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between">
+                      <p> {{ match.expectation.label|title}} </p>
+                    </div>
+                  </div>
+                </td>
+
+                <! -- Failure Severity -->
+                <td>
+                  <p>{{ match.failure_severity }}</p>
+                  {% if match.indistitribution %}
+                        <p class="tag info text-align-center">ℹ️ In-distribution</p>
+                  {% else %}
+                    <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
+                  {% endif %}
+                </td>
+
+                <! -- Notes -->
+                <td>
+
+                </td>
+              </tr>
+            {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <! -- END MISSING DETECTIONS -->
+        <! -- UNNCESSARY DETECTIONS  -->
+        <div class="tab-pane fade" id="unnecessary_detection">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Model Prediction</th>
+                <th scope="col">Failure Severity & Tags</th>
+                <th scope="col">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            {% for match in unnecessary_detections %}
+              <tr>
+                <! -- Model prediction -->
+                <td>
+                  <! -- Pred Box -->
+                  <div class="position-relative">
+                    <svg class="position-absolute" width="{{match.sample.image.width}}" height="{{match.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+                    <rect id="" class="box normalBox" x={{match.model_prediction.xmin}} y={{match.model_prediction.ymin}} width={{match.model_prediction.xmax|sub:match.model_prediction.xmin}} height={{match.model_prediction.ymax|sub:match.model_prediction.ymin}} style="stroke:blue;fill-opacity:0">
+                    </rect>
+                    </svg>
+                    <img src="{{match.sample.image.url}}" class="border-radius">
+                  </div>
+                  <! -- Pred Label -->
+                  <i class="fa-solid fa-square" style="color: blue"></i>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between">
+                      <p> {{ match.model_prediction.label|title}} </p>
+                    </div>
+                  </div>
+                </td>
+                <! -- Failure Severity -->
+                <td>
+                  <p>{{ match.failure_severity }}</p>
+                  {% if match.critical_quality_score %}
+                    <p class="tag warning text-align-center">⚠️ Critical quality score</p>
+                  {% endif %}
+                </td>
+
+                <! -- Notes -->
+                <td>
+
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <! -- END UNNCESSARY DETECTIONS  -->
+    </div>
+</div>
+
 </div> <! -- Container -->
-
-<! -- Bootstrap-->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
-  </script>
 
 </body>
 </html>

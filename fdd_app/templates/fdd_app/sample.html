@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Open Model Exporation</title>
+    {% load static %}
+    {% load mathfilters %}
+    {% load index %}
+    {% load to_int %}
+    <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
+
+    <! -- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;700&display=swap" rel="stylesheet">
+
+    <! -- external scripts -->
+    <script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
+    <! -- Bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+    </script>
+    <! -- jquery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body class="font">
+  <! -- NAVBAR -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-link light" aria-current="page" href="/fdd_app/persona">&#129489 User Research</a>
+           <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/">&#128171 Failure Exploration</a>
+            <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">&#128218 AI Failure Book</a>
+        </div>
+      </div>
+
+       <div class="margin-right">
+        <h4 class="white">&#129489 Use Case</h4>
+        <div class="dropdown whitebackground border-radius">
+          <select class="form-select border-radius" aria-label="Default select example">
+            {% for persona in personas reversed %}
+              <option class="border-radius" value="persona{{forloop.counter}}">{{persona.name}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="margin-right">
+        <h4 class="white">&#128065 AI Model</h4>
+        <div class="dropdown whitebackground border-radius">
+        <select class="form-select border-radius" aria-label="Default select example">
+        {% for ai in ais %}
+          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
+        {% endfor %}
+        </select
+        </div>
+      </div>
+
+    </div>
+  </nav>
+  <! -- END NAVBAR -->
+
+  <div class="container">
+    <h1 class="border-bottom margin-top-large">&#128171 Failure Exploration</h1>
+
+    {% if write_expectation %}
+      <! -- ROW-->
+      <div class="row justify-content-start">
+        <! -- EXPECTATION -->
+        <div id="" class="col-6">
+          <h2 class="purple-color margin-top-large">User Expectation</h2>
+          <h3 class="font-size-15">Let's set expectations. </h3>
+          <div class="alert light-purple-background border-radius" role="alert">
+            &#128073 Put yourself into the shoes of your user... What would he or she expect for this image? Draw bounding boxes and label the objects.
+          </div>
+          <! -- canvas -->
+          <div class="position-relative" style="width: {{sample.image.width}}px; height: {{sample.image.height}}px">
+            <img class="border-radius" width="{{sample.image.width}}" height="{{sample.image.height}}" src="{{sample.image.url}}" id="screenshot" draggable="false">
+            <svg width="{{sample.image.width}}" height="{{sample.image.height}}" viewBox="0 0 {{sample.image.width}} {{sample.image.height}}" id="draw" xmlns="http://www.w3.org/2000/svg">
+            <rect id="marquee" x="0" y="0" width="{{sample.image.width}}" height="{{sample.image.height}}" />
+            <g id="boxes"></g>
+            </svg>
+          </div>
+
+          <! -- labels -->
+          <div>
+          <form method="post">
+            {% csrf_token %}
+            <div id="label0" class="label d-none" style="color: {{ colors.0 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c0" name="class0" class="border-radius form-control">
+            </div>
+            <div id="label1" class="label d-none" style="color: {{ colors.1 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c1" name="class1" class="border-radius form-control">
+            </div>
+            <div id="label2" class="label d-none" style="color: {{ colors.2 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c2" name="class2" class="border-radius form-control">
+            </div>
+            <div id="label3" class="label d-none" style="color: {{ colors.3 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c3" name="class3" class="border-radius form-control">
+            </div>
+            <div id="label4" class="label d-none" style="color: {{ colors.4 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c4" name="class4" class="border-radius form-control">
+            </div>
+            <div id="label5" class="label d-none" style="color: {{ colors.5 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c5" name="class5" class="border-radius form-control">
+            </div>
+            <div id="label6" class="label d-none" style="color: {{ colors.6 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c6" name="class6" class="border-radius form-control">
+            </div>
+            <div id="label7" class="label d-none" style="color: {{ colors.7 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c7" name="class7" class="border-radius form-control">
+            </div>
+            <div id="label8" class="label d-none" style="color: {{ colors.8 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c8" name="class8" class="border-radius form-control">
+            </div>
+            <div id="label9" class="label d-none" style="color: {{ colors.9 }}">
+              <i class="fa-solid fa-square"></i>
+              <input type="text" id="c9" name="class9" class="border-radius form-control">
+            </div>
+
+            <div id="div_save" class="d-flex d-none">
+              <input id="b4" name="expectation_submit" type="submit" value="&#128076 Reveal Model Prediction" class="btn primary margin-top-small">
+            </div>
+            </div>
+          </form>
+          <div id="div_review" class="d-flex align-items-center">
+           <button id="b2" class="btn primary margin-right margin-top-small" onclick="javascript:saveBoxes()"> Save</button>
+           <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app/user">Start over</a> </button>
+          </div>
+          </div>
+          <! -- end labels -->
+        </div>
+        <! -- END EXPECTATION -->
+      </div>
+      <! -- END ROW -->
+    {% endif %}
+
+    {% if read_expectation %}
+      <! -- ROW -->
+      <div class="row justify-content-start">
+        <! -- EXPECTATION PREFILLED -->
+        <div id="" class="col-6">
+          <h2 class="purple-color margin-top-large">User Expectation</h2>
+          <h3 class="font-size-15">Let's set expectations. </h3>
+          <div class="alert light-purple-background border-radius" role="alert">
+            &#128079 Got it! <br> This is what the user expects.
+          </div>
+          <! -- canvas -->
+          <div class="position-relative" style="width: {{sample.image.width}}px; height: {{sample.image.height}}px">
+            <img class="border-radius" width="{{sample.image.width}}" height="{{sample.image.height}}" src="{{sample.image.url}}" id="screenshot" draggable="false">
+            <svg width="{{sample.image.width}}" height="{{sample.image.height}}" viewBox="0 0 {{sample.image.width}} {{sample.image.height}}" id="draw" xmlns="http://www.w3.org/2000/svg">
+            <rect id="marquee" x="0" y="0" width="{{sample.image.width}}" height="{{sample.image.height}}" />
+            {% for exp in expectations %}
+              <g id="boxes"></g>
+              <rect class="bbox" x="{{exp.xmin}}" y="{{exp.ymin}}" width="{{exp.xmax|sub:exp.xmin}}" height="{{exp.ymax|sub:exp.ymin}}" style="stroke:{{ colors|index:forloop.counter0 }};" c/>
+            {% endfor %}
+            </svg>
+          </div>
+
+          <! -- labels -->
+          <div>
+          {% for exp in expectations %}
+            <div class="label">
+              <i class="fa-solid fa-square" style="color:{{ colors|index:forloop.counter0 }};"></i>
+              <p class="form-like-p">{{exp.label}}</p>
+            </div>
+          {% endfor %}
+          </div>
+          <! -- end labels -->
+        </div>
+        <! -- END EXPECTATION PREFILLED -->
+
+        <! -- PREDICTION -->
+        <div id="" class="col-6">
+          <h2 class="purple-color margin-top-large">Model Prediction</h2>
+          <h3 class="font-size-15">Let's view the prediction of the model. </h3>
+          <div class="alert light-purple-background border-radius" role="alert">
+            &#128073 This is what the AI model predicts. Assess if the AI can live up to the standards of your user.
+          </div>
+          <! -- image -->
+          <div class="position-relative">
+            <svg class="position-absolute" width="{{sample.image.width}}" height="{{sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+            {% for pred in model_predictions %}
+               <rect id="{{ forloop.counter0 }}" class="box normalBox" x={{pred.xmin}} y={{pred.ymin}} width={{pred.xmax|sub:pred.xmin}} height={{pred.ymax|sub:pred.ymin}} style="stroke:{{ colors|index:forloop.counter0 }};fill-opacity:0"/>
+              </rect>
+            {% endfor %}
+            </svg>
+            <img src="{{sample.image.url}}" class="border-radius">
+          </div>
+
+          {% for pred in model_predictions %}
+          <div id="{{ forloop.counter0|add:100 }}" class="pred">
+            <i class="fa-solid fa-square" style="color:{{ colors|index:forloop.counter0 }}"></i>
+            <div class="d-flex justify-content-between align-items-center border-bottom">
+              <div class="d-flex justify-content-between">
+                <p> {{ pred.label|title}} </p>
+                <p class="margin-left"> {{ pred.score | mul:100 | floatformat:0 }} %  </p>
+              </div>
+
+              <button id="b5" class="btn secondary" onclick="loadExplanation('{{ forloop.counter0|add:200 }}')">Explanation </button>
+            </div>
+            <div id="{{ forloop.counter0|add:300 }}" class="d-none d-flex align-items-center">
+              <img class="fixed-height rounded" src="" alt="" id="{{ forloop.counter0|add:200 }}">
+              <p>Here we visualize the attention of the AI. This corresponds to visualizing which part of the image the AI focuses on when making a prediction. </p>
+            </div>
+          </div>
+          {% endfor %}
+          <button id="b6" class="btn primary margin-top-small" onclick="javascript:runFailureAnalysis(failures)"> Run failure analysis  </button>
+        </div>
+        <! -- END PREDICTION -->
+      </div>
+      <! -- END ROW -->
+
+
+    <! --  ROW -->
+    <div id="failures" class="row justify-content-start d-none">
+        <! -- FAILURE ANALYSIS -->
+        <h2 class="purple-color margin-top-large">Failure Analysis </h2>
+        <h3 class="font-size-15">Let's see if the model could live up to the expectation of the user. </h3>
+
+        <! --  MATCH -->
+        {% if model_predictions|length == 0 and expectations|length > 0 %}
+          <div class="border margin-top-small padding-small">
+            <h5 class="text-align-center">Failure Analysis</h5>
+            <p class="tag error text-align-center">&#10060 Failing to observe</p>
+            <p class="text-align-center">The model did not make any prediction for this image. </p>
+            <br>
+          </div>
+        {% endif %}
+
+        {% for match in matches%}
+        <div class="border margin-top-small">
+          <div class="row border-bottom padding-small" padding-small>
+            <h4 class="text-align-center"> {{forloop.counter}}/{{matches|length}}</h4>
+            <div class="col-6">
+              <h4 class="text-align-center">Expectation</h4>
+              <div class="d-flex justify-content-center align-items-center">
+                {% if match.exp_idx != -1%}
+                <i class="fa-solid fa-square" style="color:{{ colors|index:match.exp_idx }}"></i><br>
+                {% endif %}
+                <p class="margin-top-zero margin-left-small">{{match.expectation.label}}</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <h4 class="text-align-center">Model Prediction</h4>
+              <div class="d-flex justify-content-center align-items-center">
+                {% if match.pred_idx != -1 %}
+                  <i class="fa-solid fa-square" style="color:{{ colors|index:match.pred_idx }}"></i><br>
+                {% endif %}
+                <p class="margin-top-zero margin-left-small">{{match.model_prediction.label|title}}</p>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center align-items-center">
+              <button id="b7" class="btn secondary width50 margin-top-small" type="button" data-bs-toggle="collapse" data-bs-target="#failure{{forloop.counter}}" aria-expanded="false" aria-controls="failure{{forloop.counter}}" onclick="javascript:hide(b7)">View in detail
+            </button>
+
+            </div>
+
+          </div>
+
+
+
+          <div id="failure{{forloop.counter}}" class="collapse">
+            <h5 class="text-align-center">Failure Analysis</h5>
+            <div class="padding-small">
+              <div>
+                {% if match.missing_detection %}
+                  <p class="tag error text-align-center">&#10060 Missing detection</p>
+                  <p class="text-align-center">The "{{match.expectation.label}}" was missed by the model. </p>
+                  <br>
+                  {% if match.indistribution %}
+                    <p class="tag info text-align-center">ℹ️ In-distribution</p>
+                    <p class="text-align-center">The object lies within the model's domain. It should be able to detect this {{match.expectation.label}}.</p>
+                    <br>
+                  {% else %}
+                    <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
+                    <p class="text-align-center">The object lies outside of the model's domain. You would need to train the model first on the class {{match.expectation.label}}. </p>
+                    <br>
+                  {% endif %}
+                {% endif %}
+
+                {% if match.unnecessary_detection %}
+                  <p class="tag error text-align-center">&#10060 Unnecessary detection</p>
+                  <p class="text-align-center">The model has detected a {{match.model_prediction.label}} that seems to be not important to the user. It could not be matched to any user expectation.</p>
+                  <br>
+                  {% if match.critical_quality_score %}
+                    <p class="tag warning text-align-center">⚠️ Critical quality score</p>
+                    <p class="text-align-center">Be aware! This prediction bears uncertainty - it's below 95%.</p>
+                    <br>
+                  {% endif %}
+                {% endif %}
+
+                {% if match.true_positive %}
+                  <p class="tag ok text-align-center">&#9989 Correct detection</p>
+                  <p class="text-align-center">Yay! The model has predicted this object correctly.</p>
+                  <br>
+                  {% if match.critical_quality_score %}
+                    <p class="tag warning text-align-center">⚠️ Critical quality score</p>
+                    <p class="text-align-center">Be aware! This prediction bears uncertainty - it's below 95%.</p>
+                    <br>
+                  {% endif %}
+                  {% if match.critical_quality_box %}
+                    <p class="tag warning text-align-center">⚠️ Critical quality box</p>
+                    <p class="text-align-center">Watch out! The boxes of the user expectation and model prediction do not quite overlap. </p>
+                    <br>
+                  {% endif %}
+                {% endif %}
+
+                {% if match.false_detection %}
+                  <p class="tag error text-align-center">&#10060 False detection</p>
+                  <p class="text-align-center">The model predicted something else for this object. It predicted {{match.model_prediction.label}}, not {{match.expectation.label}}.</p>
+                  <br>
+                  {% if match.indistribution %}
+                    <p class="tag info text-align-center">ℹ️ In-distribution</p>
+                    <p class="text-align-center">The object lies within the model's domain. It should be able to detect this {{match.expectation.label}}.</p>
+                    <br>
+                  {% else %}
+                    <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
+                    <p class="text-align-center">The object lies outside of the model's domain. You would need to train the model first on the class {{match.expectation.label}}.</p>
+                    <br>
+                  {% endif %}
+                  {% if match.critical_quality_score %}
+                    <p class="tag warning text-align-center">⚠️ Critical quality score</p>
+                    <p class="text-align-center">Be aware! This prediction bears uncertainty - it's below 95%.</p>
+                    <br>
+                  {% endif %}
+                  {% if match.critical_quality_box %}
+                    <p class="tag warning text-align-center"> ⚠️ Critical quality box</p>
+                    <p class="text-align-center">Watch out! The boxes of the user expectation and model prediction do not quite overlap.</p>
+                    <br>
+                  {% endif %}
+                {% endif %}
+
+                {% if match.missing_detection or match.unnecessary_detection  or match.false_detection or match.failing_to_detect %}
+                  <div class="alert light-purple-background border-radius" role="alert"> &#128073 How severe is this problem from a user's point of view?
+                  </div>
+                  <! --  failure severity form -->
+                  <form id="{{match.id}}" class="failure_severity_form" action="" method="POST">
+                    {% csrf_token %}
+                    <label for="severity">Rate from 1 (low) to 5 (high)</label><br>
+                    <input type="number" step="1" name="failure_severity">
+                    <input value = "{{match.id}}" type="hidden" name="match_id">
+                  <! --  end failure severity form -->
+
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+        </div>
+        {% endfor %}
+
+        {% if matches|length > 0 %}
+          <input type="submit" value="&#128218 Save to AI failure book" class="btn primary margin-top-small" style="width: 50%">
+          </form>
+        {% else %}
+          <p> &#128579 Everthing fine! No failures detected</p>
+          <a class="btn primary atag-btn-black" style="width: 50%" href="/fdd_app">&#129303 Continue exploring</a>
+        {% endif %}
+
+
+        <! --  END MATCH -->
+
+      <! -- END FAILURE ANALYSIS-->
+    </div>
+    <! -- END ROW -->
+
+    </div>
+    <! -- END ROW-->
+
+    {% endif %}
+
+  </div> <! -- Container -->
+
+</body>
+</html>
+<! -- internal scripts -->
+<script src="{% static 'fdd_app/js/bbox.js' %}"></script>
+<script src="{% static 'fdd_app/js/table.js' %}"></script>
+<script src="{% static 'fdd_app/js/slider.js' %}"></script>
+<script src="{% static 'fdd_app/js/explanation.js' %}"></script>
+<script src="{% static 'fdd_app/js/hide.js' %}"></script>
+
+
+
+
+
+
+
+
+
+
+
+

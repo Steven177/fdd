@@ -656,6 +656,82 @@
 
 
 
+<tr>
+          <td>
+            <img src="{{d.sample.image.url}}" class="img border-radius max-width">
+          </td>
+          <td>
+            <p>Number of errors: {{d.num_of_errors}}</p>
+            <p>Number of warnings: {{d.num_of_warn}}</p>
+          {% for match in d.matches %}
+            <div class="border-bottom">
+              <h5>{{forloop.counter}}/{{d.matches|length}}</h5>
+              {% if match.failing_to_detect %}
+              <p class="tag error text-align-center">&#10060 Failing to detect</p>
+              {% endif %}
+              {% if match.missing_detection %}
+                <p class="tag error text-align-center">&#10060 Missing detection</p>
+                {% if match.indistitribution %}
+                  <p class="tag info text-align-center">ℹ️ In-distribution</p>
+                {% else %}
+                  <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
+                {% endif %}
+              {% endif %}
+              {% if match.unnecessary_detection %}
+                <p class="tag error text-align-center">&#10060 Unnecessary detection</p>
+              {% endif %}
+              {% if match.false_detection %}
+                <p class="tag error text-align-center">&#10060 False detection</p>
+                {% if match.indistitribution %}
+                  <p class="tag info text-align-center">ℹ️ In-distribution</p>
+                {% else %}
+                  <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
+                {% endif %}
+              {% endif %}
+
+              {% if match.critical_quality_box %}
+                <p class="tag warning text-align-center">⚠️ Critical quality box</p>
+              {% endif %}
+              {% if match.critical_quality_score %}
+                <p class="tag warning text-align-center">⚠️ Critical quality score</p>
+              {% endif %}
+
+            </div>
+
+          {% endfor %}
+          </td>
+
+          <td>
+            <p>{{d.total_severity}}</p>
+          </td>
+          <td>
+            <p>Your notes</p>
+          </td>
+
+
+        {% endfor %}
+        </tr>
+
+
+ <! -- labels -->
+          <div>
+          {% for exp in expectations %}
+            <div class="label">
+              <i class="fa-solid fa-square" style="color:{{ colors|index:forloop.counter0 }};"></i>
+              <p class="form-like-p">{{exp.label}}</p>
+            </div>
+          {% endfor %}
+          </div>
+          <! -- end labels -->
+
+
+
+            <img class="border-radius" src="{{match.sample.image.url}}">
+            <svg width="{{sample.image.width}}" height="{{sample.image.height}}" viewBox="0 0 {{sample.image.width}} {{sample.image.height}}" id="draw" xmlns="http://www.w3.org/2000/svg">
+            <rect class="bbox" x="{{match.expectation.xmin}}" y="{{match.expectation.ymin}}" width="{{match.expectation.xmax|sub:expectation.xmin}}" height="{{expectation.ymax|sub:expectation.ymin}}" c/>
+          </svg>
+
+
 
 
 
