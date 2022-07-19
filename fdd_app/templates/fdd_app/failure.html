@@ -735,11 +735,71 @@
 
 
 
+<div class="margin-right">
+      <div class="dropdown whitebackground border-radius">
+        <select class="form-select border-radius" aria-label="Default select example">
+        {% for persona in personas %}
+          <option class="border-radius" value="persona{{forloop.counter}}">{{persona.name}}</option>
+        {% endfor %}
+        </select>
+      </div>
+    </div>
 
 
 
+        <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
+          {% csrf_token %}
+          <input type="hidden" name="form_id" value="query">
+          <p>Choose persona</p>
+          {{ query_form.persona }}
+          <a href="create_persona">Create new persona</a>
+          <br>
+          <br>
+          <p>Choose scenario</p>
+          {{ query_form.scenario }}
+          <a href="create_scenario">Create new scenario</a>
+          <br>
+          <br>
+          <p>New input query</p>
+          {{ query_form.query }}
+          <button type="submit" class="btn primary">Save</button>
+          <a href="samples">Done</a>
+        </form>
+        <! -- END QUERIES -->
 
 
 
+<div class="margin-right">
+          <div class="dropdown whitebackground border-radius">
+            <select class="form-select border-radius" aria-label="Default select example">
+            {% for persona in personas %}
+              <option class="border-radius" value="persona{{forloop.counter}}">{{persona.name}}</option>
+            {% endfor %}
+            </select>
+          </div>
+        </div>
+        <button class="btn secondary">Create new persona</button>
+        <a href="create_persona">Create new persona</a>
+      </div>
+    </div>
+
+    <div class="row">
+      <h2 class="purple-color margin-top-large">Scenario </h2>
+      <h3 class="font-size-15">Let's imagine a specific scenario for your persona. </h3>
+
+      <div class="col-6">
+        <div class="margin-right">
+          <div class="dropdown whitebackground border-radius">
+            <select class="form-select border-radius" aria-label="Default select example">
+            {% for scenario in scenarios %}
+              <option class="border-radius" value="persona{{forloop.counter}}">{{scenario.name}}</option>
+            {% endfor %}
+            </select>
+          </div>
+        </div>
+        <a href="create_scenario">Create new scenario</a>
+
+      </div>
+    </div>
 
 

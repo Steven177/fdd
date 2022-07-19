@@ -185,13 +185,14 @@ function saveBoxes() {
 
   var path = window.location.href
   console.log(path)
+  console.log(this.href)
   var sample_id = path.split('fdd_app/')[1]
   console.log(sample_id)
 
   // http://localhost:8000/fdd_app/sample%3D$%7Bsample_id%7D
 
   $.ajax({
-    "url": "/fdd_app/sample=${sample_id}",
+    "url": path,
     "type": "POST",
     "data": {'expBoxes[]': expBoxes},
  });

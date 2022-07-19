@@ -6,24 +6,27 @@ import uuid
 
 class Persona(models.Model):
   name = models.CharField(max_length=100, blank=True)
+  age = models.IntegerField(blank=True, default=-1)
   personality = models.TextField(blank=True)
   objectives_and_goals = models.TextField(blank=True)
+  attitutes_towards_ai = models.TextField(blank=True)
 
 class Scenario(models.Model):
-  persona = models.ForeignKey(Persona, on_delete=models.CASCADE, blank=True, default=-1)
+  persona = models.ForeignKey(Persona, on_delete=models.CASCADE, blank=True)
   name = models.CharField(max_length=100, blank=True)
-  context = models.CharField(max_length=200, blank=True)
+  environment = models.TextField(blank=True)
 
 class Query(models.Model):
-  # scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, blank=True, default=-1)
-  query = models.CharField(max_length=200, blank=True)
+  persona = models.ForeignKey(Persona, on_delete=models.CASCADE, blank=True)
+  scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, blank=True)
+  input_query = models.CharField(max_length=200, blank=True)
 
 class Ai(models.Model):
   name = models.CharField(max_length=100, blank=True)
 
 class Sample(models.Model):
-  #persona = models.ForeignKey(Persona, on_delete=models.CASCADE, blank=True, default=-1)
-  #scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, blank=True, default=-1)
+  persona = models.ForeignKey(Persona, on_delete=models.CASCADE, blank=True, default=-1)
+  scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, blank=True, default=-1)
   image = models.ImageField(upload_to='images/')
   has_failure = models.BooleanField(default=False, blank=True)
 

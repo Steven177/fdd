@@ -43,53 +43,34 @@
   <! -- END NAVBAR -->
 
   <div class="container">
-    <h1 class="border-bottom margin-top-large">&#129489  User Scenario</h1>
+    <h1 class="border-bottom margin-top-large">&#129489  User Scenario: Step 1️⃣</h1>
 
+    <p>A user scenario consists of a persona with background. A scenario or context that the persona is in. We then use this to brainstorm how the user will use the system, more specifically what inputs will he/she generate.</p>
 
     <div class="row">
+      <div class="col-6">
+        <p>Example Persona</p>
+      </div>
 
       <! -- persona -->
       <div class="col-6">
-        <h2 class="purple-color margin-top-large">Persona </h2>
+        <h2 class="purple-color">Persona </h2>
         <h3 class="font-size-15">The persona is the main actor. </h3>
         <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
           {% csrf_token %}
-          <input type="hidden" name="form_id" value="persona">
-          {{ persona_form.as_p }}
+          <label>What is the name of your persona?*</label><br>
+          {{ persona_form.persona_name}} <br>
+          <label>How old is your persona?*</label><br>
+          {{ persona_form.age }} <br>
+          <label>What's the personality of your persona?*</label><br>
+          {{ persona_form.personality }} <br>
+          <label>What are the objectives and goals of your persona?*</label><br>
+          {{persona_form.objectives_and_goals }} <br>
+          <label>What is her attitudes towards AI?*</label><br>
+          {{ persona_form.attitutes_towards_ai }} <br>
           <button type="submit" class="btn primary">Save</button>
         </form>
-
       </div>
-
-      <! -- scenario -->
-      <div class="col-6">
-        <h2 class="purple-color margin-top-large">Scenario </h2>
-        <h3 class="font-size-15">Let's imagine a specific scenario for your persona. </h3>
-        <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
-        {% csrf_token %}
-        <input type="hidden" name="form_id" value="scenario">
-        {{ scenario_form.as_p }}
-        <button type="submit" class="btn primary">Save</button>
-        </form>
-      </div>
-
-
-    <! -- AIs -->
-    <h2 class="purple-color margin-top-large">AI Model </h2>
-    <h3 class="font-size-15">Let's decide on the underlying technology.  </h3>
-    <div class="margin-right">
-      <div class="dropdown whitebackground border-radius">
-        <select class="form-select border-radius" aria-label="Default select example">
-        {% for ai in ais %}
-          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
-        {% endfor %}
-        </select>
-      </div>
-    </div>
-    <! -- END AIs -->
-
-
-
   </div>
 
 </body>

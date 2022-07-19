@@ -43,54 +43,30 @@
   <! -- END NAVBAR -->
 
   <div class="container">
-    <h1 class="border-bottom margin-top-large">&#129489  User Scenario</h1>
-
-
-    <div class="row">
-
-      <! -- persona -->
+    <h1 class="border-bottom margin-top-large">&#129489  User Scenario: Step 2️⃣</h1>
+    <div class="row margin-top-large">
+      <div class="alert light-purple-background border-radius" role="alert">
+          &#128073 xxx.
+        </div>
       <div class="col-6">
-        <h2 class="purple-color margin-top-large">Persona </h2>
-        <h3 class="font-size-15">The persona is the main actor. </h3>
-        <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
-          {% csrf_token %}
-          <input type="hidden" name="form_id" value="persona">
-          {{ persona_form.as_p }}
-          <button type="submit" class="btn primary">Save</button>
-        </form>
-
+        <p>Example scenatrio</p>
+        <p>{{persona.name}}</p>
       </div>
 
       <! -- scenario -->
       <div class="col-6">
-        <h2 class="purple-color margin-top-large">Scenario </h2>
-        <h3 class="font-size-15">Let's imagine a specific scenario for your persona. </h3>
+        <h2 class="purple-color">Scenario </h2>
+        <h3 class="font-size-15">xxx </h3>
         <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
-        {% csrf_token %}
-        <input type="hidden" name="form_id" value="scenario">
-        {{ scenario_form.as_p }}
-        <button type="submit" class="btn primary">Save</button>
+          {% csrf_token %}
+          <label>Imagine your persona in a specific scenario - <br> What is a name for your scenario?</label>
+          {{ scenario_form.context_name }} <br>
+          <label> Can you describe the scenario in more detail? <br> What is the background and environment like?</label> <br>
+          {{ scenario_form.environment }} <br>
+          <button type="submit" class="btn primary">Save</button>
         </form>
       </div>
-
-
-    <! -- AIs -->
-    <h2 class="purple-color margin-top-large">AI Model </h2>
-    <h3 class="font-size-15">Let's decide on the underlying technology.  </h3>
-    <div class="margin-right">
-      <div class="dropdown whitebackground border-radius">
-        <select class="form-select border-radius" aria-label="Default select example">
-        {% for ai in ais %}
-          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
-        {% endfor %}
-        </select>
-      </div>
     </div>
-    <! -- END AIs -->
-
-
-
-  </div>
 
 </body>
 </html>

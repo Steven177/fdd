@@ -14,73 +14,69 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 
 
-from .forms import ImageForm
+from .forms import ImageForm, PersonaForm, ScenarioForm, QueryForm
 #from .forms import FailureForm
-from .forms import PersonaForm
-from .forms import ScenarioForm
 
-from .models import Sample
-from .models import Expectation
-from .models import Model_Prediction
-from .models import Match
-from .models import Ai
-from .models import Persona
-from .models import Scenario
+from .models import Sample, Expectation, Model_Prediction, Match, Ai, Persona, Scenario, Query
 
 from .utils import *
 from .ai import *
 from .dalle import *
 # from .seed import *
 
-def user_scenario(request):
-  personas = Persona.objects.all().order_by('-id')
-  ais = Ai.objects.all()
+def create_persona(request):
   persona_form = PersonaForm(request.POST)
-
+  # POST
   if request.method == "POST":
-    # Persona
     if persona_form.is_valid():
       persona_form.save()
       return redirect('/fdd_app/user_scenario')
+  # GET
+  else:
+    return render(request, 'fdd_app/create_persona.html',
+      {
+      'persona_form': persona_form,
+      })
 
-    #
-  return render(request, 'fdd_app/user_scenario.html', {'personas': personas, 'persona_form': persona_form, 'ais': ais})
+def create_scenario(request):
+  scenario_form = ScenarioForm(request.POST)
+  persona = Persona.objects.latest('id')
+  # POST
+  if request.method == "POST":
+    # Persona
+    if scenario_form.is_valid():
+      scenario_form = scenario_form.save(commit=False)
+      scenario_form.persona = persona
+      scenario_form.save()
+      return redirect('/fdd_app/samples')
+  # GET
+  else:
+    return render(request, 'fdd_app/create_scenario.html',
+      {
+      'scenario_form': scenario_form,
+      'persona': persona
+      })
 
 @csrf_exempt
 def samples(request):
   image_form = ImageForm(request.POST, request.FILES)
-  scenario_form = ScenarioForm(request.POST)
+  query_form = QueryForm(request.POST)
 
-  personas = Persona.objects.all()
+  persona = Persona.objects.latest('id')
+  scenario = Scenario.objects.latest('id')
 
-  scenarios = Scenario.objects.filter(persona)
+  samples = Sample.objects.filter(persona=persona)
+
   ais = Ai.objects.all()
-  samples = Sample.objects.all()
 
-  # POST scenario
-  if request.method == "POST" and scenario_form.is_valid():
-    scenario_form.save()
-
-    scenario = Scenario.objects.latest('id')
-    results = call_google_api(scenario.query)
-
-    image_results = results['images_results']
-
-    random_idx = np.random.randint(0, np.floor(len(image_results)/4))
-    image_results = image_results[random_idx:random_idx + 1]
-
-    for image_result in image_results:
-      url = image_result['thumbnail']
-      title = image_result['title']
-      urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(title))
-      image = Sample.objects.create(image='../media/images/{}.jpg'.format(title))
-      image.save()
-
-    return render(request, 'fdd_app/samples.html', {"image_form": image_form, 'scenario_form': scenario_form, 'samples': samples, 'personas': personas, 'ais': ais})
-
-  # POST input
-  elif request.method == "POST" and image_form.is_valid():
+  # POST manual
+  if request.method == "POST" and image_form.is_valid():
+    print("IMAGE_FORM")
+    image_form = image_form.save(commit=False)
+    image_form.persona = persona
+    image_form.scenario = scenario
     image_form.save()
+
     # AUGMENTATIONS
     s = Sample.objects.latest('id')
     pil_img = Image.open(s.image)
@@ -92,26 +88,94 @@ def samples(request):
     h = T.functional.adjust_brightness(pil_img, 0.2)
     # b
     b_file = augment_image(b)
-    Sample(image=b_file).save()
+    b_new = Sample(image=b_file)
+    b_new.persona = persona
+    b_new.scenario = scenario
+    b_new.save()
     # c
     c_file = augment_image(c)
-    Sample(image=c_file).save()
+    c_new = Sample(image=c_file)
+    c_new.persona = persona
+    c_new.scenario = scenario
+    c_new.save()
     # g
     g_file = augment_image(g)
-    Sample(image=g_file).save()
+    g_new = Sample(image=g_file)
+    c_new.persona = persona
+    c_new.scenario = scenario
+    c_new.save()
     # g
     r_file = augment_image(r)
-    Sample(image=r_file).save()
+    r_new = Sample(image=r_file)
+    r_new.persona = persona
+    r_new.scenario = scenario
+    r_new.save()
     # g
     h_file = augment_image(h)
-    Sample(image=h_file).save()
+    h_new = Sample(image=h_file)
+    h_new.persona = persona
+    h_new.scenario = scenario
+    h_new.save()
 
-    return render(request, 'fdd_app/samples.html', {"image_form": image_form, 'scenario_form': scenario_form, 'samples': samples, 'personas': personas, 'ais': ais})
+    return render(request, 'fdd_app/samples.html',
+      {
+      'image_form': image_form,
+      'query_form':query_form,
+      'samples': samples,
+      'persona': persona,
+      'scenario': scenario,
+      'ais': ais})
+
+  # POST automatic
+  elif request.method == "POST" and query_form.is_valid():
+    print("QUERY_FORM")
+    query_form = query_form.save(commit=False)
+    query_form.persona = persona
+    query_form.scenario = scenario
+    query_form.save()
+
+    query = Query.objects.latest('id')
+    print("############")
+    print(query)
+    print(query.input_query)
+    print("############")
+    results = call_google_api(query.input_query)
+    print(results)
+
+    image_results = results['images_results']
+
+    random_idx = np.random.randint(0, np.floor(len(image_results)/4))
+    image_results = image_results[random_idx:random_idx + 1]
+
+    for image_result in image_results:
+      url = image_result['thumbnail']
+      title = image_result['title']
+      urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(title))
+      image = Sample.objects.create(image='../media/images/{}.jpg'.format(title), persona=persona, scenario=scenario)
+      image.save()
+
+    return render(request, 'fdd_app/samples.html',
+      {
+      "image_form": image_form,
+      'query_form': query_form,
+      'samples': samples,
+      'persona': persona,
+      'scenario': scenario,
+      'ais': ais
+      })
 
 
-  # GET input
+
+  # GET samples
   else:
-    return render(request, 'fdd_app/samples.html', {"image_form": image_form, 'scenario_form': scenario_form, 'samples': samples, 'personas': personas, 'ais': ais})
+    return render(request, 'fdd_app/samples.html',
+      {
+      "image_form": image_form,
+      'query_form':query_form,
+      'samples': samples,
+      'persona': persona,
+      'scenario': scenario}
+      )
 
 
 @csrf_exempt
@@ -126,6 +190,7 @@ def sample(request, sample_id):
   read_expectation = False
 
   sample = Sample.objects.get(id=sample_id)
+  print("--------------")
   print("SAMPLE")
   print(sample)
 
@@ -133,7 +198,7 @@ def sample(request, sample_id):
 
   # POST user (send boxes)
   if request.is_ajax():
-    print("+++++++++++++++")
+    print("#############")
     # expectation = expectation_form.instance
 
     exp_boxes = request.POST.get('expBoxes[]')
@@ -152,7 +217,7 @@ def sample(request, sample_id):
       new_exp = Expectation(xmin=x, ymin=y, xmax=width + x, ymax=height + y, sample=sample)
       new_exp.save()
 
-    print("+++++++++++++++")
+    print("###########")
 
     return render(request, 'fdd_app/sample.html', {
       'exp_boxes': exp_boxes,
@@ -166,12 +231,14 @@ def sample(request, sample_id):
 
   # POST user (submit expectation)
   elif request.method == 'POST' and "expectation_submit" in request.POST:
+    print("****************")
     # template control
     write_expectation = False
     read_expectation = True
 
     # ---------------------------
     # SAVE LABELS of EXPECTATION
+    print(sample)
     expectations = Expectation.objects.filter(sample=sample.id)
 
     # https://stackoverflow.com/questions/42359112/access-form-data-of-post-method-in-django
@@ -185,10 +252,8 @@ def sample(request, sample_id):
 
     labels.pop(-1)
 
-    print("----------------")
     print(labels)
     print(expectations)
-    print("----------------")
 
     for idx, label in enumerate(labels):
       exp = expectations[idx]

@@ -61,9 +61,16 @@
   <! -- END NAVBAR -->
 
   <div class="container">
-    <h1 class="border-bottom margin-top-large">&#128171 Failure Exploration</h1>
+
+    <h1 class="border-bottom margin-top-large">&#129489  User Scenario: Step 3️⃣ </h1>
+    {{persona.name}}
+    {{scenario.name}}
+
     <! -- ROW-->
     <div class="row justify-content-start">
+      <div class="alert light-purple-background border-radius" role="alert">
+          &#128073 xxx.
+        </div>
       <! -- LIMITATIONS -->
       <div id="" class="col-6">
         <h2 class="purple-color margin-top-large">Critical Quality of Input</h2>
@@ -161,6 +168,7 @@
         <form method = "post" enctype="multipart/form-data" class="form-control form-label border-radius">
           {% csrf_token %}
           <input type="hidden" name="form_id" value="input">
+          <label> Image  </label>
           {{ image_form.as_p }}
           <button type="submit" class="btn primary">Upload</button>
         </form>
@@ -175,7 +183,8 @@
         <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
       {% csrf_token %}
       <input type="hidden" name="form_id" value="scenario">
-      {{ scenario_form }}
+      <label> Input query </label>
+      {{ query_form.as_p }}
       <button type="submit" class="btn primary">Save</button>
       </form>
       </div>
