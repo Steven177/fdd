@@ -35,23 +35,11 @@
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-            <a class="nav-link light" aria-current="page" href="/fdd_app/persona">&#129489 User Research</a>
-           <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/">&#128171 Failure Exploration</a>
-            <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">&#128218 AI Failure Book</a>
+            <a class="nav-link light" aria-current="page" href="/fdd_app/create_persona">🤔 User Scenario</a>
+           <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/samples">💫 Failure Exploration</a>
+            <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">📚 AI Failure Book</a>
         </div>
       </div>
-
-       <div class="margin-right">
-        <h4 class="white">&#129489 Use Case</h4>
-        <div class="dropdown whitebackground border-radius">
-          <select class="form-select border-radius" aria-label="Default select example">
-            {% for persona in personas reversed %}
-              <option class="border-radius" value="persona{{forloop.counter}}">{{persona.name}}</option>
-            {% endfor %}
-          </select>
-        </div>
-      </div>
-
       <div class="margin-right">
         <h4 class="white">&#128065 AI Model</h4>
         <div class="dropdown whitebackground border-radius">
@@ -59,7 +47,7 @@
         {% for ai in ais %}
           <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
         {% endfor %}
-        </select
+        </select>
         </div>
       </div>
 
@@ -141,7 +129,7 @@
           </form>
           <div id="div_review" class="d-flex align-items-center">
            <button id="b2" class="btn primary margin-right margin-top-small" onclick="javascript:saveBoxes()"> Save</button>
-           <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app/user">Start over</a> </button>
+           <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app/sample={{sample.id}}">Start over</a> </button>
           </div>
           </div>
           <! -- end labels -->
@@ -366,15 +354,21 @@
         </div>
         {% endfor %}
 
-        {% if matches|length > 0 %}
-          <input type="submit" value="&#128218 Save to AI failure book" class="btn primary margin-top-small" style="width: 50%">
+        {% if sample.has_failure %}
+          <div class="row">
+            <button type="submit" name="done_or_continue" value="C" class="btn secondary margin-top-small margin-right" style="width: 30%">
+              Continue exploring 🏃‍♀️
+            </button>
+            <button type="submit" name="done_or_continue" value="D" class="btn primary margin-top-small" style="width: 30%">
+              Done exploring 🥱
+            </button>
+
+          </div>
           </form>
         {% else %}
-          <p> &#128579 Everthing fine! No failures detected</p>
-          <a class="btn primary atag-btn-black" style="width: 50%" href="/fdd_app">&#129303 Continue exploring</a>
+          <a href="samples" class="btn secondary margin-top-small margin-right" style="width: 30%">Continue exploring 🏃‍♀️</a>
+          <a href="failure_book" class="btn primary margin-top-small" style="width: 30%">Done exploring 🥱</a>
         {% endif %}
-
-
         <! --  END MATCH -->
 
       <! -- END FAILURE ANALYSIS-->

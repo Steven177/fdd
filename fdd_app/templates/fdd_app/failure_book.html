@@ -33,23 +33,11 @@
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-            <a class="nav-link light" aria-current="page" href="/fdd_app/persona">&#129489 User Research</a>
-           <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/">&#128171 Failure Exploration</a>
-            <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">&#128218 AI Failure Book</a>
+            <a class="nav-link light" aria-current="page" href="/fdd_app/create_persona">🤔 User Scenario</a>
+           <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/samples">💫 Failure Exploration</a>
+            <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">📚 AI Failure Book</a>
         </div>
       </div>
-
-       <div class="margin-right">
-        <h4 class="white">&#129489 Use Case</h4>
-        <div class="dropdown whitebackground border-radius">
-          <select class="form-select border-radius" aria-label="Default select example">
-            {% for persona in personas reversed %}
-              <option class="border-radius" value="persona{{forloop.counter}}">{{persona.name}}</option>
-            {% endfor %}
-          </select>
-        </div>
-      </div>
-
       <div class="margin-right">
         <h4 class="white">&#128065 AI Model</h4>
         <div class="dropdown whitebackground border-radius">
@@ -57,7 +45,7 @@
         {% for ai in ais %}
           <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
         {% endfor %}
-        </select
+        </select>
         </div>
       </div>
 

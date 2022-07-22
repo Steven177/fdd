@@ -32,45 +32,67 @@
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-            <a class="nav-link light" aria-current="page" href="/fdd_app/persona">&#129489 User Research</a>
-           <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/">&#128171 Failure Exploration</a>
-            <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">&#128218 AI Failure Book</a>
+            <a class="nav-link light" aria-current="page" href="/fdd_app/create_persona">🤔 User Scenario</a>
         </div>
       </div>
-
+      <div class="margin-right">
+        <h4 class="white">&#128065 AI Model</h4>
+        <div class="dropdown whitebackground border-radius">
+        <select class="form-select border-radius" aria-label="Default select example">
+        {% for ai in ais %}
+          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
+        {% endfor %}
+        </select>
+        </div>
+      </div>
     </div>
   </nav>
   <! -- END NAVBAR -->
 
   <div class="container">
-    <h1 class="border-bottom margin-top-large">&#129489  User Scenario: Step 1️⃣</h1>
+    <h1 class="border-bottom margin-top-large">🤔 User Scenario: Picture a persona 🧑</h1>
 
-    <p>A user scenario consists of a persona with background. A scenario or context that the persona is in. We then use this to brainstorm how the user will use the system, more specifically what inputs will he/she generate.</p>
+    <h2 class="purple-color">Persona</h2>
+    <h3 class="font-size-15">The persona is the main actor of your scene. </h3>
+    <form method = "post" enctype="multipart/form-data" class="form-control form-label border-radius">
+      {% csrf_token %}
+      <div class="row">
+      <div class="col-4">
+        <label>What's the profile image of your persona?*</label><br>
+        <input type="hidden" name="form_id" value="persona">
+          {{ persona_form.image }} <br>
+      </div>
+
+      <div class="col-8">
+
+        <label>What's the personality of your persona?*</label><br>
+          {{ persona_form.personality }} <br>
+      </div>
+    </div>
 
     <div class="row">
-      <div class="col-6">
-        <p>Example Persona</p>
+      <div class="col-4">
+        <label>What is the name of your persona?*</label><br>
+          {{ persona_form.name}} <br>
+        <label>How old is your persona?*</label><br>
+          {{ persona_form.age }} <br>
+        <label>What's the occupation of your persona?*</label><br>
+          {{ persona_form.occupation }} <br>
       </div>
 
-      <! -- persona -->
-      <div class="col-6">
-        <h2 class="purple-color">Persona </h2>
-        <h3 class="font-size-15">The persona is the main actor. </h3>
-        <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
-          {% csrf_token %}
-          <label>What is the name of your persona?*</label><br>
-          {{ persona_form.persona_name}} <br>
-          <label>How old is your persona?*</label><br>
-          {{ persona_form.age }} <br>
-          <label>What's the personality of your persona?*</label><br>
-          {{ persona_form.personality }} <br>
-          <label>What are the objectives and goals of your persona?*</label><br>
+      <div class="col-4">
+        <label>What are the objectives and goals of your persona?*</label><br>
           {{persona_form.objectives_and_goals }} <br>
-          <label>What is her attitudes towards AI?*</label><br>
-          {{ persona_form.attitutes_towards_ai }} <br>
-          <button type="submit" class="btn primary">Save</button>
-        </form>
       </div>
+      <div class="col-4">
+        <label>What is her attitudes towards AI?*</label><br>
+          {{ persona_form.attitutes_towards_ai }} <br>
+      </div>
+    </div>
+    <div class="row">
+      <button type="submit" class="btn primary">Save</button>
+      </form>
+    </div>
   </div>
 
 </body>

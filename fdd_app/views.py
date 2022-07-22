@@ -22,25 +22,34 @@ from .models import Sample, Expectation, Model_Prediction, Match, Ai, Persona, S
 from .utils import *
 from .ai import *
 from .dalle import *
+from .creds import *
 # from .seed import *
 
+import replicate
+import requests
+import shutil
+
+
 def create_persona(request):
-  persona_form = PersonaForm(request.POST)
+  persona_form = PersonaForm(request.POST, request.FILES)
+  ais = Ai.objects.all()
   # POST
   if request.method == "POST":
     if persona_form.is_valid():
       persona_form.save()
-      return redirect('/fdd_app/user_scenario')
+      return redirect('/fdd_app/create_scenario')
   # GET
   else:
     return render(request, 'fdd_app/create_persona.html',
       {
       'persona_form': persona_form,
+      'ais': ais
       })
 
 def create_scenario(request):
   scenario_form = ScenarioForm(request.POST)
   persona = Persona.objects.latest('id')
+  ais = Ai.objects.all()
   # POST
   if request.method == "POST":
     # Persona
@@ -54,7 +63,8 @@ def create_scenario(request):
     return render(request, 'fdd_app/create_scenario.html',
       {
       'scenario_form': scenario_form,
-      'persona': persona
+      'persona': persona,
+      'ais': ais
       })
 
 @csrf_exempt
@@ -65,17 +75,28 @@ def samples(request):
   persona = Persona.objects.latest('id')
   scenario = Scenario.objects.latest('id')
 
+  personas = Persona.objects.all()
+  scenarios = Scenario.objects.all()
+  p_and_s = []
+
+  for p in personas:
+    s = persona.scenario_set.all()
+    p_and_s.append({'persona': p, 'scenarios': s})
+
+  print(".................")
+  print(p_and_s)
+  print(".................")
+
   samples = Sample.objects.filter(persona=persona)
 
   ais = Ai.objects.all()
 
   # POST manual
   if request.method == "POST" and image_form.is_valid():
-    print("IMAGE_FORM")
-    image_form = image_form.save(commit=False)
-    image_form.persona = persona
-    image_form.scenario = scenario
-    image_form.save()
+    i_f = image_form.save(commit=False)
+    i_f.persona = persona
+    i_f.scenario = scenario
+    i_f.save()
 
     # AUGMENTATIONS
     s = Sample.objects.latest('id')
@@ -128,19 +149,14 @@ def samples(request):
 
   # POST automatic
   elif request.method == "POST" and query_form.is_valid():
-    print("QUERY_FORM")
-    query_form = query_form.save(commit=False)
-    query_form.persona = persona
-    query_form.scenario = scenario
-    query_form.save()
+    # Google API
+    qf = query_form.save(commit=False)
+    qf.persona = persona
+    qf.scenario = scenario
+    qf.save()
 
     query = Query.objects.latest('id')
-    print("############")
-    print(query)
-    print(query.input_query)
-    print("############")
     results = call_google_api(query.input_query)
-    print(results)
 
     image_results = results['images_results']
 
@@ -151,12 +167,43 @@ def samples(request):
       url = image_result['thumbnail']
       title = image_result['title']
       urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(title))
-      image = Sample.objects.create(image='../media/images/{}.jpg'.format(title), persona=persona, scenario=scenario)
-      image.save()
+      image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(title), persona=persona, scenario=scenario)
+      image1.save()
 
+    # DALLE
+    client = replicate.Client(api_token=REPLICATE_API_TOKEN)
+    model = client.models.get("kuprel/min-dalle")
+    generated_image = model.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
+    for url in generated_image:
+      sample = Sample.objects.latest('id')
+      file_name = 'media/images/{}.jpg'.format(sample.id + 1)
+      res = requests.get(url, stream = True)
+
+      if res.status_code == 200:
+        with open(file_name,'wb') as f:
+          shutil.copyfileobj(res.raw, f)
+          image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(sample.id + 1), persona=persona, scenario=scenario)
+          image2.save()
+        print('Image sucessfully Downloaded: ',file_name)
+      else:
+        print('Image Couldn\'t be retrieved')
+
+
+    """
+    generated_PIL_img = Image.open(generated_img)
+    sample = Sample.objects.latest('id')
+    print(sample)
+    latest_id = sample.id + 1
+    print(latest_id)
+    generated_PIL_img.save(r"../media/images/generated_img{}.jpeg".format(latest_id))
+
+    image2 = Sample.objects.create(image='../media/images/generated_img{}.jpeg'.format(latest_id), persona=persona, scenario=scenario)
+    image2.save()
+    """
+    print("++++++++++++++")
     return render(request, 'fdd_app/samples.html',
       {
-      "image_form": image_form,
+      'image_form': image_form,
       'query_form': query_form,
       'samples': samples,
       'persona': persona,
@@ -164,18 +211,19 @@ def samples(request):
       'ais': ais
       })
 
-
-
   # GET samples
   else:
+
     return render(request, 'fdd_app/samples.html',
       {
-      "image_form": image_form,
+      'image_form': image_form,
       'query_form':query_form,
       'samples': samples,
       'persona': persona,
-      'scenario': scenario}
-      )
+      'scenario': scenario,
+      'p_and_s': p_and_s,
+      'ais': ais
+      })
 
 
 @csrf_exempt
@@ -190,24 +238,15 @@ def sample(request, sample_id):
   read_expectation = False
 
   sample = Sample.objects.get(id=sample_id)
-  print("--------------")
-  print("SAMPLE")
-  print(sample)
 
   colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
 
   # POST user (send boxes)
   if request.is_ajax():
-    print("#############")
     # expectation = expectation_form.instance
-
     exp_boxes = request.POST.get('expBoxes[]')
-
     exp_boxes = json.dumps(exp_boxes)
     exp_boxes = eval(json.loads(exp_boxes))
-
-
-    print(exp_boxes)
 
     for exp in exp_boxes:
       x = exp['x']
@@ -216,8 +255,6 @@ def sample(request, sample_id):
       height = exp['height']
       new_exp = Expectation(xmin=x, ymin=y, xmax=width + x, ymax=height + y, sample=sample)
       new_exp.save()
-
-    print("###########")
 
     return render(request, 'fdd_app/sample.html', {
       'exp_boxes': exp_boxes,
@@ -231,14 +268,12 @@ def sample(request, sample_id):
 
   # POST user (submit expectation)
   elif request.method == 'POST' and "expectation_submit" in request.POST:
-    print("****************")
     # template control
     write_expectation = False
     read_expectation = True
 
     # ---------------------------
     # SAVE LABELS of EXPECTATION
-    print(sample)
     expectations = Expectation.objects.filter(sample=sample.id)
 
     # https://stackoverflow.com/questions/42359112/access-form-data-of-post-method-in-django
@@ -251,9 +286,6 @@ def sample(request, sample_id):
         labels.append(response[key])
 
     labels.pop(-1)
-
-    print(labels)
-    print(expectations)
 
     for idx, label in enumerate(labels):
       exp = expectations[idx]
@@ -390,7 +422,10 @@ def sample(request, sample_id):
         match.failure_severity = int(sev)
         match.save()
 
-    return redirect('/fdd_app/failure_book')
+    if request.POST['done_or_continue'][0] == "D":
+      return redirect('/fdd_app/failure_book')
+    elif request.POST['done_or_continue'][0] =="C":
+      return redirect('/fdd_app/samples')
 
   # GET sample
   else:
@@ -406,8 +441,14 @@ def sample(request, sample_id):
 @csrf_exempt
 def failure_book(request):
   # GET failure_book
-  samples = Sample.objects.filter(has_failure=True)
+  book = []
   personas = Persona.objects.all()
+  for persona in personas:
+    samples = Sample.objects.filter(has_failure=True, persona=persona)
+    book.append({'persona': persona, 'samples': samples})
+
+  print(book)
+
   ais = Ai.objects.all()
 
   false_detections = Match.objects.filter(false_detection=True)
@@ -516,8 +557,6 @@ def failure_book(request):
     'sev_missing_detections': sev_missing_detections,
     'sev_unnecessary_detections': sev_unnecessary_detections,
     "data": data,
-    "recoveries": recoveries,
-    "rec_ind": rec_ind,
     'personas': personas,
     'ais': ais
     })

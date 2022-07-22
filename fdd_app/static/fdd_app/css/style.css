@@ -40,6 +40,10 @@ body.font {
   border-radius: 5px;
 }
 
+.maxwidth100prozent{
+  max-width:  100%;
+}
+
 .text-align-center {
   text-align:  center;
 }

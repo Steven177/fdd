@@ -12,9 +12,10 @@ from io import StringIO
 from django.core.files.base import ContentFile
 import io
 
+from .creds import *
 
 
-API_TOKEN = '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'
+
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 API_URL = "https://api-inference.huggingface.co/models/facebook/detr-resnet-50"
 
@@ -169,12 +170,14 @@ def calculate_iou(exp, pred):
   iou = intersection_area / float(exp_box_area + pred_box_area - intersection_area)
   return iou
 
+
 def check_quality_of_score(score, threshold=0.95):
   return True if score <= threshold else False
 
+
 def call_google_api(q):
   params = {
-  "api_key": "29c4697ac11caf960f16371bafa039aa7510c41cbe9acd0fe5bb6293d7f6f0e1",
+  "api_key": GOOGLE_API_TOKEN,
   "engine": "google",
   "q": q,
   "location": "Austin, Texas, United States",
