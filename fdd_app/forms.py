@@ -9,13 +9,10 @@ class ImageForm(forms.ModelForm):
       fields = ['image']
 
 class PersonaForm(forms.ModelForm):
-  image = forms.ImageField(label="")
-  name = forms.CharField(max_length=100, label="", required=False)
-  age = forms.IntegerField(label="", required=False)
-  occupation = forms.CharField(max_length=100, label="", required=False)
-  personality = forms.CharField(widget=forms.Textarea, label="", required=False)
-  objectives_and_goals = forms.CharField(widget=forms.Textarea, label="", required=False)
-  attitutes_towards_ai = forms.CharField(widget=forms.Textarea, label="", required=False)
+  #image = forms.ImageField(label="")
+  #name = forms.CharField(max_length=100, label="", required=False)
+  #personality = forms.CharField(widget=forms.Textarea, label="", required=False)
+  #objectives_and_goals = forms.CharField(widget=forms.Textarea, label="", required=False)
 
   class Meta:
     model = Persona
@@ -27,8 +24,8 @@ class PersonaForm(forms.ModelForm):
     self.fields['scenario'].queryset = Scenario.objects.none()
   """
 class ScenarioForm(forms.ModelForm):
-  location = forms.CharField(max_length=100, label="", required=False)
-  environment = forms.CharField(widget=forms.Textarea, label="", required=False)
+  #name = forms.CharField(max_length=100, label="", required=False)
+  #description = forms.CharField(widget=forms.Textarea, label="", required=False)
 
   class Meta:
     model = Scenario

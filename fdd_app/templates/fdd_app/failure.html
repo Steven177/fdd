@@ -892,3 +892,39 @@
       </div>
       <! -- END LIMITATIONS -->
 
+
+
+<div class="row">
+      <div class="col-4">
+        <label>What's the profile image of your persona?*</label><br>
+        <input type="hidden" name="form_id" value="persona">
+          {{ persona_form.image }} <br>
+      </div>
+
+      <div class="col-8">
+
+        <label>What's the personality of your persona?*</label><br>
+          {{ persona_form.personality }} <br>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-4">
+        <label>What is the name of your persona?*</label><br>
+          {{ persona_form.name}} <br>
+        <label>How old is your persona?*</label><br>
+          {{ persona_form.age }} <br>
+        <label>What's the occupation of your persona?*</label><br>
+          {{ persona_form.occupation }} <br>
+      </div>
+
+      <div class="col-4">
+        <label>What are the objectives and goals of your persona?*</label><br>
+          {{persona_form.objectives_and_goals }} <br>
+      </div>
+      <div class="col-4">
+        <label>What is her attitudes towards AI?*</label><br>
+          {{ persona_form.attitutes_towards_ai }} <br>
+      </div>
+    </div>
+    <div class="row">

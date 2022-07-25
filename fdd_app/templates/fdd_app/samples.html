@@ -57,18 +57,17 @@
       <div class="row">
         <div class="col-6">
           <h2 class="purple-color margin-top-large">User</h2>
-          <h3 class="font-size-15">Persona </h3>
           <img src="{{ persona.image.url }}" alt="" class="border-radius img-fluid maxwidth100prozent">
           <p>{{persona.name}}</p>
-          <p>{{persona.age}}</p>
-          <p>{{persona.occupation}}</p>
+          <p>{{persona.personality}}</p>
+          <p>{{persona.objectives_and_goals}}</p>
 
         </div>
         <div class="col-6">
           <h2 class="purple-color margin-top-large">Scenario</h2>
           <h3 class="font-size-15">Some text </h3>
-          {{scenario.location}} <br>
-          {{scenario.environment}}
+          {{scenario.name}} <br>
+          {{scenario.description}}
         </div>
       </div>
 
@@ -111,15 +110,32 @@
       <! -- Personas & scenarios-->
       <div class="col-4">
         <h2 class="purple-color margin-top-large">User Scenarios</h2>
+
         <h3 class="font-size-15"> All of your user scenarios. </h3>
+        <a href="/fdd_app/create_persona">Create new user scenario</a>
+
+
+        <br>
+        <br>
         {% for item in p_and_s %}
-          {{item.persona.name}}
-          {% for scenario in item.scenarios %}
-            {{scenario.name}}
+          <p class="{% if item.persona.id == persona.id %}active_persona{%endif%}">User: {{item.persona.name}}</p>
+          <a href="/fdd_app/persona={{item.persona.id}}/read_persona">View in detail</a> <br>
+
+          {% for s in item.scenarios %}
+            <a class="{% if s.id == scenario.id %}active_scenario{%endif%}" href="/fdd_app/persona={{item.persona.id}}/scenario={{s.id}}/samples">
+              {{s.name}} <br>
+              <a href="/fdd_app/persona={{item.persona.id}}/scenario={{scenario.id}}/read_scenario"> View in detail</a><br>
+              <br>
+              <br>
+            </a>
+
           {% endfor %}
-          <a href="create_scenario">Create new scenario for this persona</a>
+          <a href="/fdd_app/persona={{item.persona.id}}/create_scenario">Create new scenario for this user</a>
+          <br>
+          <br>
+          <br>
         {% endfor %}
-        <a href="create_persona">Create new persona</a>
+
       </div>
       <! -- Data probes-->
       <div class="col-8">
@@ -128,7 +144,7 @@
         <div class="row">
         {% for sample in samples %}
         <div class="col-2">
-          <a href="/fdd_app/sample={{ sample.id }}" class="no-text-dec">
+          <a href="/fdd_app/sample={{sample.id}}" class="no-text-dec">
             <img id="{{sample.id}}" class="border-radius img-fluid library-img margin-bottom-small" src="{{sample.image.url}}" draggable="true">
           </a>
         </div>

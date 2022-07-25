@@ -35,6 +35,7 @@
             <a class="nav-link light" aria-current="page" href="/fdd_app/create_persona">🤔 User Scenario</a>
         </div>
       </div>
+
       <div class="margin-right">
         <h4 class="white">&#128065 AI Model</h4>
         <div class="dropdown whitebackground border-radius">
@@ -45,21 +46,27 @@
         </select>
         </div>
       </div>
+
+
     </div>
   </nav>
   <! -- END NAVBAR -->
 
   <div class="container">
-    <h1 class="border-bottom margin-top-large">🤔 User Scenario: Picture a persona 🧑</h1>
+    <h1 class="border-bottom margin-top-large">User </h1>
 
-    <h2 class="purple-color">Persona</h2>
-    <h3 class="font-size-15">The persona is the main actor of your scene. </h3>
-    <form method = "post" enctype="multipart/form-data" class="form-control form-label border-radius">
-      {% csrf_token %}
-      {{persona_form.as_p}}
-      <button type="submit" class="btn primary">Save</button>
-      </form>
-    </div>
+
+    <form method="POST">
+        <!-- Security token by Django -->
+        {% csrf_token %}
+
+        <!-- form as paragraph -->
+        {{ persona_form.as_p }}
+
+        <input type="submit" value="Update">
+    </form>
+    <a href="/fdd_app/persona={{persona.id}}/read_persona">Cancel</a>
+
   </div>
 
 </body>

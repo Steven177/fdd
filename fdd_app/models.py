@@ -5,18 +5,15 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 import uuid
 
 class Persona(models.Model):
-  image = models.ImageField(upload_to='personas/', default='personas/default_persona')
+  image = models.ImageField(upload_to='personas/', default='personas/default_persona.jpeg')
   name = models.CharField(max_length=100, blank=True)
-  age = models.IntegerField(blank=True, default=-1)
-  occupation = models.CharField(max_length=100, blank=True)
   personality = models.TextField(blank=True)
   objectives_and_goals = models.TextField(blank=True)
-  attitutes_towards_ai = models.TextField(blank=True)
 
 class Scenario(models.Model):
   persona = models.ForeignKey(Persona, on_delete=models.CASCADE, blank=True)
-  location = models.CharField(max_length=100, blank=True)
-  environment = models.TextField(blank=True)
+  name = models.CharField(max_length=100, blank=True)
+  description = models.TextField(blank=True)
 
 class Query(models.Model):
   persona = models.ForeignKey(Persona, on_delete=models.CASCADE, blank=True)

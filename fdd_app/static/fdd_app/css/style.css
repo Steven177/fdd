@@ -48,6 +48,16 @@ body.font {
   text-align:  center;
 }
 
+.active_persona {
+  text-decoration:  none;
+  color:  green;
+}
+
+.active_scenario {
+  text-decoration:  none;
+  color:  green;
+}
+
 .no-text-dec {
   text-decoration:  none;
 }

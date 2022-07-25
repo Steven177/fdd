@@ -72,9 +72,9 @@
         <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
           {% csrf_token %}
           <label>What situation could {{persona.name}} be in when using your product? Provide a short memorable slogan. </label> <br>
-          {{ scenario_form.location }} <br>
+          {{ scenario_form.name }} <br>
           <label> Can you describe the scenario in more detail? <br> What is the environment like? What does your {{persona.name}} want to achieve?</label> <br>
-          {{ scenario_form.environment }} <br>
+          {{ scenario_form.description }} <br>
           <button type="submit" class="btn primary">Save</button>
         </form>
       </div>

@@ -7,7 +7,7 @@ from serpapi import GoogleSearch
 import urllib.request
 import torchvision.transforms as T
 
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 from django.http import HttpResponse
 from django.http import QueryDict
 from django.views.decorators.csrf import csrf_exempt
@@ -29,7 +29,8 @@ import replicate
 import requests
 import shutil
 
-
+# PERSONA
+###################
 def create_persona(request):
   persona_form = PersonaForm(request.POST, request.FILES)
   ais = Ai.objects.all()
@@ -37,7 +38,8 @@ def create_persona(request):
   if request.method == "POST":
     if persona_form.is_valid():
       persona_form.save()
-      return redirect('/fdd_app/create_scenario')
+      last_persona = Persona.objects.latest('id')
+      return redirect('/fdd_app/persona={}/create_scenario'.format(last_persona.id))
   # GET
   else:
     return render(request, 'fdd_app/create_persona.html',
@@ -46,9 +48,39 @@ def create_persona(request):
       'ais': ais
       })
 
-def create_scenario(request):
+def read_persona(request, persona_id):
+  persona = Persona.objects.get(id = persona_id)
+  scenario = Scenario.objects.filter(persona=persona).first()
+  return render(request, "fdd_app/read_persona.html", {'persona': persona, 'scenario': scenario})
+
+def update_persona(request, persona_id):
+  persona = get_object_or_404(Persona, id = persona_id)
+
+  persona_form = PersonaForm(request.POST or None, instance = persona)
+  # POST
+  if persona_form.is_valid():
+    persona_form.save()
+    # return redirect('read_persona'.format(persona_id))
+    # url = 'fdd_app/persona=' + str(persona_id) + '/read_persona'
+    return redirect('read_persona', persona_id=persona_id)
+  # GET
+  return render(request, "fdd_app/update_persona.html", {'persona_form': persona_form, 'persona':persona})
+
+def delete_persona(request, persona_id):
+  persona = get_object_or_404(Persona, id = persona_id)
+  persona.delete()
+
+  persona = Persona.objects.earliest('id')
+  scenario = Scenario.objects.filter(persona=persona).first()
+
+  return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona.id, scenario.id))
+
+#SCENARIO
+###################
+
+def create_scenario(request, persona_id):
   scenario_form = ScenarioForm(request.POST)
-  persona = Persona.objects.latest('id')
+  persona = Persona.objects.get(id=persona_id)
   ais = Ai.objects.all()
   # POST
   if request.method == "POST":
@@ -57,7 +89,8 @@ def create_scenario(request):
       scenario_form = scenario_form.save(commit=False)
       scenario_form.persona = persona
       scenario_form.save()
-      return redirect('/fdd_app/samples')
+      scenario_id = Scenario.objects.latest('id').id
+      return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
   # GET
   else:
     return render(request, 'fdd_app/create_scenario.html',
@@ -67,27 +100,55 @@ def create_scenario(request):
       'ais': ais
       })
 
+
+def read_scenario(request, persona_id, scenario_id):
+  persona = Persona.objects.get(id=persona_id)
+  scenario = Scenario.objects.get(id=scenario_id)
+  return render(request, "fdd_app/read_scenario.html", {'persona': persona, 'scenario': scenario})
+
+def update_scenario(request, persona_id, scenario_id):
+  scenario = get_object_or_404(Scenario, id = scenario_id)
+
+  scenario_form = ScenarioForm(request.POST or None, instance = scenario)
+  # POST
+  if scenario_form.is_valid():
+    scenario_form.save()
+
+    return redirect('read_scenario', persona_id=persona_id, scenario_id=scenario_id)
+  # GET
+  return render(request, "fdd_app/update_scenario.html",
+    {
+    'scenario_form': scenario_form,
+    'scenario':scenario
+    })
+
+def delete_scenario(request, persona_id, scenario_id):
+  persona = Persona.objects.get(id=persona_id)
+  scenario = get_object_or_404(Scenario, id = scenario_id)
+  scenario.delete()
+  scenario_id = Scenario.objects.latest('id').id
+
+  return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
+
+# SAMPLES
+###################
 @csrf_exempt
-def samples(request):
+def samples(request, persona_id, scenario_id):
   image_form = ImageForm(request.POST, request.FILES)
   query_form = QueryForm(request.POST)
 
-  persona = Persona.objects.latest('id')
-  scenario = Scenario.objects.latest('id')
+  persona = Persona.objects.get(id=persona_id)
+  scenario = Scenario.objects.get(id=scenario_id)
 
   personas = Persona.objects.all()
   scenarios = Scenario.objects.all()
   p_and_s = []
 
   for p in personas:
-    s = persona.scenario_set.all()
+    s = p.scenario_set.all()
     p_and_s.append({'persona': p, 'scenarios': s})
 
-  print(".................")
-  print(p_and_s)
-  print(".................")
-
-  samples = Sample.objects.filter(persona=persona)
+  samples = Sample.objects.filter(scenario=scenario)
 
   ais = Ai.objects.all()
 
@@ -102,11 +163,11 @@ def samples(request):
     s = Sample.objects.latest('id')
     pil_img = Image.open(s.image)
 
-    b = T.functional.adjust_brightness(pil_img, 3)
-    c = T.functional.adjust_contrast(pil_img, 2)
+    b = T.functional.adjust_brightness(pil_img, np.random.randint(2, 3))
+    c = T.functional.adjust_contrast(pil_img, np.random.randint(1, 2))
     g = T.functional.gaussian_blur(pil_img, kernel_size=(31, 27), sigma=(100))
-    r = T.functional.rotate(pil_img, 40)
-    h = T.functional.adjust_brightness(pil_img, 0.2)
+    r = T.functional.rotate(pil_img, np.random.randint(20, 360))
+    h = T.functional.adjust_brightness(pil_img, np.random.uniform(0.2, 0.6))
     # b
     b_file = augment_image(b)
     b_new = Sample(image=b_file)
@@ -145,7 +206,9 @@ def samples(request):
       'samples': samples,
       'persona': persona,
       'scenario': scenario,
-      'ais': ais})
+      'ais': ais,
+      'p_and_s': p_and_s
+      })
 
   # POST automatic
   elif request.method == "POST" and query_form.is_valid():
@@ -188,19 +251,6 @@ def samples(request):
       else:
         print('Image Couldn\'t be retrieved')
 
-
-    """
-    generated_PIL_img = Image.open(generated_img)
-    sample = Sample.objects.latest('id')
-    print(sample)
-    latest_id = sample.id + 1
-    print(latest_id)
-    generated_PIL_img.save(r"../media/images/generated_img{}.jpeg".format(latest_id))
-
-    image2 = Sample.objects.create(image='../media/images/generated_img{}.jpeg'.format(latest_id), persona=persona, scenario=scenario)
-    image2.save()
-    """
-    print("++++++++++++++")
     return render(request, 'fdd_app/samples.html',
       {
       'image_form': image_form,
@@ -208,12 +258,13 @@ def samples(request):
       'samples': samples,
       'persona': persona,
       'scenario': scenario,
-      'ais': ais
+      'ais': ais,
+      'p_and_s': p_and_s
       })
 
   # GET samples
   else:
-
+    print(p_and_s)
     return render(request, 'fdd_app/samples.html',
       {
       'image_form': image_form,
@@ -221,8 +272,8 @@ def samples(request):
       'samples': samples,
       'persona': persona,
       'scenario': scenario,
+      'ais': ais,
       'p_and_s': p_and_s,
-      'ais': ais
       })
 
 
@@ -438,6 +489,8 @@ def sample(request, sample_id):
       'ais': ais
     })
 
+# FAILURE BOOK
+###################
 @csrf_exempt
 def failure_book(request):
   # GET failure_book
