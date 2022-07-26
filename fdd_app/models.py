@@ -63,6 +63,7 @@ class Match(models.Model):
   critical_quality_score = models.BooleanField(default=False, blank=True)
 
   failure_severity = models.IntegerField(default=0, blank=True)
+  failure_effects = models.CharField(max_length=200, blank=True)
 
 """
 class Failure(models.Model):

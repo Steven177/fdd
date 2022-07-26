@@ -86,19 +86,19 @@ body.font {
 }
 
 .error {
-  background-color: rgba(255, 0, 0, .1);
+  border: 3px solid rgba(255, 0, 0, .2)
 }
 
 .info {
-  background-color: rgba(114, 160, 196, .1);
+  border: 3px solid rgba(114, 160, 196, .2);
 }
 
 .warning {
-  background-color: rgba(255, 203, 0, .1);
+  border: 3px solid rgba(255, 203, 0, .2);
 }
 
 .ok {
-  background-color: rgba(0, 189, 0, .1);
+  border: 3px solid rgba(0, 189, 0, .2);
 }
 
 .border {

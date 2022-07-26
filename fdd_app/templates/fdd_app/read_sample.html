@@ -129,7 +129,7 @@
           </form>
           <div id="div_review" class="d-flex align-items-center">
            <button id="b2" class="btn primary margin-right margin-top-small" onclick="javascript:saveBoxes()"> Save</button>
-           <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app/sample={{sample.id}}">Start over</a> </button>
+           <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/read_sample">Start over</a> </button>
           </div>
           </div>
           <! -- end labels -->
@@ -342,8 +342,15 @@
                   <form id="{{match.id}}" class="failure_severity_form" action="" method="POST">
                     {% csrf_token %}
                     <label for="severity">Rate from 1 (low) to 5 (high)</label><br>
-                    <input type="number" step="1" name="failure_severity">
+
+                    <input type="range" name="failure_severity" id="failure_severity_id{{forloop.counter}}" value="1" min="1" max="5" oninput="failure_severity_output{{forloop.counter}}.value = failure_severity_id{{forloop.counter}}.value">
+                    <output name="failure_severity_output{{forloop.counter}}" id="failure_severity_output_id{{forloop.counter}}">1</output>
+
+                    <label for="notes">Assess the failure effects</label>
+                    <textarea rows="2" col="200" name="failure_effects"></textarea>
+
                     <input value = "{{match.id}}" type="hidden" name="match_id">
+
                   <! --  end failure severity form -->
 
                 {% endif %}
@@ -356,18 +363,19 @@
 
         {% if sample.has_failure %}
           <div class="row">
-            <button type="submit" name="done_or_continue" value="C" class="btn secondary margin-top-small margin-right" style="width: 30%">
-              Continue exploring 🏃‍♀️
-            </button>
-            <button type="submit" name="done_or_continue" value="D" class="btn primary margin-top-small" style="width: 30%">
+            <button type="submit" name="done_or_continue" value="D" class="btn secondary margin-top-small" style="width: 30%">
               Done exploring 🥱
             </button>
-
+            <button type="submit" name="done_or_continue" value="C" class="btn primary margin-top-small margin-right" style="width: 30%">
+              Continue exploring 🏃‍♀️
+            </button>
           </div>
           </form>
         {% else %}
-          <a href="samples" class="btn secondary margin-top-small margin-right" style="width: 30%">Continue exploring 🏃‍♀️</a>
-          <a href="failure_book" class="btn primary margin-top-small" style="width: 30%">Done exploring 🥱</a>
+          <a href="/fdd_app/failure_book" class="btn secondary margin-top-small" style="width: 30%">Done exploring 🥱</a>
+
+          <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/samples" class="btn primary margin-top-small" style="width: 30%">Continue exploring 🏃‍♀️</a>
+
         {% endif %}
         <! --  END MATCH -->
 

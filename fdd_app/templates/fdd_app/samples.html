@@ -114,8 +114,6 @@
 
         <h3 class="font-size-15"> All of your user scenarios. </h3>
         <a href="/fdd_app/create_persona">Create new user scenario</a>
-
-
         <br>
         <br>
         {% for item in p_and_s %}
@@ -145,9 +143,10 @@
         <div class="row">
         {% for sample in samples %}
         <div class="col-2">
-          <a href="/fdd_app/sample={{sample.id}}" class="no-text-dec">
+          <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/read_sample" class="no-text-dec">
             <img id="{{sample.id}}" class="border-radius img-fluid library-img margin-bottom-small" src="{{sample.image.url}}" draggable="true">
           </a>
+          <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/delete_sample">Delete</a>
         </div>
         {% endfor %}
         </div>

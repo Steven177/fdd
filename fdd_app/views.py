@@ -278,7 +278,7 @@ def samples(request, persona_id, scenario_id):
 
 
 @csrf_exempt
-def sample(request, sample_id):
+def read_sample(request, persona_id, scenario_id, sample_id):
   personas = Persona.objects.all()
   ais = Ai.objects.all()
   # expectation_form = ExpectationForm(request.POST)
@@ -289,6 +289,8 @@ def sample(request, sample_id):
   read_expectation = False
 
   sample = Sample.objects.get(id=sample_id)
+  persona = Persona.objects.get(id=persona_id)
+  scenario = Scenario.objects.get(id=scenario_id)
 
   colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
 
@@ -307,8 +309,10 @@ def sample(request, sample_id):
       new_exp = Expectation(xmin=x, ymin=y, xmax=width + x, ymax=height + y, sample=sample)
       new_exp.save()
 
-    return render(request, 'fdd_app/sample.html', {
+    return render(request, 'fdd_app/read_sample.html', {
       'exp_boxes': exp_boxes,
+      'persona': persona,
+      'scenario': scenario,
       'sample': sample,
       'colors': colors,
       'write_expectation': write_expectation,
@@ -447,8 +451,10 @@ def sample(request, sample_id):
         match.critical_quality_score = check_quality_of_score(match.model_prediction.score)
         match.save()
 
-    return render(request, 'fdd_app/sample.html', {
+    return render(request, 'fdd_app/read_sample.html', {
       'colors': colors,
+      'persona': persona,
+      'scenario': scenario,
       'sample': sample,
       'model_predictions': model_predictions,
       'expectations': expectations,
@@ -463,9 +469,10 @@ def sample(request, sample_id):
   elif request.method == "POST" and 'failure_severity' in request.POST:
     response = request.POST
     failure_severities = response.getlist('failure_severity')
+    failure_effects = response.getlist('failure_effects')
     match_ids = response.getlist('match_id')
 
-    # Update failure severity
+    # Save failure severity
     for idx, sev in enumerate(failure_severities):
       match_id = match_ids[idx]
       match = Match.objects.get(id=match_id)
@@ -473,14 +480,24 @@ def sample(request, sample_id):
         match.failure_severity = int(sev)
         match.save()
 
+    # Save failure effects
+    for idx, eff in enumerate(failure_effects):
+      match_id = match_ids[idx]
+      match = Match.objects.get(id=match_id)
+      if eff != "":
+        match.failure_effects = eff
+        match.save()
+
     if request.POST['done_or_continue'][0] == "D":
       return redirect('/fdd_app/failure_book')
     elif request.POST['done_or_continue'][0] =="C":
-      return redirect('/fdd_app/samples')
+      return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
 
   # GET sample
   else:
-    return render(request, 'fdd_app/sample.html', {
+    return render(request, 'fdd_app/read_sample.html', {
+      'persona': persona,
+      'scenario': scenario,
       'sample': sample,
       'colors': colors,
       'write_expectation': write_expectation,
@@ -488,6 +505,13 @@ def sample(request, sample_id):
       'personas': personas,
       'ais': ais
     })
+
+
+def delete_sample(request, persona_id, scenario_id, sample_id):
+  sample = Sample.objects.get(id=sample_id)
+  sample.delete()
+  return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
+
 
 # FAILURE BOOK
 ###################
