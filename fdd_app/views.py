@@ -615,3 +615,7 @@ def failure_book(request):
     })
 
 
+def read_ai(request):
+  return render(request, 'fdd_app/read_ai.html')
+
+

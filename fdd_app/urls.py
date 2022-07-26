@@ -17,6 +17,8 @@ urlpatterns = [
 
     path('persona=<int:persona_id>/scenario=<int:scenario_id>/samples', views.samples, name='samples'),
     path('sample=<int:sample_id>', views.sample, name='sample'),
+
     path('failure_book', views.failure_book, name='failure_book'),
+    path('read_ai', views.read_ai, name='read_ai')
 ]
 
