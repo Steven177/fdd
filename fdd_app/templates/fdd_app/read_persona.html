@@ -30,42 +30,20 @@
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-            <a class="nav-link light" aria-current="page" href="/fdd_app/create_persona">🤔 User Scenario</a>
-        </div>
-      </div>
-
-      <div class="margin-right">
-        <h4 class="white">&#128065 AI Model</h4>
-        <div class="dropdown whitebackground border-radius">
-        <select class="form-select border-radius" aria-label="Default select example">
-        {% for ai in ais %}
-          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
-        {% endfor %}
-        </select>
-        </div>
-      </div>
-
-
     </div>
   </nav>
   <! -- END NAVBAR -->
 
-  <div class="container">
-    <h1 class="border-bottom margin-top-large">User </h1>
+
+  <div class="container margin-bottom-large">
+    <a class="btn primary margin-top-small" href="/fdd_app/persona={{scenario.persona.id}}/scenario={{scenario.id}}/samples">👈 Back</a>
+    <h1 class="border-bottom margin-top-large">🧑 User </h1>
     <img src="{{ persona.image.url }}" alt="" class="border-radius img-fluid maxwidth100prozent">
-    {{persona.name}}
-    {{persona.personality}}
-    {{persona.objectives_and_goals}}
-    <br>
-    <a href="/fdd_app/persona={{persona.id}}/update_persona">Edit</a>
-    <br>
-    <a href="/fdd_app/persona={{persona.id}}/delete_persona">Delete</a>
-    <br>
-
-    <a href="/fdd_app/persona={{scenario.persona.id}}/scenario={{scenario.id}}/samples">Okay done</a>
-
+    <h1>{{persona.name}}</h1>
+    <p><strong>Personality: </strong><br> {{persona.personality}}</p>
+    <p><strong>Objectives & Goals: </strong><br> {{persona.objectives_and_goals}}</p>
+    <a class="btn secondary" href="/fdd_app/persona={{persona.id}}/update_persona">Edit</a>
+    <a class="btn secondary" href="/fdd_app/persona={{persona.id}}/delete_persona">Delete</a>
   </div>
 
 </body>

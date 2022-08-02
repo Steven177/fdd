@@ -41,6 +41,8 @@ class Model_Prediction(models.Model):
 class Expectation(models.Model):
   sample = models.ForeignKey(Sample, on_delete=models.CASCADE, blank=True)
   label = models.CharField(max_length=100, blank=True)
+  indist = models.BooleanField(default=False, blank=True)
+  outdist = models.BooleanField(default=False, blank=True)
   xmin = models.IntegerField(default=-1, blank=True)
   ymin = models.IntegerField(default=-1, blank=True)
   xmax = models.IntegerField(default=-1, blank=True)

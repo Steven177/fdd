@@ -31,13 +31,6 @@
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-            <a class="nav-link light" aria-current="page" href="/fdd_app/create_persona">🤔 User Scenario</a>
-           <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/samples">💫 Failure Exploration</a>
-            <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">📚 AI Failure Book</a>
-        </div>
-      </div>
       <div class="margin-right">
         <h4 class="white">&#128065 AI Model</h4>
         <div class="dropdown whitebackground border-radius">
@@ -47,280 +40,199 @@
         {% endfor %}
         </select>
         </div>
+        <a class="link-white" href="/fdd_app/read_ai">View model details  <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
       </div>
 
     </div>
   </nav>
   <! -- END NAVBAR -->
 
+
+
+
   <div class="container">
     <h1 class="border-bottom margin-top-large">&#128218 AI Failure Book</h1>
-   <! -- ROW-->
-    <div class="row justify-content-start">
-      <! -- FAILURE RECOVERY  -->
-      <div class="col-12">
-        <h2 class="purple-color margin-top-large">Overview</h2>
-        <h3 class="font-size-15">Let's see in what ways we can recover from failures.</h3>
-        <p> Number of false_detections: {{ false_detections|length }} </p>
-        <p>Total severity false_detections: {{sev_false_detections}}</p>
 
-        <p> Number of failing_to_detect: {{ failing_to_detect|length }} </p>
-        <p>Total severity failing_to_detect: {{sev_failing_to_detect}}</p>
-        <p> Number of missing_detection: {{ missing_detections|length }} </p>
-        <p>Total severity missing_detections: {{sev_missing_detections}}</p>
-        <p> Number of unnecessary_detection: {{ unnecessary_detections|length }} </p>
-        <p>Total severity unnecessary_detections: {{sev_unnecessary_detections}}</p>
-
-        <p> Number of critical_quality_score: {{ critical_quality_scores|length }} </p>
-        <p> Number of critical_quality_box: {{ critical_quality_boxes|length }} </p>
-
-      </div>
-      <! -- END FAILURE RECOVERY -->
-    </div>
-    <! -- END ROW-->
-
-    <h2 class="purple-color margin-top-large">Failures Modes</h2>
-    <h3 class="font-size-15">All of your failure at a glance.</h3>
-
-
-<div class="m-4">
-    <ul class="nav nav-tabs" id="myTab">
-        <li class="nav-item">
-            <a href="#false_detections" class="nav-link active colorblack" data-bs-toggle="tab">False Detections</a>
-        </li>
-        <li class="nav-item">
-            <a href="#failing_to_detect" class="nav-link colorblack" data-bs-toggle="tab">Failing to detect</a>
-        </li>
-        <li class="nav-item">
-            <a href="#missing_detection" class="nav-link colorblack" data-bs-toggle="tab">Missing detections</a>
-        </li>
-        <li class="nav-item">
-            <a href="#unnecessary_detection" class="nav-link colorblack" data-bs-toggle="tab">Unnecessary detections</a>
-        </li>
+    <ul class="nav nav-tabs margin-top-large">
+      <li class="nav-item">
+          <a href="#design_corner" class="nav-link active colorblack" data-bs-toggle="tab"><h2>🎨 Design Corner</h2></a>
+      </li>
+      <li class="nav-item">
+          <a href="#engineering_corner" class="nav-link colorblack" data-bs-toggle="tab"><h2>🛠️ Engineering Corner</h2></a>
+      </li>
     </ul>
+
     <div class="tab-content">
-        <! -- FALSE DETECTIONS  -->
-        <div class="tab-pane fade show active" id="false_detections">
+      <! -- DESIGN CORNER  -->
+      <div class="tab-pane fade show active" id="design_corner">
+        <h2 class="purple-color margin-top-large">Quantitative</h2>
+        <h2 class="purple-color margin-top-large">Qualitative</h2>
+      </div>
 
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">User Expectation</th>
-                <th scope="col">Model Prediction</th>
-                <th scope="col">Failure Severity & Tags</th>
-                <th scope="col">Notes</th>
-              </tr>
-            </thead>
-            <tbody>
 
-            {% for match in false_detections %}
-              <tr>
-                <! -- Expectation -->
-                <td>
-                  <! -- Exp Box -->
-                  <div class="position-relative">
-                    <svg class="position-absolute" width="{{match.sample.image.width}}" height="{{match.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
-                    <rect id="" class="box normalBox" x={{match.expectation.xmin}} y={{match.expectation.ymin}} width={{match.expectation.xmax|sub:match.expectation.xmin}} height={{match.expectation.ymax|sub:match.expectation.ymin}} style="stroke:green;fill-opacity:0">
+      <! -- ENGINEERING CORNER  -->
+      <div class="tab-pane fade" id="engineering_corner">
+        <h2 class="purple-color margin-top-large">Quantitative</h2>
+        <div class="row">
+          <div class="col-6">
+            <p>Recall</p>
+            <p>Precision</p>
+
+          </div>
+          <div class="col-6">
+            <p>Percentage of labels in distribution</p>
+            <p>percentage of label out-of-distribution</p>
+
+          </div>
+        </div>
+
+        <h2 class="purple-color margin-top-large">Qualitative</h2>
+
+
+        <ul class="nav nav-tabs" id="myTab2">
+          <li class="nav-item">
+              <a href="#finetuning" class="nav-link active colorblack" data-bs-toggle="tab">Finetuning</a>
+          </li>
+          <li class="nav-item">
+              <a href="#retraining" class="nav-link colorblack" data-bs-toggle="tab">Retraining</a>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+
+          <! -- FINETUNING  -->
+          <div class="tab-pane fade show active" id="finetuning">
+            <button class="btn secondary margin-top-small">Export data & labels as csv</button>
+
+
+            {% for item in finetuning %}
+            <div class="row">
+              <! -- Model prediction -->
+              <div class="col-4">
+                <p><strong>Model Prediction</strong></p>
+                <div class="position-relative">
+                  <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+
+                  {% for model_prediction in item.model_predictions %}
+                    <rect id="" class="box normalBox" x={{model_prediction.xmin}} y={{model_prediction.ymin}} width={{model_prediction.xmax|sub:model_prediction.xmin}} height={{model_prediction.ymax|sub:model_prediction.ymin}} style="stroke:{{colors|index:forloop.counter0 }};fill-opacity:0">
                     </rect>
-                    </svg>
-                    <img src="{{match.sample.image.url}}" class="border-radius">
-                  </div>
-                  <! -- Exp Label -->
-                  <i class="fa-solid fa-square" style="color: green"></i>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex justify-content-between">
-                      <p> {{ match.expectation.label|title}} </p>
+                  {% endfor %}
+                  </svg>
+                  <img src="{{item.sample.image.url}}" class="border-radius">
+                </div>
+                  {% for model_prediction in item.model_predictions %}
+                    <i class="fa-solid fa-square" style="color: {{ colors|index:forloop.counter0 }}"></i>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="d-flex justify-content-between">
+                        <p> {{ model_prediction.label|title}} </p>
+                      </div>
                     </div>
-                  </div>
-                </td>
+                  {% endfor %}
+              </div>
 
-                <! -- Model prediction -->
-                <td>
-                  <! -- Pred Box -->
+              <! -- User-centric ground truth -->
+              <div class="col-4">
+                <p><strong>User-centric ground truth</strong></p>
                   <div class="position-relative">
-                    <svg class="position-absolute" width="{{match.sample.image.width}}" height="{{match.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
-                    <rect id="" class="box normalBox" x={{match.model_prediction.xmin}} y={{match.model_prediction.ymin}} width={{match.model_prediction.xmax|sub:match.model_prediction.xmin}} height={{match.model_prediction.ymax|sub:match.model_prediction.ymin}} style="stroke:blue;fill-opacity:0">
-                    </rect>
+                    <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+
+                    {% for expectation in item.expectations %}
+                      <rect id="" class="box normalBox" x={{expectation.xmin}} y={{expectation.ymin}} width={{expectation.xmax|sub:expectation.xmin}} height={{expectation.ymax|sub:expectation.ymin}} style="stroke:{{colors|index:forloop.counter0 }};fill-opacity:0">
+                      </rect>
+                    {% endfor %}
                     </svg>
-                    <img src="{{match.sample.image.url}}" class="border-radius">
+                    <img src="{{item.sample.image.url}}" class="border-radius">
                   </div>
-                  <! -- Pred Label -->
-                  <i class="fa-solid fa-square" style="color: blue"></i>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex justify-content-between">
-                      <p> {{ match.model_prediction.label|title}} </p>
-                    </div>
-                  </div>
-                </td>
-                <! -- Failure Severity -->
-                <td>
-                  <p>{{ match.failure_severity }}</p>
-                  {% if match.indistitribution %}
-                        <p class="tag info text-align-center">ℹ️ In-distribution</p>
-                  {% else %}
-                    <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
-                  {% endif %}
+                    {% for expectation in item.expectations %}
+                      <i class="fa-solid fa-square" style="color: {{colors|index:forloop.counter0 }}"></i>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between">
+                          <p> {{ expectation.label|title}} </p>
+                        </div>
+                      </div>
+                    {% endfor %}
+              </div>
+              <div class="col-4">
 
-                  {% if match.critical_quality_box %}
-                    <p class="tag warning text-align-center">⚠️ Critical quality box</p>
-                  {% endif %}
-                  {% if match.critical_quality_score %}
-                    <p class="tag warning text-align-center">⚠️ Critical quality score</p>
-                  {% endif %}
-                </td>
+              </div>
 
-                <! -- Notes -->
-                <td>
-
-                </td>
-              </tr>
+            </div>
             {% endfor %}
 
-            </tbody>
-          </table>
-        </div>
-        <! -- END FALSE DETECTIONS  -->
-        <! -- FAILING TO OBSERVE  -->
-        <div class="tab-pane fade" id="failing_to_detect">
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Sample</th>
-                <th scope="col">Failure Severity & Tags</th>
-                <th scope="col">Notes</th>
-              </tr>
-            </thead>
-            <tbody>
 
-            {% for match in failing_to_detect %}
-              <tr>
-                <td>
-                <! -- Sample -->
-                  <img src="{{match.sample.image.url}}" class="border-radius">
-                </td>
-                <! -- Failure Severity -->
-                <td>
-                  <p>{{ match.failure_severity }}</p>
-                </td>
 
-                <! -- Notes -->
-                <td>
+          </div> <! -- END FINETUNING  -->
 
-                </td>
-              </tr>
-            {% endfor %}
 
-            </tbody>
-          </table>
-        </div>
-        <! -- END FAILING TO OBSERVE  -->
-        <! -- MISSING DETECTIONS -->
-        <div class="tab-pane fade" id="missing_detection">
 
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">User Expectation</th>
-                <th scope="col">Failure Severity & Tags</th>
-                <th scope="col">Notes</th>
-              </tr>
-            </thead>
-            <tbody>
+          <! -- RETRAINING  -->
+          <div class="tab-pane fade show" id="retraining">
+            <button class="btn secondary margin-top-small">Export data & labels as csv</button>
 
-            {% for match in missing_detections %}
-              <tr>
-                <! -- Expectation -->
-                <td>
-                  <! -- Exp Box -->
-                  <div class="position-relative">
-                    <svg class="position-absolute" width="{{match.sample.image.width}}" height="{{match.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
-                    <rect id="" class="box normalBox" x={{match.expectation.xmin}} y={{match.expectation.ymin}} width={{match.expectation.xmax|sub:match.expectation.xmin}} height={{match.expectation.ymax|sub:match.expectation.ymin}} style="stroke:green;fill-opacity:0">
+
+            {% for item in retraining %}
+            <div class="row">
+              <! -- Model prediction -->
+              <div class="col-4">
+                <p><strong>Model Prediction</strong></p>
+                <div class="position-relative">
+                  <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+
+                  {% for model_prediction in item.model_predictions %}
+                    <rect id="" class="box normalBox" x={{model_prediction.xmin}} y={{model_prediction.ymin}} width={{model_prediction.xmax|sub:model_prediction.xmin}} height={{model_prediction.ymax|sub:model_prediction.ymin}} style="stroke:{{colors|index:forloop.counter0 }};fill-opacity:0">
                     </rect>
-                    </svg>
-                    <img src="{{match.sample.image.url}}" class="border-radius">
-                  </div>
-                  <! -- Exp Label -->
-                  <i class="fa-solid fa-square" style="color: green"></i>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex justify-content-between">
-                      <p> {{ match.expectation.label|title}} </p>
+                  {% endfor %}
+                  </svg>
+                  <img src="{{item.sample.image.url}}" class="border-radius">
+                </div>
+                  {% for model_prediction in item.model_predictions %}
+                    <i class="fa-solid fa-square" style="color: {{ colors|index:forloop.counter0 }}"></i>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="d-flex justify-content-between">
+                        <p> {{ model_prediction.label|title}} </p>
+                      </div>
                     </div>
-                  </div>
-                </td>
+                  {% endfor %}
+              </div>
 
-                <! -- Failure Severity -->
-                <td>
-                  <p>{{ match.failure_severity }}</p>
-                  {% if match.indistitribution %}
-                        <p class="tag info text-align-center">ℹ️ In-distribution</p>
-                  {% else %}
-                    <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
-                  {% endif %}
-                </td>
-
-                <! -- Notes -->
-                <td>
-
-                </td>
-              </tr>
-            {% endfor %}
-
-            </tbody>
-          </table>
-        </div>
-        <! -- END MISSING DETECTIONS -->
-        <! -- UNNCESSARY DETECTIONS  -->
-        <div class="tab-pane fade" id="unnecessary_detection">
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Model Prediction</th>
-                <th scope="col">Failure Severity & Tags</th>
-                <th scope="col">Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-
-            {% for match in unnecessary_detections %}
-              <tr>
-                <! -- Model prediction -->
-                <td>
-                  <! -- Pred Box -->
+              <! -- User-centric ground truth -->
+              <div class="col-4">
+                <p><strong>User-centric ground truth</strong></p>
                   <div class="position-relative">
-                    <svg class="position-absolute" width="{{match.sample.image.width}}" height="{{match.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
-                    <rect id="" class="box normalBox" x={{match.model_prediction.xmin}} y={{match.model_prediction.ymin}} width={{match.model_prediction.xmax|sub:match.model_prediction.xmin}} height={{match.model_prediction.ymax|sub:match.model_prediction.ymin}} style="stroke:blue;fill-opacity:0">
-                    </rect>
+                    <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+
+                    {% for expectation in item.expectations %}
+                      <rect id="" class="box normalBox" x={{expectation.xmin}} y={{expectation.ymin}} width={{expectation.xmax|sub:expectation.xmin}} height={{expectation.ymax|sub:expectation.ymin}} style="stroke:{{colors|index:forloop.counter0 }};fill-opacity:0">
+                      </rect>
+                    {% endfor %}
                     </svg>
-                    <img src="{{match.sample.image.url}}" class="border-radius">
+                    <img src="{{item.sample.image.url}}" class="border-radius">
                   </div>
-                  <! -- Pred Label -->
-                  <i class="fa-solid fa-square" style="color: blue"></i>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex justify-content-between">
-                      <p> {{ match.model_prediction.label|title}} </p>
-                    </div>
-                  </div>
-                </td>
-                <! -- Failure Severity -->
-                <td>
-                  <p>{{ match.failure_severity }}</p>
-                  {% if match.critical_quality_score %}
-                    <p class="tag warning text-align-center">⚠️ Critical quality score</p>
-                  {% endif %}
-                </td>
+                    {% for expectation in item.expectations %}
+                      <i class="fa-solid fa-square" style="color: {{colors|index:forloop.counter0 }}"></i>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between">
+                          <p> {{ expectation.label|title}} </p>
+                        </div>
+                      </div>
+                    {% endfor %}
+              </div>
+              <div class="col-4">
 
-                <! -- Notes -->
-                <td>
+              </div>
 
-                </td>
-              </tr>
+            </div>
             {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <! -- END UNNCESSARY DETECTIONS  -->
-    </div>
-</div>
+
+
+
+
+
+
+          </div> <! -- END RETRAINING  -->
+        </div> <! -- END Tab content  -->
+    </div> <! -- END ENGINEERING CORNER  -->
+  </div> <! -- End tab content  -->
 
 </div> <! -- Container -->
 

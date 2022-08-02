@@ -3,13 +3,15 @@
   --purple: #7207B7;
   --white: #ffffff;
   --gold:  #ECA355;
+  --lightgold:  rgba(236, 163, 85, 0.2);
   --light: #F9FAFB;
-  --light-puple: #efe6f5;
+  --lightpurple: #efe6f5;
   --black: #000000;
   --red:  red;
   --yellow:  yellow;
   --green:  green;
   --blue:  blue;
+  --pink:  #BB657B;
 }
 
 /* fonts */
@@ -17,17 +19,108 @@ body.font {
   font-family: 'Montserrat', sans-serif;
 }
 
+.mycard {
+  border-radius:  2px;
+  border: 1px solid var(--lightpurple);
+  padding:  20px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 0.5px 1.5px ;
+}
+
+.mycard:hover {
+  box-shadow: var(--lightpurple) 0px 4px 12px;
+}
+
+.active_card {
+  border-radius:  2px;
+  padding:  20px;
+  background-image: linear-gradient(to right, var(--black) , var(--purple));
+  color:  white;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 0.5px 1.5px;
+}
+
+.active_card:hover {
+  box-shadow: var(--lightpurple) 0px 4px 12px;
+}
+
+.box-shadow {
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 12px;
+}
+
+.box-shadow:hover {
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 24px;
+
+}
+
 .library-img {
   width:  100%;
   height:  auto;
+}
+
+.link-white {
+  text-decoration:  none;
+  color: var(--white);
+}
+
+.link-white:hover {
+  text-decoration:  underline;
+  color: var(--white);
+}
+
+.link-black {
+  text-decoration:  none;
+  color: var(--black);
+}
+
+.link-black:hover {
+  text-decoration:  underline;
+  color: var(--black);
+}
+
+.card{
+  border-radius:  2px !important;
 }
 
 .colorblack {
   color:  black !important;
 }
 
+.width100 {
+  width:  100%;
+}
+
+.height {
+  height:  100%;
+}
+
+.black {
+  color:  var(--black);
+}
+
+.black:hover {
+  color:  var(--black);
+  text-decoration: underline;
+
+}
+
+.thumb{
+  width:  75px;
+  border-radius:  100px;
+}
+
 .border-bottom {
-  border-bottom: 0.3px solid var(----purple) !important;
+  border-bottom: 0.3px solid var(--lightpurple) !important;
+}
+
+.border-top {
+  border-top: 0.3px solid var(--lightpurple) !important;
+}
+
+.border-bottom-thick {
+  border-bottom: 3px solid var(--lightpurple);
+}
+
+.border-top-thick {
+  border-top: 3px solid var(--lightpurple);
 }
 
 .font-size-15 {
@@ -49,13 +142,22 @@ body.font {
 }
 
 .active_persona {
+  color:  var(--purple);
   text-decoration:  none;
-  color:  green;
+}
+.active_persona:hover {
+  color:  var(--purple);
+  text-decoration:  underline;
 }
 
 .active_scenario {
+  color:  var(--gold);
   text-decoration:  none;
-  color:  green;
+}
+
+.active_scenario:hover {
+  color:  var(--gold);
+  text-decoration:  none;
 }
 
 .no-text-dec {
@@ -66,8 +168,37 @@ body.font {
 .white {
   color:  var(--white);
 }
-.light-purple-background {
-  background-color:  var(--light-puple) !important;
+.light-purple-border {
+  border: 3px solid var(--lightpurple) !important;
+}
+
+.golden-background {
+  background-color:  var(--lightgold) !important;
+}
+
+.instruction {
+  padding:  20px;
+  color:  white;
+  background-image: linear-gradient(90deg, var(--gold), var(--purple));
+  display:  flex;
+  align-items: center;
+}
+
+.instruction-passive {
+  padding:  20px;
+  color:  black;
+  background-image: linear-gradient(90deg, var(--lightgold), var(--lightpurple));
+
+}
+
+.gradient-text {
+  background-image: linear-gradient(90deg var(--gold), var(--purple));
+  background-clip:  text;
+  color: transparent;
+}
+
+.golden-border {
+  border:  3px solid var(--gold);
 }
 
 .purple-color {
@@ -108,12 +239,12 @@ body.font {
 
 /* buttons */
 .primary {
-  background-color: var(--purple) !important;
+  background-image: linear-gradient(90deg, var(--black), var(--purple));
   color:  var(--white) !important;
 }
 
 .secondary {
-  background-color: var(--light-puple) !important;
+  background-color: var(--lightpurple) !important;
   color:  var(--black) !important;
 }
 
@@ -207,9 +338,14 @@ body.font {
   margin-bottom:  10px;
 }
 
+.margin-bottom-large {
+  margin-bottom:  40px;
+}
+
 .margin-top-large {
   margin-top:  40px !important;
 }
+
 
 .margin-top-small {
   margin-top:  10px !important;
@@ -219,16 +355,13 @@ body.font {
   margin-left: 10px !important;
 }
 
-.margin-left {
-  margin-left:  10px;
-}
 
 .margin-left-large {
-  margin: left:  40px;
+  margin-left:  40px;
 
 }
 
-.margin-right {
+.margin-right-small {
   margin-right:  10px;
 }
 
@@ -248,7 +381,7 @@ body.font {
 }
 
 .navbar {
-  background-color:  var(--purple) !important;
+  background-image: linear-gradient(to right, var(--purple) , var(--black));
   padding-left: 10px !important;
   padding-right: 10px !important;
 }
@@ -330,6 +463,93 @@ body.font {
 
 .whitebackground {
   background-color:  white;
+}
+
+
+/* SLIDER */
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--purple);
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #04AA6D;
+  cursor: pointer;
+}
+
+/* SEARCH BAR */
+.search-box {
+  width: 350px;
+  display: flex;
+  margin:  auto;
+}
+
+.search-input {
+  width: 100%;
+  font-size: 16px;
+  padding: 15px 45px 15px 15px;
+  background-color: var(--lightpurple);
+  color: black;
+  border-radius: 2px;
+  border:none;
+  transition: all .4s;
+}
+
+.search-input:focus {
+  border:none;
+  outline:none;
+  background-color: var(--lightpurple);
+  box-shadow: 0 1px 12px #b8c6db;
+  -moz-box-shadow: 0 1px 12px #b8c6db;
+  -webkit-box-shadow: 0 1px 12px #b8c6db;
+}
+
+.search-btn {
+  background-color: transparent;
+  font-size: 18px;
+  padding: 6px 9px;
+  margin-left:-45px;
+  border:none;
+  color: var(--purple);
+  transition: all .4s;
+  z-index: 10;
+}
+
+.search-btn:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+  color: black;
+}
+
+.search-btn:focus {
+  outline:none;
+  color:black;
+}
+
+.accordion-button {
+  color:  black !important;
+  background-color:  white !important;
+  box-shadow:  none !important;
 }
 
 

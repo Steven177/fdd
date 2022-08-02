@@ -30,30 +30,18 @@
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-            <a class="nav-link light" aria-current="page" href="/fdd_app/create_persona">🤔 User Scenario</a>
-        </div>
-      </div>
-      <div class="margin-right">
-        <h4 class="white">&#128065 AI Model</h4>
-        <div class="dropdown whitebackground border-radius">
-        <select class="form-select border-radius" aria-label="Default select example">
-        {% for ai in ais %}
-          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
-        {% endfor %}
-        </select>
-        </div>
-      </div>
     </div>
   </nav>
   <! -- END NAVBAR -->
 
   <div class="container">
-    <h1 class="border-bottom margin-top-large">🤔 User Scenario: Picture a persona 🧑</h1>
-
+    <h1 class="border-bottom margin-top-large">🤔 User Scenario: Picture a persona</h1>
     <h2 class="purple-color">Persona</h2>
     <h3 class="font-size-15">The persona is the main actor of your scene. </h3>
+    <div class="instruction border-radius margin-bottom-small d-flex" role="alert">
+      <h1 class="margin-right-small">👉</h1>
+      <p>Picture a potential user that may use your product.  You may want to rely on findings from your user research for this.</p>
+    </div>
     <form method = "post" enctype="multipart/form-data" class="form-control form-label border-radius">
       {% csrf_token %}
       {{persona_form.as_p}}

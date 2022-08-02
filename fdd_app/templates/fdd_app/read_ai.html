@@ -6,21 +6,23 @@
   <title>Document</title>
 
   {% load static %}
-
+  {% load mathfilters %}
+  {% load index %}
+  {% load slice %}
+  {% load to_int %}
   <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
   <! -- fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;700&display=swap" rel="stylesheet">
 
-  <! -- stickynotes -->
-  <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/stickynotes/stickynotes.css' %}">
-
+  <! -- external scripts -->
+  <script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
   <! -- Bootstrap-->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"> </script>
   <! -- jquery-->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -36,7 +38,7 @@
 
   <div class="container">
     <form>
-      <input class="btn primary margin-top-small" type="button" value="Back" onclick="history.back()">
+      <input class="btn primary margin-top-small" type="button" value="👈 Back" onclick="history.back()">
     </form>
     <h1 class="border-bottom margin-top-large">&#128065 DETR: Object Detection</h1>
 
@@ -63,41 +65,233 @@
     <div class="row">
       <h2 class="purple-color margin-top-large">Capabilities</h2>
       <div class="col-4">
-        <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Deserunt, atque. Perferendis excepturi ducimus cum nihil dolorum in atque officia rem id placeat? Fugit facilis qui, accusamus doloremque soluta ducimus voluptate.</p>
+        <p>The network has been trained on the COCO dataset which consists of ~80 classes. We grouped them in categories for you. </p>
       </div>
       <div class="col-8">
-        <div class="accordion accordion-flush" id="accordionFlushExample">
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="flush-headingOne">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-        Accordion Item #1
-      </button>
-    </h2>
-    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-      <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion body.</div>
+
+
+    <div class="search-box margin-bottom-large">
+      <input id="accordion_search_bar" class="search-input" type="text" placeholder="Search...">
+      <button class="search-btn"><i class="fas fa-search margin-bottom-small"></i></button>
     </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="flush-headingTwo">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-        Accordion Item #2
-      </button>
-    </h2>
-    <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
-      <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the second item's accordion body. Let's imagine this being filled with some actual content.</div>
-    </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="flush-headingThree">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
-        Accordion Item #3
-      </button>
-    </h2>
-    <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
-      <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the third item's accordion body. Nothing more exciting happening here in terms of content, but just filling up the space to make it look, at least at first glance, a bit more representative of how this would look in a real-world application.</div>
-    </div>
-  </div>
-</div>
+
+            <! --  CLASS TABLE -->
+            <div class="accordion margin-top-small" id="accordionPanelsStayOpenExample">
+              <div class="accordion-item" id="collapseOne_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                    &#129489 Category: Person
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
+                  <div class="accordion-body">
+                    <p>Person</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseTwo_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                    &#128665 Category: Vehicle
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+                  <div class="accordion-body">
+                    <p>Bicycle</p>
+                    <p>Car</p>
+                    <p>Motorcycle</p>
+                    <p>Airplane</p>
+                    <p>Bus</p>
+                    <p>Train</p>
+                    <p>Truck</p>
+                    <p>Boat</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseThree_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                    &#128739 Category: Traffic
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+                  <div class="accordion-body">
+                    <p>Traffic light</p>
+                    <p>Fire Hydrant</p>
+                    <p>Stop sign</p>
+                    <p>Parking meter</p>
+                    <p>Bench</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseFour_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingFour">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
+                    &#128021 Category: Animal
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingFour">
+                  <div class="accordion-body">
+                    <p>Bird</p>
+                    <p>Cat</p>
+                    <p>Dog</p>
+                    <p>Horse</p>
+                    <p>Sheep</p>
+                    <p>Cow</p>
+                    <p>Elephant</p>
+                    <p>Bear</p>
+                    <p>Zebra</p>
+                    <p>Giraffe</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseFive_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingFive">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFive" aria-expanded="false" aria-controls="panelsStayOpen-collapseFive">
+                    &#9730 Category: Accessory
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseFive" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingFive">
+                  <div class="accordion-body">
+                    <p>Backpack</p>
+                    <p>Umbrella</p>
+                    <p>Handbag</p>
+                    <p>Tie</p>
+                    <p>Suitcase</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseSix_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingSix">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseSix" aria-expanded="false" aria-controls="panelsStayOpen-collapseSix">
+                    &#9917 Category: Sports
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseSix" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingSix">
+                  <div class="accordion-body">
+                    <p>Frisbee</p>
+                    <p>Skis</p>
+                    <p>Snowboard</p>
+                    <p>Sportsball</p>
+                    <p>Kite</p>
+                    <p>Baseball bat</p>
+                    <p>Baseball glove</p>
+                    <p>Skateboard</p>
+                    <p>Surfboard</p>
+                    <p>Tennis racket</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseSeven_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingSeven">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseSeven" aria-expanded="false" aria-controls="panelsStayOpen-collapseSeven">
+                    &#128298 Category: Kitchen
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseSeven" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingSeven">
+                  <div class="accordion-body">
+                    <p>Wine glass</p>
+                    <p>Cup</p>
+                    <p>Fork</p>
+                    <p>Knife</p>
+                    <p>Spoon</p>
+                    <p>Bowl</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseEight_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingEight">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseEight" aria-expanded="false" aria-controls="panelsStayOpen-collapseEight">
+                    &#127858 Category: Food
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseEight" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingEight">
+                  <div class="accordion-body">
+                    <p>Banana</p>
+                    <p>Apple</p>
+                    <p>Sandwitch</p>
+                    <p>Orange</p>
+                    <p>Broccoli</p>
+                    <p>Carrot</p>
+                    <p>Hotdog</p>
+                    <p>Pizza</p>
+                    <p>Donut</p>
+                    <p>Cake</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseNine_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingNine">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseNine" aria-expanded="false" aria-controls="panelsStayOpen-collapseNine">
+                    &#128186 Category: Furniture
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseNine" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingNine">
+                  <div class="accordion-body">
+                    <p>Chair</p>
+                    <p>Couch</p>
+                    <p>Potted plant</p>
+                    <p>Bed</p>
+                    <p>Dining table</p>
+                    <p>Toilet</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseTen_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingTen">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTen" aria-expanded="false" aria-controls="panelsStayOpen-collapseTen">
+                    &#9889 Category: Electronic
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTen" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTen">
+                  <div class="accordion-body">
+                    <p>TV</p>
+                    <p>Laptop</p>
+                    <p>Mouse</p>
+                    <p>Remote</p>
+                    <p>Keyboard</p>
+                    <p>Cell phone</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseEleven_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingEleven">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseEleven" aria-expanded="false" aria-controls="panelsStayOpen-collapseEleven">
+                    &#128268 Category: Appliance
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseEleven" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingEleven">
+                  <div class="accordion-body">
+                    <p>Microwave</p>
+                    <p>Oven</p>
+                    <p>Toaster</p>
+                    <p>Sink</p>
+                    <p>Refrigerator</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item" id="collapseTwelve_container">
+                <h2 class="accordion-header" id="panelsStayOpen-headingTwelve">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwelve" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwelve">
+                    &#127968 Category: Indoor
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTwelve" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwelve">
+                  <div class="accordion-body">
+                    <p>Book</p>
+                    <p>Clock</p>
+                    <p>Vase</p>
+                    <p>Scissors</p>
+                    <p>Teddy bear</p>
+                    <p>Hair drier</p>
+                    <p>Toothbrush</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <! -- END CLASS TABLE -->
+
+
 
       </div>
     </div>
@@ -226,4 +420,11 @@
 </body>
 </html>
 
-<script src="{% static 'fdd_app/stickynotes/stickynotes.js' %}"></script>
+<! -- internal scripts -->
+<script src="{% static 'fdd_app/js/bbox.js' %}"></script>
+<script src="{% static 'fdd_app/js/search.js' %}"></script>
+<script src="{% static 'fdd_app/js/table.js' %}"></script>
+<script src="{% static 'fdd_app/js/slider.js' %}"></script>
+<script src="{% static 'fdd_app/js/explanation.js' %}"></script>
+<script src="{% static 'fdd_app/js/hide.js' %}"></script>
+

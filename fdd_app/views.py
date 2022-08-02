@@ -345,6 +345,10 @@ def read_sample(request, persona_id, scenario_id, sample_id):
     for idx, label in enumerate(labels):
       exp = expectations[idx]
       exp.label = label
+      if check_if_indistribution(label):
+        exp.indist = True
+      else:
+        exp.outdist = True
       exp.save()
 
     expectations = Expectation.objects.filter(sample=sample.id)
@@ -517,124 +521,28 @@ def delete_sample(request, persona_id, scenario_id, sample_id):
 ###################
 @csrf_exempt
 def failure_book(request):
-  # GET failure_book
-  book = []
-  personas = Persona.objects.all()
-  for persona in personas:
-    samples = Sample.objects.filter(has_failure=True, persona=persona)
-    book.append({'persona': persona, 'samples': samples})
-
-  print(book)
-
+  # ENGINEERING CORNER
+  # [sample: {'expectation', 'model_prediction'}]
+  colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
   ais = Ai.objects.all()
-
-  false_detections = Match.objects.filter(false_detection=True)
-  failing_to_detect = Match.objects.filter(failing_to_detect=True)
-  missing_detections = Match.objects.filter(missing_detection=True)
-  unnecessary_detections = Match.objects.filter(unnecessary_detection=True)
-  critical_quality_boxes = Match.objects.filter(critical_quality_box=True)
-  critical_quality_scores = Match.objects.filter(critical_quality_score=True)
-
-  sev_false_detections = 0
-  for i in false_detections:
-    sev_false_detections += i.failure_severity
-
-  sev_failing_to_detect = 0
-  for i in failing_to_detect:
-    sev_failing_to_detect += i.failure_severity
-
-  sev_missing_detections = 0
-  for i in missing_detections:
-    sev_missing_detections += i.failure_severity
-
-  sev_unnecessary_detections = 0
-  for i in unnecessary_detections:
-    sev_unnecessary_detections += i.failure_severity
-
-  data = []
+  finetuning = []
+  retraining = []
+  samples = Sample.objects.all()
   for sample in samples:
-    expectations = sample.expectation_set.all()
-    model_predictions = sample.model_prediction_set.all()
-    matches = sample.match_set.all()
+    indist_exps = sample.expectation_set.filter(indist=True)
+    exps = sample.expectation_set.all()
+    model_preds = sample.model_prediction_set.all()
+    finetuning.append({'sample': sample, 'expectations': indist_exps, 'model_predictions': model_preds})
+    retraining.append({'sample': sample, 'expectations': exps, 'model_predictions': model_preds})
 
-    total_severity = 0
-    num_of_errors = 0
-    num_of_warn = 0
-
-    recoveries = [
-    "Quality of output",
-    "N-best options",
-    "Hand-over of control",
-    "Implicit feedback",
-    "Explicit feedback",
-    "Corrections by the user",
-    "Local explanation",
-    "Global explanation"
-    ]
-
-    rec_ind = []
-    for match in matches:
-      if match.failing_to_detect or match.false_detection or match.missing_detection or match.unnecessary_detection:
-        num_of_errors += 1
-
-      if match.critical_quality_score and match.critical_quality_box:
-        num_of_warn += 2
-      elif match.critical_quality_score or match.critical_quality_box:
-        num_of_warn += 1
-
-      total_severity += match.failure_severity
-
-      # ---------------------------
-      # FAILURE RECOVERY
-
-      if match.failing_to_detect:
-        rec_ind.append([2, 7, 3])
-      if match.false_detection and match.indistribution:
-        rec_ind.append([5, 6, 1])
-      if match.false_detection and not match.indistribution:
-        rec_ind.append([7, 4, 2])
-      if match.missing_detection and match.indistribution:
-        rec_ind.append([4, 5, 2])
-      if match.missing_detection and  not match.indistribution:
-        rec_ind.append([7, 4, 2])
-      if match.unnecessary_detection:
-        rec_ind.append([4])
-      if match.critical_quality_score:
-        rec_ind.append([0, 1, 2, 4])
-      if match.critical_quality_box:
-        rec_ind.append([0, 4, 5])
-
-
-
-    # print(rec_ind)
-
-    data.append({
-      "sample": sample,
-      "matches": matches,
-      "expectations": expectations,
-      "model_predictions": model_predictions,
-      "total_severity": total_severity,
-      "num_of_errors": num_of_errors,
-      "num_of_warn": num_of_warn,
-      'personas': personas,
-      'ais': ais
-      })
+  # DESIGN CORNER
 
   return render(request, 'fdd_app/failure_book.html',
     {
     'samples': samples,
-    'false_detections': false_detections,
-    'failing_to_detect': failing_to_detect,
-    'missing_detections': missing_detections,
-    'unnecessary_detections': unnecessary_detections,
-    'critical_quality_boxes': critical_quality_boxes,
-    'critical_quality_scores': critical_quality_scores,
-    'sev_false_detections': sev_false_detections,
-    'sev_failing_to_detect': sev_failing_to_detect,
-    'sev_missing_detections': sev_missing_detections,
-    'sev_unnecessary_detections': sev_unnecessary_detections,
-    "data": data,
-    'personas': personas,
+    'finetuning': finetuning,
+    'retraining': retraining,
+    'colors': colors,
     'ais': ais
     })
 

@@ -14,9 +14,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;700&display=swap" rel="stylesheet">
 
-  <! -- stickynotes -->
-  <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/stickynotes/stickynotes.css' %}">
-
   <! -- Bootstrap-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
   </script>
@@ -30,40 +27,19 @@
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-            <a class="nav-link light" aria-current="page" href="/fdd_app/create_persona">🤔 User Scenario</a>
-        </div>
-      </div>
-
-      <div class="margin-right">
-        <h4 class="white">&#128065 AI Model</h4>
-        <div class="dropdown whitebackground border-radius">
-        <select class="form-select border-radius" aria-label="Default select example">
-        {% for ai in ais %}
-          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
-        {% endfor %}
-        </select>
-        </div>
-      </div>
-
-
     </div>
   </nav>
   <! -- END NAVBAR -->
 
   <div class="container">
-    <h1 class="border-bottom margin-top-large">User </h1>
-    <img src="{{ persona.image.url }}" alt="" class="border-radius img-fluid maxwidth100prozent">
-    {{scenario.name}}
-    {{scenario.description}}
-    <br>
-    <a href="/fdd_app/persona={{scenario.persona.id}}/scenario={{scenario.id}}/update_scenario">Edit</a>
-    <br>
-    <a href="/fdd_app/persona={{scenario.persona.id}}/scenario={{scenario.id}}/delete_scenario">Delete</a>
-    <br>
+    <a class="btn primary margin-top-small" href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/samples">👈 Back</a>
+    <h1 class="border-bottom margin-top-large"> 📌 Scenario </h1>
+    <h4>{{scenario.name}}</h4>
+    <p>Description:</p>
+    <p>{{scenario.description}}</p>
+    <a class="btn secondary" href="/fdd_app/persona={{scenario.persona.id}}/scenario={{scenario.id}}/update_scenario">Edit</a>
+    <a class="btn secondary" href="/fdd_app/persona={{scenario.persona.id}}/scenario={{scenario.id}}/delete_scenario">Delete</a>
 
-    <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/samples">Okay done</a>
 
   </div>
 

@@ -26,16 +26,8 @@
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-            <a class="nav-link light" aria-current="page" href="/fdd_app/create_persona">🤔 User Scenario</a>
-           <a class="nav-link active light margin-right" aria-current="page" href="/fdd_app/samples">💫 Failure Exploration</a>
-            <a class="nav-link light" aria-current="page" href="/fdd_app/failure_book">📚 AI Failure Book</a>
-        </div>
-      </div>
       <div class="margin-right">
         <h4 class="white">&#128065 AI Model</h4>
-        <a href="/fdd_app/read_ai">View details</a>
         <div class="dropdown whitebackground border-radius">
         <select class="form-select border-radius" aria-label="Default select example">
         {% for ai in ais %}
@@ -43,6 +35,7 @@
         {% endfor %}
         </select>
         </div>
+        <a class="link-white" href="/fdd_app/read_ai">View model details  <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
       </div>
 
     </div>
@@ -51,103 +44,98 @@
 
   <div class="container">
 
-   <h1 class="border-bottom margin-top-large">🤔 User Scenario: Imagine the inputs </h1>
+   <h1 class="border-bottom margin-top-large">🤔 User-centric data probe generation</h1>
 
-    <! -- ROW-->
-    <div class="row justify-content-start">
-      <div class="row">
-        <div class="col-6">
-          <h2 class="purple-color margin-top-large">User</h2>
-          <img src="{{ persona.image.url }}" alt="" class="border-radius img-fluid maxwidth100prozent">
-          <p>{{persona.name}}</p>
-          <p>{{persona.personality}}</p>
-          <p>{{persona.objectives_and_goals}}</p>
-
-        </div>
-        <div class="col-6">
-          <h2 class="purple-color margin-top-large">Scenario</h2>
-          <h3 class="font-size-15">Some text </h3>
-          {{scenario.name}} <br>
-          {{scenario.description}}
-        </div>
-      </div>
-
-    </div>
-    <! -- END ROW-->
-
-    <! -- ROW-->
-    <div class="row justify-content-start">
-      <! -- IMAGE UPLOAD -->
-      <div class="col-6">
-        <h2 class="purple-color margin-top-large">Image upload</h2>
-        <h3 class="font-size-15">Existing hypothesis? </h3>
-
-        <form method = "post" enctype="multipart/form-data" class="form-control form-label border-radius">
-          {% csrf_token %}
-          <input type="hidden" name="form_id" value="input">
-          <label> Image from user research </label>
-          {{ image_form.as_p }}
-          <button type="submit" class="btn primary">Upload image</button>
-        </form>
-      </div>
-
-      <div class="col-6">
-        <h2 class="purple-color margin-top-large">Image generation on the fly</h2>
-        <h3 class="font-size-15"> New hypothesis?</h3>
-        <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
-          {% csrf_token %}
-          <input type="hidden" name="form_id" value="scenario">
-          <label> What kind of image are you looking for?</label>
-          {{ query_form.as_p }}
-          <button type="submit" class="btn primary">Generate image</button>
-        </form>
-      </div>
-
-    </div>
-    <! -- END ROW-->
 
     <! -- ROW-->
     <div class="row justify-content-start">
       <! -- Personas & scenarios-->
-      <div class="col-4">
+      <div class="col-5">
         <h2 class="purple-color margin-top-large">User Scenarios</h2>
-
         <h3 class="font-size-15"> All of your user scenarios. </h3>
-        <a href="/fdd_app/create_persona">Create new user scenario</a>
-        <br>
-        <br>
-        {% for item in p_and_s %}
-          <p class="{% if item.persona.id == persona.id %}active_persona{%endif%}">User: {{item.persona.name}}</p>
-          <a href="/fdd_app/persona={{item.persona.id}}/read_persona">View in detail</a> <br>
 
-          {% for s in item.scenarios %}
-            <a class="{% if s.id == scenario.id %}active_scenario{%endif%}" href="/fdd_app/persona={{item.persona.id}}/scenario={{s.id}}/samples">
-              {{s.name}} <br>
-              <a href="/fdd_app/persona={{item.persona.id}}/scenario={{scenario.id}}/read_scenario"> View in detail</a><br>
-              <br>
-              <br>
+          <a class="btn secondary margin-bottom-small" href="/fdd_app/create_persona">Create new user scenario</a>
+
+          {% for item in p_and_s %}
+          <div class="d-flex align-items-center width100 border-top-thick">
+            <a class="{% if item.persona.id == persona.id %}active_persona{% else %}link-black {%endif%}" href="/fdd_app/persona={{item.persona.id}}/read_persona">
+                <img src="{{ item.persona.image.url }}" alt="" class="border-radius img-fluid thumb margin-top-small">
+                <h4 class=""> {{item.persona.name}}</h4>
             </a>
+          </div>
 
-          {% endfor %}
-          <a href="/fdd_app/persona={{item.persona.id}}/create_scenario">Create new scenario for this user</a>
-          <br>
-          <br>
-          <br>
+            {% for s in item.scenarios %}
+              <div class="{% if s.id == scenario.id %}active_card{% else %}mycard{%endif%} margin-bottom-small margin-left-large d-flex justify-content-between">
+                <div class="position-relative">
+                  <h5>{{s.name}}</h5>
+                  <p>{{s.description}}</p>
+                  <a href="/fdd_app/persona={{item.persona.id}}/scenario={{s.id}}/samples" class="stretched-link"></a>
+                </div>
+                <a class="margin-left-large margin-bottom-small" href="/fdd_app/persona={{item.persona.id}}/scenario={{scenario.id}}/read_scenario"><i class="fa-solid fa-arrow-up-right-from-square {% if s.id == scenario.id %}link-white{% else %}link-black{%endif%} "></i></a>
+              </div>
+            {% endfor %}
+
+          <a class="btn secondary margin-top-small margin-left-large margin-bottom-small"href="/fdd_app/persona={{item.persona.id}}/create_scenario">New scenario for {{item.persona.name}}</a>
         {% endfor %}
 
       </div>
       <! -- Data probes-->
-      <div class="col-8">
+      <div class="col-7">
         <h2 class="purple-color margin-top-large">Data probes</h2>
         <h3 class="font-size-15">Your data library. A simple click on one of the images let's you start the failure exploration.</h3>
+         <div class="instruction border-radius margin-bottom-small d-flex" role="alert">
+            <h1 class="margin-right-small">👉</h1> <p>Picture a user scenario and think about what inputs a user may want to input to the AI.</p>
+          </div>
+
+        <p>
+          <a class="btn secondary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Upload image manually</a>
+          <a class="btn secondary" data-bs-toggle="collapse" href="#multiCollapseExample2" role="button" aria-expanded="false" aria-controls="multiCollapseExample2"> Generate image automatically</a>
+        </p>
+
+        <div class="row">
+          <div class="col">
+            <div class="collapse multi-collapse" id="multiCollapseExample1">
+              <div class="card card-body">
+                <form method = "post" enctype="multipart/form-data" class="form-control form-label border-radius">
+                  {% csrf_token %}
+                  <input type="hidden" name="form_id" value="input">
+                  <label> Image from user research </label>
+                  {{ image_form.as_p }}
+                  <button type="submit" class="btn primary"> 👍 Upload image</button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="collapse multi-collapse" id="multiCollapseExample2">
+              <div class="card card-body">
+                <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
+                  {% csrf_token %}
+                  <input type="hidden" name="form_id" value="scenario">
+                  <label> What kind of image are you looking for?</label>
+                  {{ query_form.as_p }}
+                  <button type="submit" class="btn primary"> 🤩 Generate image</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="row">
         {% for sample in samples %}
-        <div class="col-2">
-          <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/read_sample" class="no-text-dec">
-            <img id="{{sample.id}}" class="border-radius img-fluid library-img margin-bottom-small" src="{{sample.image.url}}" draggable="true">
-          </a>
-          <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/delete_sample">Delete</a>
-        </div>
+          <div class="col-3">
+            <div class="d-flex justify-content-end">
+              <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/update_sample">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </a>
+              <a class="" href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/delete_sample">
+                <i class="fa-solid fa-trash-can link-black"></i>
+              </a>
+            </div>
+            <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/read_sample" class="">
+              <img id="{{sample.id}}" class="border-radius img-fluid library-img margin-bottom-small box-shadow" src="{{sample.image.url}}" draggable="true">
+            </a>
+          </div>
         {% endfor %}
         </div>
       </div>

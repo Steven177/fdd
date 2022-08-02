@@ -26,46 +26,26 @@
 
 </head>
 <body class="font">
-  <! -- NAVBAR -->
+   <! -- NAVBAR -->
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
       <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-            <a class="nav-link light" aria-current="page" href="/fdd_app/create_persona">🤔 User Scenario</a>
-        </div>
-      </div>
-
-      <div class="margin-right">
-        <h4 class="white">&#128065 AI Model</h4>
-        <div class="dropdown whitebackground border-radius">
-        <select class="form-select border-radius" aria-label="Default select example">
-        {% for ai in ais %}
-          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
-        {% endfor %}
-        </select>
-        </div>
-      </div>
-
-
     </div>
   </nav>
   <! -- END NAVBAR -->
 
   <div class="container">
     <h1 class="border-bottom margin-top-large">User </h1>
-
-
     <form method="POST">
-        <!-- Security token by Django -->
-        {% csrf_token %}
+      <!-- Security token by Django -->
+      {% csrf_token %}
 
-        <!-- form as paragraph -->
-        {{ scenario_form.as_p }}
+      <!-- form as paragraph -->
+      {{ scenario_form.as_p }}
 
-        <input type="submit" value="Update">
+      <a class="btn secondary" href="/fdd_app/persona={{scenario.persona.id}}/scenario={{scenario.id}}/read_scenario">Cancel</a>
+      <input class="btn primary" type="submit" value="👍 Update">
     </form>
-    <a href="/fdd_app/persona={{scenario.persona.id}}/scenario={{scenario.id}}/read_scenario">Cancel</a>
 
   </div>
 
