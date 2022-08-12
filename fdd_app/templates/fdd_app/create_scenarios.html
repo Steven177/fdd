@@ -34,7 +34,7 @@
 
   {% block sidebar1 %}{% include 'fdd_app/sidebar1.html' %}{% endblock sidebar1 %}
 
-  {% block navbar2 %}{% include 'fdd_app/navbar2.html' %}{% endblock navbar2 %}
+  {% block navbar %}{% include 'fdd_app/navbar.html' %}{% endblock navbar %}
 
   <div class="container">
     <! -- ROW -->
@@ -107,14 +107,16 @@
 
             <div class="row">
               {% for sa in item.samples %}
-              <div class="col-2">
-                <! -- Samples-->
+              <div class="col-3">
                 <div class="d-flex justify-content-start">
                   <a class="link-black" href="/fdd_app/persona={{persona.id}}/scenario={{item.scenario.id}}/sample={{sa.id}}/delete_sample">
                     <i class="fa-solid fa-trash-can"></i>
                   </a>
                 </div>
-                <img class="largethumb" src="{{sa.image.url}}" alt="">
+                <! -- Samples-->
+                <div>
+                  <img class="largethumb" src="{{sa.image.url}}" alt="">
+                </div>
               </div>
               {% endfor %}
 

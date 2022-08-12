@@ -146,8 +146,8 @@ a.disabled {
 }
 
 .largethumb {
-  max-height:  100px;
-  width:  auto;
+  max-width:  100px;
+  height:  auto;
   border-radius:  2px;
 }
 
