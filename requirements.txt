@@ -50,10 +50,13 @@ decorator==4.4.0
 defusedxml==0.6.0
 distlib==0.3.4
 distributed==2.5.2
+dj-database-url==1.0.0
 Django==3.2.13
 django-filter==21.1
+django-heroku==0.3.1
 django-jquery==3.1.0
 django-mathfilters==1.0.0
+django-on-heroku==1.1.2
 django-template-maths==0.2.0
 docutils==0.15.2
 entrypoints==0.3
@@ -151,6 +154,8 @@ prometheus-client==0.7.1
 prompt-toolkit==2.0.10
 protobuf==3.20.1
 psutil==5.6.3
+psycopg2==2.9.3
+psycopg2-binary==2.9.3
 ptyprocess==0.6.0
 py==1.8.0
 pyarrow==8.0.0
@@ -244,6 +249,7 @@ virtualenv-clone==0.5.7
 wcwidth==0.1.7
 webencodings==0.5.1
 Werkzeug==0.16.0
+whitenoise==6.2.0
 widgetsnbextension==3.5.1
 wrapt==1.11.2
 wurlitzer==1.0.3
