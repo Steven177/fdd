@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 
 
-from .forms import ImageForm, PersonaForm, ScenarioForm, QueryForm
+from .forms import PersonaForm, ScenarioForm, QueryForm
 #from .forms import FailureForm
 
 from .models import Sample, Expectation, Model_Prediction, Match, Ai, Persona, Scenario, Query
@@ -31,133 +31,92 @@ import shutil
 
 # PERSONA
 ###################
+
 def create_persona(request):
   persona_form = PersonaForm(request.POST, request.FILES)
-  ais = Ai.objects.all()
   # POST
   if request.method == "POST":
     if persona_form.is_valid():
       persona_form.save()
-      last_persona = Persona.objects.latest('id')
-      return redirect('/fdd_app/persona={}/create_scenario'.format(last_persona.id))
-  # GET
+      lastest_persona = Persona.objects.latest('id')
+      return redirect('/fdd_app/persona={}/create_scenarios'.format(lastest_persona.id))
+
+  elif Scenario.objects.all().exists():
+    lastest_persona = Persona.objects.latest('id')
+    latest_scenario = Scenario.objects.earliest('id')
+    personas = Persona.objects.all().order_by("-id")
+    return render(request, 'fdd_app/create_persona.html',
+      {
+      'latest_persona': lastest_persona,
+      'latest_scenario': latest_scenario,
+      'persona_form': persona_form,
+      'personas': personas,
+      })
+  elif Persona.objects.all().exists():
+    lastest_persona = Persona.objects.latest('id')
+    personas = Persona.objects.all().order_by("-id")
+    return render(request, 'fdd_app/create_persona.html',
+      {
+      'latest_persona': lastest_persona,
+      'persona_form': persona_form,
+      'personas': personas,
+      })
   else:
     return render(request, 'fdd_app/create_persona.html',
       {
       'persona_form': persona_form,
-      'ais': ais
       })
 
-def read_persona(request, persona_id):
-  persona = Persona.objects.get(id = persona_id)
-  scenario = Scenario.objects.filter(persona=persona).first()
-  return render(request, "fdd_app/read_persona.html", {'persona': persona, 'scenario': scenario})
 
 def update_persona(request, persona_id):
+  lastest_persona = Persona.objects.latest('id')
+  latest_scenario = Scenario.objects.earliest('id')
+
   persona = get_object_or_404(Persona, id = persona_id)
+  personas = Persona.objects.all().order_by('-id')
+
+  scenario = Scenario.objects.earliest('id')
 
   persona_form = PersonaForm(request.POST or None, instance = persona)
+  scenario_form = ScenarioForm(request.POST)
+
   # POST
   if persona_form.is_valid():
     persona_form.save()
-    # return redirect('read_persona'.format(persona_id))
-    # url = 'fdd_app/persona=' + str(persona_id) + '/read_persona'
-    return redirect('read_persona', persona_id=persona_id)
+    return redirect('/fdd_app/persona={}/create_scenarios'.format(persona_id))
+
   # GET
-  return render(request, "fdd_app/update_persona.html", {'persona_form': persona_form, 'persona':persona})
+  return render(request, "fdd_app/update_persona.html",
+    {
+    'latest_persona': lastest_persona,
+    'latest_scenario': latest_scenario,
+    'persona_form': persona_form,
+    'scenario_form': scenario_form,
+    'personas': personas,
+    'persona':persona,
+    'scenario': scenario
+    })
 
 def delete_persona(request, persona_id):
   persona = get_object_or_404(Persona, id = persona_id)
   persona.delete()
 
-  persona = Persona.objects.earliest('id')
-  scenario = Scenario.objects.filter(persona=persona).first()
-
-  return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona.id, scenario.id))
-
-#SCENARIO
-###################
-
-def create_scenario(request, persona_id):
-  scenario_form = ScenarioForm(request.POST)
-  persona = Persona.objects.get(id=persona_id)
-  ais = Ai.objects.all()
-  # POST
-  if request.method == "POST":
-    # Persona
-    if scenario_form.is_valid():
-      scenario_form = scenario_form.save(commit=False)
-      scenario_form.persona = persona
-      scenario_form.save()
-      scenario_id = Scenario.objects.latest('id').id
-      return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
-  # GET
+  if Persona.objects.all().count() > 0:
+    persona = Persona.objects.latest('id')
+    scenario = Scenario.objects.filter(persona=persona).first()
+    return redirect('/fdd_app/persona={}/create_scenarios'.format(persona.id, scenario.id))
   else:
-    return render(request, 'fdd_app/create_scenario.html',
-      {
-      'scenario_form': scenario_form,
-      'persona': persona,
-      'ais': ais
-      })
+    return redirect('/fdd_app/create_persona')
 
+def file_upload(request, persona_id):
 
-def read_scenario(request, persona_id, scenario_id):
-  persona = Persona.objects.get(id=persona_id)
-  scenario = Scenario.objects.get(id=scenario_id)
-  return render(request, "fdd_app/read_scenario.html", {'persona': persona, 'scenario': scenario})
+  if request.method == 'POST':
+    persona = Persona.objects.get(id=persona_id)
+    my_file=request.FILES.get('file')
+    scenario_id = request.POST.get("scenario_id")
+    scenario = Scenario.objects.get(id=scenario_id)
 
-def update_scenario(request, persona_id, scenario_id):
-  scenario = get_object_or_404(Scenario, id = scenario_id)
-
-  scenario_form = ScenarioForm(request.POST or None, instance = scenario)
-  # POST
-  if scenario_form.is_valid():
-    scenario_form.save()
-
-    return redirect('read_scenario', persona_id=persona_id, scenario_id=scenario_id)
-  # GET
-  return render(request, "fdd_app/update_scenario.html",
-    {
-    'scenario_form': scenario_form,
-    'scenario':scenario
-    })
-
-def delete_scenario(request, persona_id, scenario_id):
-  persona = Persona.objects.get(id=persona_id)
-  scenario = get_object_or_404(Scenario, id = scenario_id)
-  scenario.delete()
-  scenario_id = Scenario.objects.latest('id').id
-
-  return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
-
-# SAMPLES
-###################
-@csrf_exempt
-def samples(request, persona_id, scenario_id):
-  image_form = ImageForm(request.POST, request.FILES)
-  query_form = QueryForm(request.POST)
-
-  persona = Persona.objects.get(id=persona_id)
-  scenario = Scenario.objects.get(id=scenario_id)
-
-  personas = Persona.objects.all()
-  scenarios = Scenario.objects.all()
-  p_and_s = []
-
-  for p in personas:
-    s = p.scenario_set.all()
-    p_and_s.append({'persona': p, 'scenarios': s})
-
-  samples = Sample.objects.filter(scenario=scenario)
-
-  ais = Ai.objects.all()
-
-  # POST manual
-  if request.method == "POST" and image_form.is_valid():
-    i_f = image_form.save(commit=False)
-    i_f.persona = persona
-    i_f.scenario = scenario
-    i_f.save()
+    Sample.objects.create(persona=persona, scenario=scenario, image=my_file, uploaded=True)
 
     # AUGMENTATIONS
     s = Sample.objects.latest('id')
@@ -168,6 +127,7 @@ def samples(request, persona_id, scenario_id):
     g = T.functional.gaussian_blur(pil_img, kernel_size=(31, 27), sigma=(100))
     r = T.functional.rotate(pil_img, np.random.randint(20, 360))
     h = T.functional.adjust_brightness(pil_img, np.random.uniform(0.2, 0.6))
+
     # b
     b_file = augment_image(b)
     b_new = Sample(image=b_file)
@@ -183,9 +143,9 @@ def samples(request, persona_id, scenario_id):
     # g
     g_file = augment_image(g)
     g_new = Sample(image=g_file)
-    c_new.persona = persona
-    c_new.scenario = scenario
-    c_new.save()
+    g_new.persona = persona
+    g_new.scenario = scenario
+    g_new.save()
     # g
     r_file = augment_image(r)
     r_new = Sample(image=r_file)
@@ -199,19 +159,126 @@ def samples(request, persona_id, scenario_id):
     h_new.scenario = scenario
     h_new.save()
 
-    return render(request, 'fdd_app/samples.html',
+
+    # Sample.objects.latest('id').delete()
+    return redirect('/fdd_app/persona={}/create_scenarios'.format(persona_id, scenario_id))
+
+
+#SCENARIO
+###################
+def create_scenarios(request, persona_id):
+  lastest_persona = Persona.objects.latest('id')
+  scenario_form = ScenarioForm(request.POST)
+  personas = Persona.objects.all().order_by("-id")
+  persona = Persona.objects.get(id=persona_id)
+
+  if request.method == "POST":
+    # scenario
+    if scenario_form.is_valid():
+      scenario_form = scenario_form.save(commit=False)
+      scenario_form.persona = persona
+      scenario_form.save()
+      return redirect('/fdd_app/persona={}/create_scenarios'.format(persona_id))
+
+  elif Scenario.objects.all().count() > 0:
+    latest_scenario = Scenario.objects.latest('id')
+    scenarios = Scenario.objects.filter(persona=persona).order_by("-id")
+    scenario = Scenario.objects.earliest('id')
+    samples_per_scenario = []
+    for s in scenarios:
+      samples = Sample.objects.filter(scenario=s, uploaded=True)
+      samples_per_scenario.append({'scenario': s, 'samples': samples})
+    return render(request, 'fdd_app/create_scenarios.html',
       {
-      'image_form': image_form,
-      'query_form':query_form,
-      'samples': samples,
+      'latest_persona': lastest_persona,
+      'latest_scenario': latest_scenario,
+      'scenario_form': scenario_form,
+      'personas': personas,
       'persona': persona,
+      'scenarios': scenarios,
       'scenario': scenario,
-      'ais': ais,
-      'p_and_s': p_and_s
+      'samples_per_scenario': samples_per_scenario,
       })
 
+  else:
+    return render(request, 'fdd_app/create_scenarios.html',
+      {
+      'latest_persona': lastest_persona,
+      'scenario_form': scenario_form,
+      'personas': personas,
+      'persona': persona,
+      })
+
+def update_scenario(request, persona_id, scenario_id):
+  lastest_persona = Persona.objects.latest('id')
+  latest_scenario = Scenario.objects.earliest('id')
+
+  scenario = get_object_or_404(Scenario, id = scenario_id)
+  persona = Persona.objects.get(id=persona_id)
+  personas = Persona.objects.all().order_by("-id")
+  scenarios = Scenario.objects.filter(persona=persona).order_by("-id")
+
+  top_scenario = Scenario.objects.earliest('id')
+
+  samples_per_scenario = []
+  for s in scenarios:
+    samples = Sample.objects.filter(scenario=s)
+    samples_per_scenario.append({'scenario': s, 'samples': samples})
+
+  scenario_form = ScenarioForm(request.POST or None, instance = scenario)
+  # POST
+  if scenario_form.is_valid():
+    scenario_form.save()
+    return redirect('/fdd_app/persona={}/create_scenarios'.format(persona_id, scenario_id))
+  # GET
+  return render(request, "fdd_app/update_scenario.html",
+    {
+    'latest_persona': lastest_persona,
+    'latest_scenario': latest_scenario,
+    'scenario_form': scenario_form,
+    'scenario':scenario,
+    'top_scenario': top_scenario,
+    'scenarios': scenarios,
+    'personas': personas,
+    'persona': persona,
+    'samples_per_scenario': samples_per_scenario
+    })
+
+def delete_scenario(request, persona_id, scenario_id):
+  persona = Persona.objects.get(id=persona_id)
+  scenario = get_object_or_404(Scenario, id = scenario_id)
+  scenario.delete()
+  return redirect('/fdd_app/persona={}/create_scenarios'.format(persona_id))
+
+# SAMPLES
+###################
+@csrf_exempt
+def samples(request, persona_id, scenario_id):
+
+  latest_scenario = Scenario.objects.latest('id')
+  lastest_persona = latest_scenario.persona
+
+  query_form = QueryForm(request.POST)
+
+  persona = Persona.objects.get(id=persona_id)
+  scenario = Scenario.objects.get(id=scenario_id)
+
+  personas = Persona.objects.all().order_by("-id")
+  scenarios = Scenario.objects.all().order_by("-id")
+  p_and_s = []
+
+  for p in personas:
+    s = p.scenario_set.all().order_by('-id')
+    p_and_s.append({'persona': p, 'scenarios': s})
+
+  samples = Sample.objects.filter(scenario=scenario)
+
+  ais = Ai.objects.all()
+
+
   # POST automatic
-  elif request.method == "POST" and query_form.is_valid():
+  if request.method == "POST" and query_form.is_valid():
+
     # Google API
     qf = query_form.save(commit=False)
     qf.persona = persona
@@ -253,7 +320,8 @@ def samples(request, persona_id, scenario_id):
 
     return render(request, 'fdd_app/samples.html',
       {
-      'image_form': image_form,
+      'latest_persona': lastest_persona,
+      'latest_scenario': latest_scenario,
       'query_form': query_form,
       'samples': samples,
       'persona': persona,
@@ -264,10 +332,10 @@ def samples(request, persona_id, scenario_id):
 
   # GET samples
   else:
-    print(p_and_s)
     return render(request, 'fdd_app/samples.html',
       {
-      'image_form': image_form,
+      'latest_persona': lastest_persona,
+      'latest_scenario': latest_scenario,
       'query_form':query_form,
       'samples': samples,
       'persona': persona,
@@ -279,86 +347,244 @@ def samples(request, persona_id, scenario_id):
 
 @csrf_exempt
 def read_sample(request, persona_id, scenario_id, sample_id):
-  personas = Persona.objects.all()
-  ais = Ai.objects.all()
-  # expectation_form = ExpectationForm(request.POST)
-  # failure_form = FailureForm(request.POST)
+  lastest_persona = Persona.objects.latest('id')
+  latest_scenario = Scenario.objects.latest('id')
 
-  # template control
-  write_expectation = True
-  read_expectation = False
+  ais = Ai.objects.all()
+  query_form = QueryForm(request.POST)
 
   sample = Sample.objects.get(id=sample_id)
   persona = Persona.objects.get(id=persona_id)
   scenario = Scenario.objects.get(id=scenario_id)
 
+  personas = Persona.objects.all().order_by("-id")
+  scenarios = Scenario.objects.all().order_by("-id")
+  p_and_s = []
+
+  for p in personas:
+    s = p.scenario_set.all().order_by("-id")
+    p_and_s.append({'persona': p, 'scenarios': s})
+
+  samples = Sample.objects.filter(scenario=scenario)
+
   colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
 
-  # POST user (send boxes)
-  if request.is_ajax():
-    # expectation = expectation_form.instance
-    exp_boxes = request.POST.get('expBoxes[]')
-    exp_boxes = json.dumps(exp_boxes)
-    exp_boxes = eval(json.loads(exp_boxes))
+  if sample.expectation_set.count() == 0:
+    write_expectation = True
+  else:
+    write_expectation = False
 
-    for exp in exp_boxes:
-      x = exp['x']
-      y = exp['y']
-      width = exp['width']
-      height = exp['height']
-      new_exp = Expectation(xmin=x, ymin=y, xmax=width + x, ymax=height + y, sample=sample)
-      new_exp.save()
+  # POST automatic
+  if request.method == "POST" and query_form.is_valid():
 
+    # Google API
+    qf = query_form.save(commit=False)
+    qf.persona = persona
+    qf.scenario = scenario
+    qf.save()
+
+    query = Query.objects.latest('id')
+    results = call_google_api(query.input_query)
+
+    image_results = results['images_results']
+
+    random_idx = np.random.randint(0, np.floor(len(image_results)/4))
+    image_results = image_results[random_idx:random_idx + 1]
+
+    for image_result in image_results:
+      url = image_result['thumbnail']
+      title = image_result['title']
+      urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(title))
+      image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(title), persona=persona, scenario=scenario)
+      image1.save()
+
+    # DALLE
+    client = replicate.Client(api_token=REPLICATE_API_TOKEN)
+    model = client.models.get("kuprel/min-dalle")
+    generated_image = model.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
+    for url in generated_image:
+      sample = Sample.objects.latest('id')
+      file_name = 'media/images/{}.jpg'.format(sample.id + 1)
+      res = requests.get(url, stream = True)
+
+      if res.status_code == 200:
+        with open(file_name,'wb') as f:
+          shutil.copyfileobj(res.raw, f)
+          image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(sample.id + 1), persona=persona, scenario=scenario)
+          image2.save()
+        print('Image sucessfully Downloaded: ',file_name)
+      else:
+        print('Image Couldn\'t be retrieved')
+
+    return render(request, 'fdd_app/samples.html',
+      {
+      'write_expectation': write_expectation,
+      'latest_persona': lastest_persona,
+      'latest_scenario': latest_scenario,
+      'query_form': query_form,
+      'samples': samples,
+      'persona': persona,
+      'scenario': scenario,
+      'ais': ais,
+      'p_and_s': p_and_s
+      })
+
+
+  # POST user (submit expectation)
+  elif request.method == 'POST' and "expectation_submit" in request.POST:
+    # labels
+    # ---------------------------
+    # SAVE LABELS of EXPECTATIO
+
+    labels = request.POST.getlist("label")
+    xs = request.POST.getlist("x")
+    ys = request.POST.getlist("y")
+    widths = request.POST.getlist("width")
+    heights = request.POST.getlist("height")
+
+    for idx, label in enumerate(labels):
+      if label != "":
+        if check_if_indistribution(label):
+          indist = True
+          outdist = False
+        else:
+          outdist = True
+          indist = False
+
+        new_exp = Expectation(
+          sample=sample,
+          label=label,
+          indist=indist,
+          outdist=outdist,
+          xmin=int(xs[idx]),
+          ymin=int(ys[idx]),
+          xmax=int(widths[idx])+int(xs[idx]),
+          ymax=int(heights[idx])+int(ys[idx]),
+          )
+        new_exp.save()
+
+    expectations = Expectation.objects.filter(sample=sample.id)
+    return redirect("/fdd_app/persona={}/scenario={}/sample={}/read_sample".format(persona_id, scenario_id, sample_id))
+
+
+
+    if request.POST['done_or_continue'][0] == "D":
+      return redirect('/fdd_app/failure_book')
+    elif request.POST['done_or_continue'][0] =="C":
+      return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
+
+  # GET sample
+  else:
     return render(request, 'fdd_app/read_sample.html', {
-      'exp_boxes': exp_boxes,
+      'write_expectation': write_expectation,
+      'latest_persona': lastest_persona,
+      'latest_scenario': latest_scenario,
+      'p_and_s': p_and_s,
+      'query_form': query_form,
+      'samples': samples,
       'persona': persona,
       'scenario': scenario,
       'sample': sample,
       'colors': colors,
-      'write_expectation': write_expectation,
-      'read_expectation': read_expectation,
       'personas': personas,
       'ais': ais
     })
 
-  # POST user (submit expectation)
-  elif request.method == 'POST' and "expectation_submit" in request.POST:
-    # template control
+def update_sample(request, persona_id, scenario_id, sample_id):
+  lastest_persona = Persona.objects.latest('id')
+  latest_scenario = Scenario.objects.earliest('id')
+
+  persona = Persona.objects.get(id=persona_id)
+  scenario = Scenario.objects.get(id=scenario_id)
+  sample = Sample.objects.get(id=sample_id)
+  return render(request, 'fdd_app/update_sample.html',
+    {
+    'latest_persona': lastest_persona,
+    'latest_scenario': latest_scenario,
+    'persona':persona,
+    'scenario': scenario,
+    'sample': sample
+    })
+
+def delete_sample(request, persona_id, scenario_id, sample_id):
+
+  sample = Sample.objects.get(id=sample_id)
+  if sample.uploaded:
+    sample.delete()
+    return redirect('/fdd_app/persona={}/create_scenarios'.format(persona_id))
+  else:
+    sample.delete()
+    return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
+
+# FAILURE EXPLORATION
+###################
+
+def failure_exploration(request, persona_id, scenario_id, sample_id):
+  sample = Sample.objects.get(id=sample_id)
+  expectations = Expectation.objects.filter(sample=sample)
+
+  lastest_persona = Persona.objects.latest('id')
+  latest_scenario = Scenario.objects.earliest('id')
+
+  ais = Ai.objects.all()
+  query_form = QueryForm(request.POST)
+
+  persona = Persona.objects.get(id=persona_id)
+  scenario = Scenario.objects.get(id=scenario_id)
+
+  personas = Persona.objects.all().order_by("-id")
+  scenarios = Scenario.objects.all().order_by("-id")
+  p_and_s = []
+
+  for p in personas:
+    s = p.scenario_set.all().order_by("-id")
+    p_and_s.append({'persona': p, 'scenarios': s})
+
+  samples = Sample.objects.filter(scenario=scenario)
+
+  colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
+
+  if sample.expectation_set.count() == 0:
+    write_expectation = True
+  else:
     write_expectation = False
-    read_expectation = True
 
-    # ---------------------------
-    # SAVE LABELS of EXPECTATION
-    expectations = Expectation.objects.filter(sample=sample.id)
+  # POST Failure form
+  if request.method == "POST" and 'failure_severity' in request.POST:
+    response = request.POST
+    failure_severities = response.getlist('failure_severity')
+    failure_effects = response.getlist('failure_effects')
+    match_ids = response.getlist('match_id')
 
-    # https://stackoverflow.com/questions/42359112/access-form-data-of-post-method-in-django
-    response = QueryDict.copy(request.POST)
-    response.pop('csrfmiddlewaretoken')
+    # Save failure severity
+    for idx, sev in enumerate(failure_severities):
+      match_id = match_ids[idx]
+      match = Match.objects.get(id=match_id)
+      if sev != "":
+        match.failure_severity = int(sev)
+        match.save()
 
-    labels = []
-    for key in response:
-      if response[key] != "":
-        labels.append(response[key])
+    # Save failure effects
+    for idx, eff in enumerate(failure_effects):
+      match_id = match_ids[idx]
+      match = Match.objects.get(id=match_id)
+      if eff != "":
+        match.failure_effects = eff
+        match.save()
+    return redirect("/fdd_app/persona={}/scenario={}/samples".format(persona_id, scenario_id))
 
-    labels.pop(-1)
-
-    for idx, label in enumerate(labels):
-      exp = expectations[idx]
-      exp.label = label
-      if check_if_indistribution(label):
-        exp.indist = True
-      else:
-        exp.outdist = True
-      exp.save()
-
-    expectations = Expectation.objects.filter(sample=sample.id)
-
-    # ---------------------------
+  # Get
+  else:
+    print("Running GET failure exploration ...")
+    print(sample.image.path)
+     # ---------------------------
     # MODEL PREDICTION
     model_prediction = query(sample.image.path) # AI model prediction
     # pil_image_obj = Image.open(sample.image)
     # model_prediction = predict(pil_image_obj)
     # model_prediction = [{'score': 0.9308645725250244, 'label': 'person', 'box': {'xmin': 79, 'ymin': 13, 'xmax': 273, 'ymax': 183}}, {'score': 0.9893394112586975, 'label': 'tie', 'box': {'xmin': 132, 'ymin': 167, 'xmax': 162, 'ymax': 184}}]
+    print(model_prediction)
+
     for obj in model_prediction:
       new_pred = Model_Prediction(sample=sample, label=obj['label'], score=obj['score'], xmin=obj['box']['xmin'], ymin=obj['box']['ymin'], xmax=obj['box']['xmax'], ymax=obj['box']['ymax'] )
       new_pred.save()
@@ -370,15 +596,22 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
     if len(expectations) > 0 and len(model_predictions) > 0:
       l1_cost_mat = calculate_l1_loss(expectations, model_predictions, sample)
+      print("l1_cost_mat = {}".format(l1_cost_mat))
       giou_cost_mat = generalized_box_iou_loss(expectations, model_predictions)
+      print("giou_cost_mat = {}".format(giou_cost_mat))
       loss_box = calculate_box_loss(giou_cost_mat, l1_cost_mat)
+      print("loss_box = {}".format(loss_box))
 
       # labels_exp, labels_pred = padd_labels(labels_exp, labels_pred)
       loss_labels = calculate_class_loss(expectations, model_predictions)
+      print("loss_labels = {}".format(loss_labels))
 
       loss_matching = calculate_matching_loss(loss_box, loss_labels)
+      print("loss_matching = {}".format(loss_matching))
       # Hungarian algorithm
       exp_ind, pred_ind = linear_sum_assignment(loss_matching)
+      print("exp_ind = {}".format(exp_ind))
+      print("pred_ind = {}".format(pred_ind))
       matching_cost = loss_matching[exp_ind, pred_ind].sum()
 
     else:
@@ -455,72 +688,29 @@ def read_sample(request, persona_id, scenario_id, sample_id):
         match.critical_quality_score = check_quality_of_score(match.model_prediction.score)
         match.save()
 
-    return render(request, 'fdd_app/read_sample.html', {
-      'colors': colors,
-      'persona': persona,
-      'scenario': scenario,
-      'sample': sample,
+
+
+    return render(request, 'fdd_app/failure_exploration.html', {
+      'write_expectation': write_expectation,
+      'latest_persona': lastest_persona,
+      'latest_scenario': latest_scenario,
       'model_predictions': model_predictions,
-      'expectations': expectations,
-      'write_expectation': write_expectation,
-      'read_expectation': read_expectation,
-      'matches': matches,
-      'personas': personas,
-      'ais': ais
-    })
-
-  # POST Failure form
-  elif request.method == "POST" and 'failure_severity' in request.POST:
-    response = request.POST
-    failure_severities = response.getlist('failure_severity')
-    failure_effects = response.getlist('failure_effects')
-    match_ids = response.getlist('match_id')
-
-    # Save failure severity
-    for idx, sev in enumerate(failure_severities):
-      match_id = match_ids[idx]
-      match = Match.objects.get(id=match_id)
-      if sev != "":
-        match.failure_severity = int(sev)
-        match.save()
-
-    # Save failure effects
-    for idx, eff in enumerate(failure_effects):
-      match_id = match_ids[idx]
-      match = Match.objects.get(id=match_id)
-      if eff != "":
-        match.failure_effects = eff
-        match.save()
-
-    if request.POST['done_or_continue'][0] == "D":
-      return redirect('/fdd_app/failure_book')
-    elif request.POST['done_or_continue'][0] =="C":
-      return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
-
-  # GET sample
-  else:
-    return render(request, 'fdd_app/read_sample.html', {
+      'p_and_s': p_and_s,
+      'query_form': query_form,
+      'samples': samples,
       'persona': persona,
       'scenario': scenario,
       'sample': sample,
       'colors': colors,
-      'write_expectation': write_expectation,
-      'read_expectation': read_expectation,
       'personas': personas,
-      'ais': ais
+      'matches': matches,
+      'ais': ais,
     })
-
-
-def delete_sample(request, persona_id, scenario_id, sample_id):
-  sample = Sample.objects.get(id=sample_id)
-  sample.delete()
-  return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
-
 
 # FAILURE BOOK
 ###################
 @csrf_exempt
-def failure_book(request):
+def failure_analysis(request):
   # ENGINEERING CORNER
   # [sample: {'expectation', 'model_prediction'}]
   colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
@@ -537,7 +727,7 @@ def failure_book(request):
 
   # DESIGN CORNER
 
-  return render(request, 'fdd_app/failure_book.html',
+  return render(request, 'fdd_app/failure_analysis.html',
     {
     'samples': samples,
     'finetuning': finetuning,
@@ -545,6 +735,7 @@ def failure_book(request):
     'colors': colors,
     'ais': ais
     })
+
 
 
 def read_ai(request):

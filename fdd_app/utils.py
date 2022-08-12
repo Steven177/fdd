@@ -197,3 +197,4 @@ def augment_image(img):
   img_pil = ContentFile(img_io.getvalue())
   img_file = InMemoryUploadedFile(img_pil, None, 'foo.jpg', 'image/jpeg', img_pil.tell, None)
   return img_file
+

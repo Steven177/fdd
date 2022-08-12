@@ -14,8 +14,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;700&display=swap" rel="stylesheet">
 
-  <! -- stickynotes -->
-  <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/stickynotes/stickynotes.css' %}">
+  <! -- fontawesome -->
+  <script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
 
   <! -- Bootstrap-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
@@ -26,31 +26,118 @@
 
 </head>
 <body class="font">
+  <! -- SIDEBAR -->
+  <div class="area"></div>
+      <nav class="main-menu side-nav sticky">
+            <ul>
+                <li>
+                    <a class="margin-top-extra-large margin-bottom-small" href="/fdd_app/persona={{latest_persona.id}}/create_scenarios">
+                        <i class="fa-solid fa-people-group fa-2x icon-nav active-nav"></i>
+                        <span class="nav-text active-nav">
+                            User Scenarios
+                        </span>
+                    </a>
+
+                </li>
+                <li class="has-subnav">
+                    <a class="margin-bottom-small" href="/fdd_app/persona={{latest_scenario.persona.id}}/scenario={{latest_scenario.id}}/samples">
+                        <i class="fa-solid fa-bolt fa-2x icon-nav font-2em"></i>
+                        <span class="nav-text">
+                            Failure Exploration
+                        </span>
+                    </a>
+
+                </li>
+              <li class="has-subnav">
+                    <a href="/fdd_app/failure_analysis">
+                        <i class="fa-solid fa-book fa-2x icon-nav font-2em"></i>
+                        <span class="nav-text">
+                            Failure Analysis
+                        </span>
+                    </a>
+                </li>
+
+            </ul>
+
+            <ul class="logout">
+                <li>
+                   <a href="#">
+                        <i class="fa-solid fa-microchip fa-2x icon-nav font-2em"></i>
+                        <span class="nav-text">
+                            AI Models
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+  <! -- END SIDEBAR -->
   <! -- NAVBAR -->
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-      <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
+      <img class="logo" src="/media/logo/xploreai.png" alt="XploreAI">
     </div>
   </nav>
   <! -- END NAVBAR -->
 
   <div class="container">
-    <h1 class="border-bottom margin-top-large">🤔 User Scenario: Picture a persona</h1>
-    <h2 class="purple-color">Persona</h2>
-    <h3 class="font-size-15">The persona is the main actor of your scene. </h3>
-    <div class="instruction border-radius margin-bottom-small d-flex" role="alert">
-      <h1 class="margin-right-small">👉</h1>
-      <p>Picture a potential user that may use your product.  You may want to rely on findings from your user research for this.</p>
-    </div>
-    <form method = "post" enctype="multipart/form-data" class="form-control form-label border-radius">
-      {% csrf_token %}
-      {{persona_form.as_p}}
-      <button type="submit" class="btn primary">Save</button>
-      </form>
-    </div>
-  </div>
+    <! -- ROW -->
+    <div class="row greybackground height100vh">
+      <! -- LEFT -->
+      <div class="col-4">
+        <div class="mycard margin-top-small margin-bottom-small position-relative d-flex">
+            <img class="thumb margin-right-small" src="/media/personas/default_persona.jpeg" alt="/media/personas/default_persona.jpeg">
+            <div>
+              <h5 id="name"></h5>
+              <p id="description"></p>
+            </div>
+            <a class="stretched-link" href="/fdd_app/persona={{p.id}}/create_scenarios"></a>
+          </div>
+
+        {% for p in personas %}
+          <div class="mycard margin-bottom-small position-relative d-flex">
+            <img class="thumb margin-right-small" src="{{p.image.url}}" alt="/media/personas/default_persona.jpeg">
+            <div>
+              <h5>{{p.name}}</h5>
+              <p>{{p.description}}</p>
+            </div>
+            <a class="stretched-link" href="/fdd_app/persona={{p.id}}/create_scenarios"></a>
+          </div>
+
+        {% endfor %}
+      </div>
+
+      <! -- RIGHT -->
+      <div class="col-8">
+
+        <! -- User -->
+        <div class="whitebackground margin-top-small padding20px">
+          <div class="d-flex justify-content-between">
+            <h2 class="purple-color">User</h2>
+          </div>
+
+          <div class="d-flex">
+            <form method = "post" enctype="multipart/form-data" class="form-control form-label border-radius">
+              {% csrf_token %}
+              <p><strong>Image</strong></p>
+              {{persona_form.image}}
+              <p class="margin-top-small"><strong>Name</strong></p>
+              {{persona_form.name}}
+              <p class="margin-top-small"><strong>Description</strong></p>
+              {{persona_form.description}}
+              <a class="btn secondary" href="/fdd_app/persona={{persona.id}}/create_scenarios">Cancel</a>
+              <button type="submit" class="btn primary"><i class="fa-solid fa-plus"></i> Add user</button>
+            </form>
+          </div>
+        </div>
+
+          <! -- User -->
+        </div> <! -- END RIGHT -->
+    </div> <! -- END ROW -->
+  </div> <! -- END CONTAINER -->
 
 </body>
 </html>
 
-<script src="{% static 'fdd_app/stickynotes/stickynotes.js' %}"></script>
+<script src="{% static 'fdd_app/js/form_style.js' %}"></script>
+
+

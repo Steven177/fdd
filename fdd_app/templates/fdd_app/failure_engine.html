@@ -1,0 +1,164 @@
+<head>
+    {% load mathfilters %}
+    {% load index %}
+    {% load slice %}
+    {% load to_int %}
+</head>
+
+<div id="failures" class="row justify-content-start">
+
+    {% if model_predictions|length == 0 and expectations|length > 0 %}
+      <div class="border margin-top-small padding-small">
+        <h5 class="text-align-center">Failure Analysis</h5>
+        <p class="tag error text-align-center">&#10060 Failing to observe</p>
+        <p class="text-align-center">The model did not make any prediction for this image. </p>
+        <br>
+      </div>
+    {% endif %}
+
+    {% for match in matches%}
+    <div class="border margin-top-small">
+
+      <div class="row border-bottom padding-small" padding-small>
+        <h4 class="text-align-center"> {{forloop.counter}}/{{matches|length}}</h4>
+        <div class="col-6">
+          <h4 class="text-align-center">Expectation</h4>
+          <div class="d-flex justify-content-center align-items-center">
+            {% if match.exp_idx != -1%}
+            <i class="fa-solid fa-square" style="color:{{ colors|index:match.exp_idx }}"></i><br>
+            {% endif %}
+            <p class="margin-top-zero margin-left-small">{{match.expectation.label}}</p>
+          </div>
+        </div>
+        <div class="col-6">
+          <h4 class="text-align-center">Model Prediction</h4>
+          <div class="d-flex justify-content-center align-items-center">
+            {% if match.pred_idx != -1 %}
+              <i class="fa-solid fa-square" style="color:{{ colors|index:match.pred_idx }}"></i><br>
+            {% endif %}
+            <p class="margin-top-zero margin-left-small">{{match.model_prediction.label|title}}</p>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center">
+          <button id="b7" class="btn secondary width50 margin-top-small" type="button" data-bs-toggle="collapse" data-bs-target="#failure{{forloop.counter}}" aria-expanded="false" aria-controls="failure{{forloop.counter}}" onclick="javascript:hide(b7)">View in detail
+        </button>
+        </div>
+      </div>
+
+      <div id="failure{{forloop.counter}}" class="collapse">
+        <h5 class="text-align-center">Failure Analysis</h5>
+        <div class="padding-small">
+          <div>
+            {% if match.missing_detection %}
+              <p class="tag error text-align-center">&#10060 Missing detection</p>
+              <p class="text-align-center">The "{{match.expectation.label}}" was missed by the model. </p>
+              <br>
+              {% if match.indistribution %}
+                <p class="tag info text-align-center">ℹ️ In-distribution</p>
+                <p class="text-align-center">The object lies within the model's domain. It should be able to detect this {{match.expectation.label}}.</p>
+                <br>
+              {% else %}
+                <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
+                <p class="text-align-center">The object lies outside of the model's domain. You would need to train the model first on the class {{match.expectation.label}}. </p>
+                <br>
+              {% endif %}
+            {% endif %}
+
+            {% if match.unnecessary_detection %}
+              <p class="tag error text-align-center">&#10060 Unnecessary detection</p>
+              <p class="text-align-center">The model has detected a {{match.model_prediction.label}} that seems to be not important to the user. It could not be matched to any user expectation.</p>
+              <br>
+              {% if match.critical_quality_score %}
+                <p class="tag warning text-align-center">⚠️ Critical quality score</p>
+                <p class="text-align-center">Be aware! This prediction bears uncertainty - it's below 95%.</p>
+                <br>
+              {% endif %}
+            {% endif %}
+
+            {% if match.true_positive %}
+              <p class="tag ok text-align-center">&#9989 Correct detection</p>
+              <p class="text-align-center">Yay! The model has predicted this object correctly.</p>
+              <br>
+              {% if match.critical_quality_score %}
+                <p class="tag warning text-align-center">⚠️ Critical quality score</p>
+                <p class="text-align-center">Be aware! This prediction bears uncertainty - it's below 95%.</p>
+                <br>
+              {% endif %}
+              {% if match.critical_quality_box %}
+                <p class="tag warning text-align-center">⚠️ Critical quality box</p>
+                <p class="text-align-center">Watch out! The boxes of the user expectation and model prediction do not quite overlap. </p>
+                <br>
+              {% endif %}
+            {% endif %}
+
+            {% if match.false_detection %}
+              <p class="tag error text-align-center">&#10060 False detection</p>
+              <p class="text-align-center">The model predicted something else for this object. It predicted {{match.model_prediction.label}}, not {{match.expectation.label}}.</p>
+              <br>
+              {% if match.indistribution %}
+                <p class="tag info text-align-center">ℹ️ In-distribution</p>
+                <p class="text-align-center">The object lies within the model's domain. It should be able to detect this {{match.expectation.label}}.</p>
+                <br>
+              {% else %}
+                <p class="tag info text-align-center">ℹ️ Out-of-distribution</p>
+                <p class="text-align-center">The object lies outside of the model's domain. You would need to train the model first on the class {{match.expectation.label}}.</p>
+                <br>
+              {% endif %}
+              {% if match.critical_quality_score %}
+                <p class="tag warning text-align-center">⚠️ Critical quality score</p>
+                <p class="text-align-center">Be aware! This prediction bears uncertainty - it's below 95%.</p>
+                <br>
+              {% endif %}
+              {% if match.critical_quality_box %}
+                <p class="tag warning text-align-center"> ⚠️ Critical quality box</p>
+                <p class="text-align-center">Watch out! The boxes of the user expectation and model prediction do not quite overlap.</p>
+                <br>
+              {% endif %}
+            {% endif %}
+
+            {% if match.missing_detection or match.unnecessary_detection  or match.false_detection or match.failing_to_detect %}
+              <div class="row">
+                <! --  failure severity form -->
+                <div class="col-6">
+                  <form id="{{match.id}}" class="failure_severity_form" action="" method="POST">
+                  {% csrf_token %}
+                  <h4>Failure Severity</h4>
+                  <label for="severity">Rate from 1 (low) to 7 (high)</label><br>
+                  <input type="range" class="slider" name="failure_severity" id="failure_severity_id{{forloop.counter}}" value="1" min="1" max="7" oninput="failure_severity_output{{forloop.counter}}.value = failure_severity_id{{forloop.counter}}.value">
+                  <output name="failure_severity_output{{forloop.counter}}" id="failure_severity_output_id{{forloop.counter}}">1</output>
+                </div>
+
+                <div class="col-6">
+                  <h4>Failure effects</h4>
+                  <label for="notes">Assess the effects of this failure</label><br>
+                  <textarea rows="2" col="1000" name="failure_effects"></textarea>
+                  <input value = "{{match.id}}" type="hidden" name="match_id">
+                </div>
+              </div>
+              <! --  end failure severity form -->
+            {% endif %}
+
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+
+{% if sample.has_failure %}
+  <div class="row d-flex justify-content-center">
+    <button type="submit" name="done_or_continue" value="D" class="btn secondary margin-top-small margin-bottom-large margin-right-small" style="width: 30%">
+      Done exploring 🥱
+    </button>
+    <button type="submit" name="done_or_continue" value="C" class="btn primary margin-top-small margin-right margin-bottom-large" style="width: 30%">
+      Continue exploring 🏃‍♀️
+    </button>
+  </div>
+  </form>
+{% else %}
+
+  <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/samples" class="btn primary margin-top-small margin-bottom-large" style="width: 30%">🏃‍ Continue exploring </a>
+
+{% endif %}
+<! --  END MATCH -->
+  </div> <! -- END FAILURE ANALYSIS-->

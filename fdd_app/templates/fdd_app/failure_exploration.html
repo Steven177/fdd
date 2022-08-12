@@ -8,7 +8,9 @@
     {% load static %}
     {% load mathfilters %}
     {% load index %}
+    {% load slice %}
     {% load to_int %}
+
     <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <! -- fonts -->
@@ -23,45 +25,45 @@
 
 <body class="font greybackground">
 
-  {% block sidebar2 %}{% include 'fdd_app/sidebar2.html' %}{% endblock sidebar2 %}
+  {% block sidebar %}{% include 'fdd_app/sidebar.html' %}{% endblock sidebar %}
 
-  <{% block navbar %}{% include 'fdd_app/navbar.html' %}{% endblock navbar %}
+  {% block navbar %}{% include 'fdd_app/navbar.html' %}{% endblock navbar %}
 
   <div class="container">
     {% block p_and_s %}{% include 'fdd_app/p_and_s.html' %}{% endblock p_and_s %}
 
-      <! -- Data probes-->
       <div class="col-8 margin-top-large">
         <div class="row whitebackground padding20px margin-bottom-small">
-          {% block query_form %}{% include 'fdd_app/query_form.html' %}{% endblock query_form %}
+            {% block query_form %}{% include 'fdd_app/query_form.html' %}{% endblock query_form %}
         </div>
 
         <div class="row whitebackground padding20px">
-          {% for sa in samples %}
-            <div class="col-3">
-              <div class="d-flex">
-                <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sa.id}}/update_sample">
-                  <i class="fa-solid fa-pen-to-square link-black"></i>
-                </a>
-                {% if sa.uploaded == False %}
-                <a class="" href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sa.id}}/delete_sample">
-                  <i class="fa-solid fa-trash-can link-black margin-left-small"></i>
-                </a>
-                {% endif %}
-              </div>
-              <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sa.id}}/read_sample" class="">
-                <img id="{{sa.id}}" class="border-radius img-fluid library-img margin-bottom-small hovershaddow" src="{{sa.image.url}}" draggable="true">
-              </a>
+          <div class="col-6">
+            <div class="row">
+            {% block all_samples %}{% include 'fdd_app/all_samples.html' %}{% endblock all_samples %}
             </div>
-          {% endfor %}
+          </div>
+          <div class="col-6">
+            {% if write_expectation %}
+              {% block write_expectation %}{% include 'fdd_app/write_expectation.html' %}{% endblock write_expectation %}
+            {% else %}
+              {% block read_expectation %}{% include 'fdd_app/read_expectation.html' %}{% endblock read_expectation %}
+                <a class="btn primary disabled" href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/failure_exploration">Run failure exploration</a>
+            {% endif %}
+          </div>
         </div>
 
+
+        <div class="row">
+          <p>Hello</p>
+          {% block model_prediction %}{% include 'fdd_app/model_prediction.html' %}{% endblock model_prediction %}
         </div>
+
+        <div class="row">
+          {% block failure_engine %}{% include 'fdd_app/failure_engine.html' %}{% endblock failure_engine %}
+        </div>
+
       </div>
-
-    </div>
-    <! -- END ROW-->
-
   </div> <! -- CONTAINER-->
 </body>
 

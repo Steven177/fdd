@@ -1,0 +1,17 @@
+{% for sa in samples %}
+  <div class="col-3">
+    <div class="d-flex">
+      <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sa.id}}/update_sample">
+        <i class="fa-solid fa-pen-to-square link-black"></i>
+      </a>
+      {% if sa.uploaded == False %}
+      <a class="" href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sa.id}}/delete_sample">
+        <i class="fa-solid fa-x link-black margin-left-small"></i>
+      </a>
+      {% endif %}
+    </div>
+    <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sa.id}}/read_sample" class="">
+      <img id="{{sa.id}}" class="border-radius img-fluid library-img margin-bottom-small box-shadow {% if sample.id == sa.id %}myactive{% else %}{% endif %}" src="{{sa.image.url}}" draggable="true">
+    </a>
+  </div>
+{% endfor %}

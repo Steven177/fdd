@@ -1,0 +1,26 @@
+<! -- ROW-->
+<div class="row margin">
+  <! -- Personas & scenarios-->
+  <div class="col-4 margin-top-large">
+
+      {% for item in p_and_s %}
+
+      <div class="{% if item.persona.id == persona.id %}active_persona mycard{%else%}mycard{%endif%} margin-bottom-small d-flex">
+        <img class="thumb margin-right-small" src="{{item.persona.image.url}}" alt="">
+        <div>
+          <h5>{{item.persona.name}}</h5>
+          <p>{{item.persona.description}}</p>
+        </div>
+      </div>
+
+        {% for s in item.scenarios %}
+          <div class="{% if s.id == scenario.id %}myactive scenariocard hovershaddow lineheight100{% else %}scenariocard hovershaddow lineheight100{%endif%} margin-bottom-small margin-left-small d-flex justify-content-between">
+            <div class="position-relative height100 width100">
+              <p class="d-flex align-items-center lineheight100">{{s.description}}</p>
+              <a href="/fdd_app/persona={{item.persona.id}}/scenario={{s.id}}/samples" class="stretched-link"></a>
+            </div>
+          </div>
+        {% endfor %}
+    {% endfor %}
+
+  </div>

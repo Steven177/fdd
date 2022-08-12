@@ -171,29 +171,69 @@ for (let i = 0; i < bboxes.length; i++) {
 
 // ----------------------------------------------------------------------
 
+c0.addEventListener('keyup', function(e){
+  document.getElementById("x0").value = rectangles['0']['x']
+  document.getElementById("y0").value = rectangles['0']['y']
+  document.getElementById("width0").value = rectangles['0']['width']
+  document.getElementById("height0").value = rectangles['0']['height']
+})
 
-// https://stackoverflow.com/questions/25862798/how-to-send-the-javascript-list-of-dictionaries-object-to-django-ajax
-function saveBoxes() {
+c1.addEventListener('keyup', function(e){
+  document.getElementById("x1").value = rectangles['1']['x']
+  document.getElementById("y1").value = rectangles['1']['y']
+  document.getElementById("width1").value = rectangles['1']['width']
+  document.getElementById("height1").value = rectangles['1']['height']
+})
 
-  console.log("hello")
-  var div_review = document.getElementById("div_review");
-  var div_save = document.getElementById("div_save");
-  div_review.classList.add("d-none");
-  div_save.classList.remove("d-none");
+c2.addEventListener('keyup', function(e){
+  document.getElementById("x2").value = rectangles['2']['x']
+  document.getElementById("y2").value = rectangles['2']['y']
+  document.getElementById("width2").value = rectangles['2']['width']
+  document.getElementById("height2").value = rectangles['2']['height']
+})
 
-  var expBoxes = JSON.stringify(rectangles);
+c3.addEventListener('keyup', function(e){
+  document.getElementById("x3").value = rectangles['3']['x']
+  document.getElementById("y3").value = rectangles['3']['y']
+  document.getElementById("width3").value = rectangles['3']['width']
+  document.getElementById("height3").value = rectangles['3']['height']
+})
 
-  var path = window.location.href
-  console.log(path)
-  console.log(this.href)
-  var sample_id = path.split('fdd_app/')[1]
-  console.log(sample_id)
+c4.addEventListener('keyup', function(e){
+  document.getElementById("x4").value = rectangles['4']['x']
+  document.getElementById("y4").value = rectangles['4']['y']
+  document.getElementById("width4").value = rectangles['4']['width']
+  document.getElementById("height4").value = rectangles['4']['height']
+})
 
-  // http://localhost:8000/fdd_app/sample%3D$%7Bsample_id%7D
+c5.addEventListener('keyup', function(e){
+  document.getElementById("x5").value = rectangles['5']['x']
+  document.getElementById("y5").value = rectangles['5']['y']
+  document.getElementById("width5").value = rectangles['5']['width']
+  document.getElementById("height5").value = rectangles['5']['height']
+})
+c6.addEventListener('keyup', function(e){
+  document.getElementById("x6").value = rectangles['6']['x']
+  document.getElementById("y6").value = rectangles['6']['y']
+  document.getElementById("width6").value = rectangles['6']['width']
+  document.getElementById("height6").value = rectangles['6']['height']
+})
+c7.addEventListener('keyup', function(e){
+  document.getElementById("x7").value = rectangles['4']['x']
+  document.getElementById("y7").value = rectangles['4']['y']
+  document.getElementById("width7").value = rectangles['7']['width']
+  document.getElementById("height7").value = rectangles['7']['height']
+})
+c8.addEventListener('keyup', function(e){
+  document.getElementById("x8").value = rectangles['8']['x']
+  document.getElementById("y8").value = rectangles['8']['y']
+  document.getElementById("width8").value = rectangles['8']['width']
+  document.getElementById("height8").value = rectangles['8']['height']
+})
+c9.addEventListener('keyup', function(e){
+  document.getElementById("x9").value = rectangles['9']['x']
+  document.getElementById("y9").value = rectangles['9']['y']
+  document.getElementById("width9").value = rectangles['9']['width']
+  document.getElementById("height9").value = rectangles['9']['height']
+})
 
-  $.ajax({
-    "url": path,
-    "type": "POST",
-    "data": {'expBoxes[]': expBoxes},
- });
-}

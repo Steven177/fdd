@@ -7,13 +7,11 @@ import uuid
 class Persona(models.Model):
   image = models.ImageField(upload_to='personas/', default='personas/default_persona.jpeg')
   name = models.CharField(max_length=100, blank=True)
-  personality = models.TextField(blank=True)
-  objectives_and_goals = models.TextField(blank=True)
+  description = models.TextField(blank=True)
 
 class Scenario(models.Model):
   persona = models.ForeignKey(Persona, on_delete=models.CASCADE, blank=True)
-  name = models.CharField(max_length=100, blank=True)
-  description = models.TextField(blank=True)
+  description = models.CharField(max_length=300, blank=True)
 
 class Query(models.Model):
   persona = models.ForeignKey(Persona, on_delete=models.CASCADE, blank=True)
@@ -28,6 +26,7 @@ class Sample(models.Model):
   scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE, blank=True, default=-1)
   image = models.ImageField(upload_to='images/')
   has_failure = models.BooleanField(default=False, blank=True)
+  uploaded = models.BooleanField(default=False, blank=True)
 
 class Model_Prediction(models.Model):
   sample = models.ForeignKey(Sample, on_delete=models.CASCADE, blank=True)

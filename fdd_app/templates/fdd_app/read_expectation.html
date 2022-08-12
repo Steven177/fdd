@@ -1,0 +1,22 @@
+{% load mathfilters %}
+{% load index %}
+<div class="position-relative" style="width: {{sample.image.width}}px; height: {{sample.image.height}}px">
+  <img class="border-radius" width="{{sample.image.width}}" height="{{sample.image.height}}" src="{{sample.image.url}}" id="screenshot" draggable="false">
+  <svg width="{{sample.image.width}}" height="{{sample.image.height}}" viewBox="0 0 {{sample.image.width}} {{sample.image.height}}" id="draw" xmlns="http://www.w3.org/2000/svg">
+  <rect id="marquee" x="0" y="0" width="{{sample.image.width}}" height="{{sample.image.height}}" />
+  {% for exp in sample.expectation_set.all %}
+    <g id="boxes"></g>
+    <rect class="bbox" x="{{exp.xmin}}" y="{{exp.ymin}}" width="{{exp.xmax|sub:exp.xmin}}" height="{{exp.ymax|sub:exp.ymin}}" style="stroke:{{ colors|index:forloop.counter0 }};" c/>
+  {% endfor %}
+  </svg>
+</div>
+
+<! -- labels -->
+<div>
+{% for exp in sample.expectation_set.all %}
+  <div class="label">
+    <i class="fa-solid fa-square" style="color:{{ colors|index:forloop.counter0 }};"></i>
+    <p class="form-like-p">{{exp.label}}</p>
+  </div>
+{% endfor %}
+

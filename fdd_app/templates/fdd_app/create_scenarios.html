@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  {% load static %}
+
+  <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <! -- fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;700&display=swap" rel="stylesheet">
+
+  <! -- fontawesome -->
+  <script src="https://kit.fontawesome.com/d35950c7f9.js" crossorigin="anonymous"></script>
+
+  <! -- Bootstrap-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"> </script>
+  <! -- jquery-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+  <! -- dropzone.js -->
+  <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+  <link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
+
+
+</head>
+<body class="font greybackground">
+
+  {% block sidebar1 %}{% include 'fdd_app/sidebar1.html' %}{% endblock sidebar1 %}
+
+  {% block navbar2 %}{% include 'fdd_app/navbar2.html' %}{% endblock navbar2 %}
+
+  <div class="container">
+    <! -- ROW -->
+    <div class="row greybackground">
+      <! -- LEFT -->
+      <div class="col-4">
+        <a class="btn primary margin-top-small margin-bottom-small" href="/fdd_app/create_persona"><i class="fa-solid fa-plus"></i> Add user</a>
+
+        {% for p in personas %}
+          <div class="{% if p.id == persona.id %}myactive mycard hovershaddow{% else %}mycard hovershaddow{%endif%} margin-bottom-small position-relative d-flex">
+            <img class="thumb margin-right-small" src="{{p.image.url}}" alt="/media/personas/default_persona.jpeg">
+            <div>
+              <h5>{{p.name}}</h5>
+              <p>{{p.description}}</p>
+            </div>
+            <a class="stretched-link" href="/fdd_app/persona={{p.id}}/create_scenarios"></a>
+          </div>
+
+        {% endfor %}
+      </div>
+
+      <! -- RIGHT -->
+      <div class="col-8">
+
+        <! -- User -->
+        <div class="whitebackground margin-top-small padding20px">
+          <div class="d-flex justify-content-between">
+            <h2 class="purple-color">User</h2>
+            <div>
+              <a class="btn secondary" href="/fdd_app/persona={{persona.id}}/update_persona"><i class="fa-solid fa-pen-to-square"></i></a>
+              <a class="btn secondary" href="/fdd_app/persona={{persona.id}}/delete_persona"><i class="fa-solid fa-trash-can"></i></a>
+            </div>
+          </div>
+
+          <div class="d-flex">
+            <img class="largethumb margin-right-small" src="{{persona.image.url}}" alt="/media/personas/default_persona.jpeg">
+            <div>
+              <h3>{{persona.name}}</h3>
+              <p>{{persona.description}}</p>
+            </div>
+          </div>
+        </div>
+
+        <! -- Scenario create -->
+        <div class="whitebackground margin-top-small padding20px">
+          <h2 class="purple-color">Scenario</h2>
+          <form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
+            {% csrf_token %}
+            <div class="margin-bottom-small">
+              {{ scenario_form.description }}
+            </div>
+
+            <button type="submit" class="btn primary"><i class="fa-solid fa-plus"></i> Add scenario</button>
+          </form>
+        </div>
+
+        <! -- Scenario read -->
+        {% if scenarios|length > 0 %}
+          {% for item in samples_per_scenario %}
+          <div class="whitebackground margin-top-small padding20px">
+            <div class="d-flex justify-content-between">
+              <div>
+                <p>{{item.scenario.description}}</p>
+              </div>
+              <div>
+                <a class="btn secondary" href="/fdd_app/persona={{persona.id}}/scenario={{item.scenario.id}}/update_scenario"><i class="fa-solid fa-pen-to-square"></i></a>
+                <a class="btn secondary" href="/fdd_app/persona={{persona.id}}/scenario={{item.scenario.id}}/delete_scenario"><i class="fa-solid fa-trash-can"></i></a>
+              </div>
+            </div>
+
+            <div class="row">
+              {% for sa in item.samples %}
+              <div class="col-2">
+                <! -- Samples-->
+                <div class="d-flex justify-content-start">
+                  <a class="link-black" href="/fdd_app/persona={{persona.id}}/scenario={{item.scenario.id}}/sample={{sa.id}}/delete_sample">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </a>
+                </div>
+                <img class="largethumb" src="{{sa.image.url}}" alt="">
+              </div>
+              {% endfor %}
+
+              <div>
+                <a class="link-black" href=""> </a>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn margin-top-small" data-bs-toggle="modal" data-bs-target="#exampleModal{{item.scenario.id}}">
+                  <i class="fa-solid fa-plus fa-2xl"></i>
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal{{item.scenario.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Upload your sample(s)</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+
+                        <form enctype='multipart/form-data' action="upload/" method='POST' class="dropzone dz" id="my-dropzone" >
+                            {% csrf_token %}
+                            <div class="fallback">
+                              <input name="file" type="file" multiple />
+                            </div>
+                            <input type="hidden" name="scenario_id" value="{{item.scenario.id}}">
+                        </form>
+                        <div class="modal-footer">
+                          <button type="button" class="btn secondary" data-bs-dismiss="modal">Close</button>
+                          <a class="btn primary" href="/fdd_app/persona={{persona.id}}/create_scenarios">Save</a>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- End Modal -->
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+
+          <! -- User -->
+        </div> <! -- END RIGHT -->
+    </div> <! -- END ROW -->
+  </div> <! -- END CONTAINER -->
+
+</body>
+</html>
+

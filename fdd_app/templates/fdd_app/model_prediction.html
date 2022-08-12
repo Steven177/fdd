@@ -1,0 +1,40 @@
+<head>
+    {% load mathfilters %}
+    {% load index %}
+    {% load slice %}
+    {% load to_int %}
+</head>
+
+<div class="position-relative">
+  <svg class="position-absolute" width="{{sample.image.width}}" height="{{sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
+  {% for pred in model_predictions %}
+     <rect id="{{ forloop.counter0 }}" class="box normalBox" x={{pred.xmin}} y={{pred.ymin}} width={{pred.xmax|sub:pred.xmin}} height={{pred.ymax|sub:pred.ymin}} style="stroke:{{ colors|index:forloop.counter0 }};fill-opacity:0"/>
+    </rect>
+  {% endfor %}
+  </svg>
+  <img src="{{sample.image.url}}" class="border-radius">
+</div>
+
+{% for pred in model_predictions %}
+  <div id="{{ forloop.counter0|add:100 }}" class="pred">
+    <i class="fa-solid fa-square" style="color:{{ colors|index:forloop.counter0 }}"></i>
+    <div class="d-flex justify-content-between align-items-center border-bottom">
+      <div class="d-flex justify-content-between">
+        <p> {{ pred.label|title}} </p>
+        <p class="margin-left-small"> {{ pred.score | mul:100 | floatformat:0 }}%  </p>
+      </div>
+
+      {% if sample.image.url|slice == "woz" %}
+      <button id="b5" class="btn secondary" onclick="loadExplanation('{{ forloop.counter0|add:200 }}')">Explanation
+      </button>
+      {% else %}
+      <button class="btn secondary">Explanation</button>
+      {% endif %}
+    </div>
+    <div id="{{ forloop.counter0|add:300 }}" class="d-none d-flex align-items-center">
+      <img class="fixed-height rounded" src="" alt="" id="{{ forloop.counter0|add:200 }}">
+      <p>Here we visualize the attention of the AI. This corresponds to visualizing which part of the image the AI focuses on when making a prediction. </p>
+    </div>
+
+</div>
+{% endfor %}

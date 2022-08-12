@@ -1,0 +1,101 @@
+
+    <! -- canvas -->
+    <div class="position-relative" style="width: {{sample.image.width}}px; height: {{sample.image.height}}px">
+      <img class="border-radius" width="{{sample.image.width}}" height="{{sample.image.height}}" src="{{sample.image.url}}" id="screenshot" draggable="false">
+      <svg width="{{sample.image.width}}" height="{{sample.image.height}}" viewBox="0 0 {{sample.image.width}} {{sample.image.height}}" id="draw" xmlns="http://www.w3.org/2000/svg">
+      <rect id="marquee" x="0" y="0" width="{{sample.image.width}}" height="{{sample.image.height}}" />
+      <g id="boxes"></g>
+      </svg>
+    </div>
+
+    <! -- labels -->
+    <div>
+      <form id="idForm" method="post">
+        {% csrf_token %}
+        <div id="label0" class="label d-none" style="color: {{ colors.0 }}">
+          <i class="fa-solid fa-square"></i>
+          <input type="text" id="c0" name="label" class="myform">
+          <input type="hidden" id="x0" name="x" class="myform">
+          <input type="hidden" id="y0" name="y" class="myform">
+          <input type="hidden" id="width0" name="width" class="myform">
+          <input type="hidden" id="height0" name="height" class="myform">
+        </div>
+        <div id="label1" class="label d-none" style="color: {{ colors.1 }}">
+          <i class="fa-solid fa-square"></i>
+          <input type="text" id="c1" name="label" class="myform">
+          <input type="hidden" id="x1" name="x" class="myform">
+          <input type="hidden" id="y1" name="y" class="myform">
+          <input type="hidden" id="width1" name="width" class="myform">
+          <input type="hidden" id="height1" name="height" class="myform">
+        </div>
+        <div id="label2" class="label d-none" style="color: {{ colors.2 }}">
+          <i class="fa-solid fa-square"></i>
+          <input type="text" id="c2" name="label" class="myform">
+          <input type="hidden" id="x2" name="x" class="myform">
+          <input type="hidden" id="y2" name="y" class="myform">
+          <input type="hidden" id="width2" name="width" class="myform">
+          <input type="hidden" id="height2" name="height" class="myform">
+        </div>
+        <div id="label3" class="label d-none" style="color: {{ colors.3 }}">
+          <i class="fa-solid fa-square"></i>
+          <input type="text" id="c3" name="label" class="myform">
+          <input type="hidden" id="x3" name="x" class="myform">
+          <input type="hidden" id="y3" name="y" class="myform">
+          <input type="hidden" id="width3" name="width" class="myform">
+          <input type="hidden" id="height3" name="height" class="myform">
+        </div>
+        <div id="label4" class="label d-none" style="color: {{ colors.4 }}">
+          <i class="fa-solid fa-square"></i>
+          <input type="text" id="c4" name="label" class="myform">
+          <input type="hidden" id="x4" name="x" class="myform">
+          <input type="hidden" id="y4" name="y" class="myform">
+          <input type="hidden" id="width4" name="width" class="myform">
+          <input type="hidden" id="height4" name="height" class="myform">
+        </div>
+        <div id="label5" class="label d-none" style="color: {{ colors.5 }}">
+          <i class="fa-solid fa-square"></i>
+          <input type="text" id="c5" name="label" class="myform">
+          <input type="hidden" id="x5" name="x" class="myform">
+          <input type="hidden" id="y5" name="y" class="myform">
+          <input type="hidden" id="width5" name="width" class="myform">
+          <input type="hidden" id="height5" name="height" class="myform">
+        </div>
+        <div id="label6" class="label d-none" style="color: {{ colors.6 }}">
+          <i class="fa-solid fa-square"></i>
+          <input type="text" id="c6" name="label" class="myform">
+          <input type="hidden" id="x6" name="x" class="myform">
+          <input type="hidden" id="y6" name="y" class="myform">
+          <input type="hidden" id="width6" name="width" class="myform">
+          <input type="hidden" id="height6" name="height" class="myform">
+        </div>
+        <div id="label7" class="label d-none" style="color: {{ colors.7 }}">
+          <i class="fa-solid fa-square"></i>
+          <input type="text" id="c7" name="label" class="myform">
+          <input type="hidden" id="x7" name="x" class="myform">
+          <input type="hidden" id="y7" name="y" class="myform">
+          <input type="hidden" id="width7" name="width" class="myform">
+          <input type="hidden" id="height7" name="height" class="myform">
+        </div>
+        <div id="label8" class="label d-none" style="color: {{ colors.8 }}">
+          <i class="fa-solid fa-square"></i>
+          <input type="text" id="c8" name="label" class="myform">
+          <input type="hidden" id="x8" name="x" class="myform">
+          <input type="hidden" id="y8" name="y" class="myform">
+          <input type="hidden" id="width8" name="width" class="myform">
+          <input type="hidden" id="height8" name="height" class="myform">
+        </div>
+        <div id="label9" class="label d-none" style="color: {{ colors.9 }}">
+          <i class="fa-solid fa-square"></i>
+          <input type="text" id="c9" name="label" class="myform">
+          <input type="hidden" id="x9" name="x" class="myform">
+          <input type="hidden" id="y9" name="y" class="myform">
+          <input type="hidden" id="width9" name="width" class="myform">
+          <input type="hidden" id="height9" name="height" class="myform">        </div>
+
+      <div id="div_save" class="d-flex">
+        <input id="b4" name="expectation_submit" type="submit" value="Save" onsubmit="javascript:saveBoxes(persona.id, scenario.id, sample.id)"class="btn primary margin-top-small margin-right-small">
+        <button class="btn secondary margin-top-small"><a class="atag-btn-black" href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/read_sample">Start over</a> </button>
+      </div>
+    </form>
+  </div>
+

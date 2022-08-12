@@ -26,69 +26,31 @@
 
 </head>
 
-<body class="font">
-  <! -- NAVBAR -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-      <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
-      <div class="margin-right">
-        <h4 class="white">&#128065 AI Model</h4>
-        <div class="dropdown whitebackground border-radius">
-        <select class="form-select border-radius" aria-label="Default select example">
-        {% for ai in ais %}
-          <option class="border-radius" value="persona{{forloop.counter}}">{{ai.name}}</option>
-        {% endfor %}
-        </select>
-        </div>
-        <a class="link-white" href="/fdd_app/read_ai">View model details  <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-      </div>
+<body class="font greybackground">
+  {% block sidebar3 %}{% include 'fdd_app/sidebar3.html' %}{% endblock sidebar3 %}
 
-    </div>
-  </nav>
-  <! -- END NAVBAR -->
-
-
+  {% block navbar %}{% include 'fdd_app/navbar.html' %}{% endblock navbar %}
 
 
   <div class="container">
-    <h1 class="border-bottom margin-top-large">&#128218 AI Failure Book</h1>
-
     <ul class="nav nav-tabs margin-top-large">
       <li class="nav-item">
-          <a href="#design_corner" class="nav-link active colorblack" data-bs-toggle="tab"><h2>🎨 Design Corner</h2></a>
+          <a href="#design_corner" class="nav-link active colorblack" data-bs-toggle="tab"><h2>Failure Analysis</h2></a>
       </li>
       <li class="nav-item">
-          <a href="#engineering_corner" class="nav-link colorblack" data-bs-toggle="tab"><h2>🛠️ Engineering Corner</h2></a>
+          <a href="#engineering_corner" class="nav-link colorblack" data-bs-toggle="tab"><h2>Labelled Data</h2></a>
       </li>
     </ul>
+    <div class="tab-content">
+      <! -- ENGINEERING CORNER  -->
+      <div class="tab-pane fade" id="design_corner">
+        <p>Canvas</p>
+      </div>
+    </div>
 
     <div class="tab-content">
-      <! -- DESIGN CORNER  -->
-      <div class="tab-pane fade show active" id="design_corner">
-        <h2 class="purple-color margin-top-large">Quantitative</h2>
-        <h2 class="purple-color margin-top-large">Qualitative</h2>
-      </div>
-
-
       <! -- ENGINEERING CORNER  -->
       <div class="tab-pane fade" id="engineering_corner">
-        <h2 class="purple-color margin-top-large">Quantitative</h2>
-        <div class="row">
-          <div class="col-6">
-            <p>Recall</p>
-            <p>Precision</p>
-
-          </div>
-          <div class="col-6">
-            <p>Percentage of labels in distribution</p>
-            <p>percentage of label out-of-distribution</p>
-
-          </div>
-        </div>
-
-        <h2 class="purple-color margin-top-large">Qualitative</h2>
-
-
         <ul class="nav nav-tabs" id="myTab2">
           <li class="nav-item">
               <a href="#finetuning" class="nav-link active colorblack" data-bs-toggle="tab">Finetuning</a>
@@ -104,9 +66,8 @@
           <div class="tab-pane fade show active" id="finetuning">
             <button class="btn secondary margin-top-small">Export data & labels as csv</button>
 
-
             {% for item in finetuning %}
-            <div class="row">
+            <div class="row margin-top-small">
               <! -- Model prediction -->
               <div class="col-4">
                 <p><strong>Model Prediction</strong></p>
@@ -133,24 +94,29 @@
               <! -- User-centric ground truth -->
               <div class="col-4">
                 <p><strong>User-centric ground truth</strong></p>
+                {% if item.expectations|length == 0 %}
+                      <h1>😔</h1>
+                      <p> Not labelled yet</p>
+                {% else %}
                   <div class="position-relative">
                     <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
 
-                    {% for expectation in item.expectations %}
-                      <rect id="" class="box normalBox" x={{expectation.xmin}} y={{expectation.ymin}} width={{expectation.xmax|sub:expectation.xmin}} height={{expectation.ymax|sub:expectation.ymin}} style="stroke:{{colors|index:forloop.counter0 }};fill-opacity:0">
-                      </rect>
-                    {% endfor %}
-                    </svg>
-                    <img src="{{item.sample.image.url}}" class="border-radius">
-                  </div>
-                    {% for expectation in item.expectations %}
-                      <i class="fa-solid fa-square" style="color: {{colors|index:forloop.counter0 }}"></i>
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex justify-content-between">
-                          <p> {{ expectation.label|title}} </p>
-                        </div>
+                        {% for expectation in item.expectations %}
+                          <rect id="" class="box normalBox" x={{expectation.xmin}} y={{expectation.ymin}} width={{expectation.xmax|sub:expectation.xmin}} height={{expectation.ymax|sub:expectation.ymin}} style="stroke:{{colors|index:forloop.counter0 }};fill-opacity:0">
+                          </rect>
+                        {% endfor %}
+                        </svg>
+                        <img src="{{item.sample.image.url}}" class="border-radius">
                       </div>
-                    {% endfor %}
+                        {% for expectation in item.expectations %}
+                          <i class="fa-solid fa-square" style="color: {{colors|index:forloop.counter0 }}"></i>
+                          <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between">
+                              <p> {{ expectation.label|title}} </p>
+                            </div>
+                          </div>
+                        {% endfor %}
+                    {% endif %}
               </div>
               <div class="col-4">
 
@@ -158,8 +124,6 @@
 
             </div>
             {% endfor %}
-
-
 
           </div> <! -- END FINETUNING  -->
 
@@ -171,7 +135,7 @@
 
 
             {% for item in retraining %}
-            <div class="row">
+            <div class="row margin-top-small">
               <! -- Model prediction -->
               <div class="col-4">
                 <p><strong>Model Prediction</strong></p>
@@ -198,6 +162,10 @@
               <! -- User-centric ground truth -->
               <div class="col-4">
                 <p><strong>User-centric ground truth</strong></p>
+                 {% if item.expectations|length == 0 %}
+                      <h1>😔</h1>
+                      <p> Not labelled yet</p>
+                {% else %}
                   <div class="position-relative">
                     <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
 
@@ -216,6 +184,7 @@
                         </div>
                       </div>
                     {% endfor %}
+                {% endif %}
               </div>
               <div class="col-4">
 

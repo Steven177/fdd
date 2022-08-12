@@ -1,18 +1,17 @@
 from django import forms
 from django.forms import formset_factory
 from .models import Sample, Persona, Scenario, Query
-
+"""
 class ImageForm(forms.ModelForm):
   image = forms.ImageField(label="")
   class Meta:
       model = Sample
       fields = ['image']
-
+"""
 class PersonaForm(forms.ModelForm):
-  #image = forms.ImageField(label="")
-  #name = forms.CharField(max_length=100, label="", required=False)
-  #personality = forms.CharField(widget=forms.Textarea, label="", required=False)
-  #objectives_and_goals = forms.CharField(widget=forms.Textarea, label="", required=False)
+  image = forms.ImageField(label="", required=False)
+  description = forms.CharField(widget=forms.Textarea(attrs={'onkeyup': 'showDescription();'}), label="", required=False)
+  name = forms.CharField(widget=forms.TextInput(attrs={'onkeyup': 'showName();'}))
 
   class Meta:
     model = Persona
@@ -24,18 +23,13 @@ class PersonaForm(forms.ModelForm):
     self.fields['scenario'].queryset = Scenario.objects.none()
   """
 class ScenarioForm(forms.ModelForm):
-  #name = forms.CharField(max_length=100, label="", required=False)
-  #description = forms.CharField(widget=forms.Textarea, label="", required=False)
-
+  description = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Scenario'}), label="", required=False)
   class Meta:
     model = Scenario
     exclude = ['persona']
 
 class QueryForm(forms.ModelForm):
-  input_query = forms.CharField(widget=forms.Textarea, label="", required=False)
+  input_query = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Prompt'}), label="", required=True)
   class Meta:
     model = Query
     fields = ['input_query']
-
-
-

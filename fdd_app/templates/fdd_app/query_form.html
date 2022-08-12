@@ -1,0 +1,6 @@
+<form method="post" enctype="multipart/form-data" class="form-control form-label border-radius">
+  {% csrf_token %}
+  <input type="hidden" name="form_id" value="scenario">
+    {{ query_form.input_query}}
+  <button type="submit" class="btn primary margin-top-small">Generate image</button>
+</form>

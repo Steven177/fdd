@@ -1,0 +1,45 @@
+ <! -- SIDEBAR -->
+  <div class="area"></div>
+      <nav class="main-menu side-nav sticky">
+            <ul>
+                <li>
+                    <a class="margin-top-extra-large margin-bottom-small" href="/fdd_app/persona={{persona.id}}/create_scenarios">
+                        <i class="fa-solid fa-people-group fa-2x icon-nav"></i>
+                        <span class="nav-text">
+                            User Scenarios
+                        </span>
+                    </a>
+
+                </li>
+                <li class="has-subnav">
+                    <a class="margin-bottom-small" href="/fdd_app/persona={{latest_scenario.persona.id}}/scenario={{latest_scenario.id}}/samples">
+                        <i class="fa-solid fa-bolt fa-2x icon-nav font-2em active-nav"></i>
+                        <span class="nav-text active-nav">
+                            Failure Exploration
+                        </span>
+                    </a>
+
+                </li>
+              <li class="has-subnav">
+                    <a href="/fdd_app/failure_analysis">
+                        <i class="fa-solid fa-book fa-2x icon-nav font-2em"></i>
+                        <span class="nav-text">
+                            Failure Analysis
+                        </span>
+                    </a>
+                </li>
+
+            </ul>
+
+            <ul class="logout">
+                <li>
+                   <a href="/fdd_app/read_ai">
+                        <i class="fa-solid fa-microchip fa-2x icon-nav font-2em"></i>
+                        <span class="nav-text">
+                            AI Models
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+  <! -- END SIDEBAR -->
