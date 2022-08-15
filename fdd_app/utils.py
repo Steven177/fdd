@@ -12,7 +12,7 @@ from io import StringIO
 from django.core.files.base import ContentFile
 import io
 
-from .creds import *
+from .cred import *
 
 
 
