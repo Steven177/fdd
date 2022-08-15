@@ -22,7 +22,7 @@ from .models import Sample, Expectation, Model_Prediction, Match, Ai, Persona, S
 from .utils import *
 from .ai import *
 from .dalle import *
-from .cred import *
+from .creds import *
 # from .seed import *
 
 import replicate

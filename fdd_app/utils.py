@@ -12,9 +12,7 @@ from io import StringIO
 from django.core.files.base import ContentFile
 import io
 
-from .cred import *
-
-
+from .creds import *
 
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 API_URL = "https://api-inference.huggingface.co/models/facebook/detr-resnet-50"
