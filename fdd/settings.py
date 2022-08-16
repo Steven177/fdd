@@ -23,6 +23,7 @@ IS_HEROKU = "DYNO" in os.environ
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-dybas%2^kbmx!5q(!g$e^m@v3*0npo%b7b=ji%i*ed=4c*btr('
+
 if 'SECRET_KEY' in os.environ:
     SECRET_KEY = os.environ["SECRET_KEY"]
 

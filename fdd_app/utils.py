@@ -13,9 +13,9 @@ from django.core.files.base import ContentFile
 import io
 import os
 
-from .creds import *
+# from .creds import *
 
-headers = {"Authorization": f"Bearer {}".format(os.environ('API_TOKEN'))}
+headers = {"Authorization": f"Bearer {os.environ['API_TOKEN']}"}
 API_URL = "https://api-inference.huggingface.co/models/facebook/detr-resnet-50"
 
 coco_distribution = ["person", "bicycle", "car","motorcycle","airplane","bus","train","truck","traffic light","fire hydrant","stop sign", "parking meter","bench","bird","cat","dog","horse","sheep","cow","elephant","bear","zebra","giraffe","backpack","umbrella","handbag","tie","suitcase","frisbee","skis","snowboard","sports ball","kite","baseball bat","baseball glove","skateboard","surfboard","tennis racket","bottle","wine glass","cup","fork","knife","spoon","bowl","banana","apple","sandwich","orange","broccoli","carrot","hot dog","pizza","donut","cake","chair","couch","potted plant","bed","dining table","toilet","tv","laptop","mouse","remote","keyboard","cell phone","microwave","oven","toaster","sink","refrigerator","book","clock","vase","scissors","teddy bear","hair drier","toothbrush"]
@@ -176,7 +176,7 @@ def check_quality_of_score(score, threshold=0.95):
 
 def call_google_api(q):
   params = {
-  "api_key": os.environ('GOOGLE_API_TOKEN'),
+  "api_key": os.environ['GOOGLE_API_TOKEN'],
   "engine": "google",
   "q": q,
   "location": "Austin, Texas, United States",
