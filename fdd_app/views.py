@@ -301,7 +301,7 @@ def samples(request, persona_id, scenario_id):
       image1.save()
 
     # DALLE
-    client = replicate.Client(api_token=REPLICATE_API_TOKEN)
+    client = replicate.Client(api_token=os.environ('REPLICATE_API_TOKEN'))
     model = client.models.get("kuprel/min-dalle")
     generated_image = model.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
     for url in generated_image:
@@ -399,7 +399,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       image1.save()
 
     # DALLE
-    client = replicate.Client(api_token=REPLICATE_API_TOKEN)
+    client = replicate.Client(api_token=os.environ('REPLICATE_API_TOKEN'))
     model = client.models.get("kuprel/min-dalle")
     generated_image = model.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
     for url in generated_image:
