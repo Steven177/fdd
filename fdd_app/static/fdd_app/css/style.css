@@ -21,6 +21,10 @@
   width:  100%;
 }
 
+.lowOpacity {
+  opacity:  0.2;
+}
+
 #id_image {
 }
 
@@ -87,6 +91,11 @@ a.disabled {
   box-shadow: var(--lightpurple) 0px 4px 12px;
 }
 
+
+.myform {
+  width:  100%;
+  padding:  5px;
+}
 
 .library-img {
   width:  100%;
@@ -266,23 +275,23 @@ a.disabled {
   padding:  10px !important;
   border-radius: 2px !important;
   color:  var(--black);
-  width:  100%;
+  width:  75px;
 }
 
 .error {
-  border: 3px solid rgba(255, 0, 0, .2)
+  border: 3px solid red
 }
 
 .info {
-  border: 3px solid rgba(114, 160, 196, .2);
+  border: 3px solid blue;
 }
 
 .warning {
-  border: 3px solid rgba(255, 203, 0, .2);
+  border: 3px solid orange;
 }
 
 .ok {
-  border: 3px solid rgba(0, 189, 0, .2);
+  border: 3px solid green;
 }
 
 .border {
@@ -420,6 +429,9 @@ a.disabled {
 
 .margin-right-small {
   margin-right:  10px;
+}
+.margin-right-large {
+  margin-right:  20px !important;
 }
 
 .margin-top-zero {

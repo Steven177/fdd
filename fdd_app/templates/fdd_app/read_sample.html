@@ -42,16 +42,28 @@
             </div>
           </div>
           <div class="col-6">
-            {% if write_expectation %}
+            <h2 class="purple-color">User Expectation</h2>
+            {% if sample.labelled and not sample.assessed %}
+              {% block read_expectation %}{% include 'fdd_app/read_expectation.html' %}{% endblock read_expectation %}
+          </div>
+        </div>
+              <div class="row margin-top-large">
+                <div class="col-12">
+                  <h2 class="purple-color">Model Prediction</h2>
+                  {% block model_prediction %}{% include 'fdd_app/model_prediction.html' %}{% endblock model_prediction %}
+                </div>
+              </div>
+              <div class="row margin-top-large">
+                <h2 class="purple-color">Failure Engine</h2>
+                {% block failure_engine %}{% include 'fdd_app/failure_engine.html' %}{% endblock failure_engine %}
+              </div>
+            {% elif not sample.labelled %}
               {% block write_expectation %}{% include 'fdd_app/write_expectation.html' %}{% endblock write_expectation %}
             {% else %}
-              {% block read_expectation %}{% include 'fdd_app/read_expectation.html' %}{% endblock read_expectation %}
-                <a class="btn primary" href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sample.id}}/failure_exploration">Run failure exploration</a>
-
+              {% block read_expectation2 %}{% include 'fdd_app/read_expectation.html' %}{% endblock read_expectation2 %}
             {% endif %}
-            </div>
-        </div>
-      </div>
+          </div>
+
   </div> <! -- CONTAINER-->
 </body>
 

@@ -27,6 +27,10 @@ class Sample(models.Model):
   image = models.ImageField(upload_to='images/')
   has_failure = models.BooleanField(default=False, blank=True)
   uploaded = models.BooleanField(default=False, blank=True)
+  generated = models.BooleanField(default=False, blank=True)
+  labelled = models.BooleanField(default=False, blank=True)
+  tested = models.BooleanField(default=False, blank=True)
+  assessed = models.BooleanField(default=False, blank=True)
 
 class Model_Prediction(models.Model):
   sample = models.ForeignKey(Sample, on_delete=models.CASCADE, blank=True)
@@ -58,6 +62,7 @@ class Match(models.Model):
   failing_to_detect = models.BooleanField(default=False, blank=True)
   false_detection = models.BooleanField(default=False, blank=True)
   indistribution = models.BooleanField(default=False, blank=True)
+  outofdistribution = models.BooleanField(default=False, blank=True)
   missing_detection = models.BooleanField(default=False, blank=True)
   unnecessary_detection = models.BooleanField(default=False, blank=True)
   critical_quality_box = models.BooleanField(default=False, blank=True)

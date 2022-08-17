@@ -140,9 +140,9 @@ function highlightBox(e) {
   // predictions
   for (let i = 0; i < predictions.length; i++) {
     element = predictions[i];
-    element.classList.add("hideDiv");
+    element.classList.add("lowOpacity");
   }
-  highlightPred.classList.remove("hideDiv");
+  highlightPred.classList.remove("lowOpacity");
 };
 
 function dehighlightBox(e) {
@@ -158,7 +158,7 @@ function dehighlightBox(e) {
   predictions = document.querySelectorAll(".pred")
   for (let i = 0; i < predictions.length; i++) {
     pred = predictions[i]
-    pred.classList.remove("hideDiv");
+    pred.classList.remove("lowOpacity");
   }
 };
 

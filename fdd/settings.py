@@ -22,10 +22,7 @@ IS_HEROKU = "DYNO" in os.environ
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-dybas%2^kbmx!5q(!g$e^m@v3*0npo%b7b=ji%i*ed=4c*btr('
-
-if 'SECRET_KEY' in os.environ:
-    SECRET_KEY = os.environ["SECRET_KEY"]
+SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if not IS_HEROKU:
@@ -49,12 +46,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_filters',
     'mathfilters',
+    'storages'
 ]
 
+#'whitenoise.middleware.WhiteNoiseMiddleware',
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -131,21 +130,45 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'fdd_pp/static'),
 ]
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATIC_URL = '/static/'
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATIC_URL = '/static/'
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
     # Add to this list all the locations containing your static files
 )
 
-MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+# USE_S3 = os.environ.get('USE_S3') == 'TRUE'
+USE_S3 = False
+if USE_S3:
+  # aws settings
+  AWS_ACCESS_KEY_ID=os.environ.get('AWS_ACCESS_KEY_ID')
+  AWS_SECRET_ACCESS_KEY=os.environ.get('AWS_SECRET_ACCESS_KEY')
+  AWS_STORAGE_BUCKET_NAME=os.environ.get('AWS_STORAGE_BUCKET_NAME')
+
+  AWS_DEFAULT_ACL = 'public-read'
+  AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+  AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+  # s3 static settings
+  AWS_LOCATION = 'static'
+  STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+  AWS_S3_FILE_OVERWRITE = False
+  # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+  DEFAULT_FILE_STORAGE = 'fdd.storages.MediaStore'
+  STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+else:
+  STATIC_URL = '/static/'
+  STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+  MEDIA_URL = '/media/'
+  MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -153,3 +176,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #import django_heroku
 #django_heroku.settings(locals())
+
+
+# API
+API_TOKEN=os.environ.get('API_TOKEN')
+GOOGLE_API_TOKEN=os.environ.get('GOOGLE_API_TOKEN')
+REPLICATE_API_TOKEN=os.environ.get('REPLICATE_API_TOKEN')
+SECRET_KEY=os.environ.get('SECRET_KEY')
+
+
+

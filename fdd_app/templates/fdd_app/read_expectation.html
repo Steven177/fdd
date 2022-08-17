@@ -14,9 +14,13 @@
 <! -- labels -->
 <div>
 {% for exp in sample.expectation_set.all %}
-  <div class="label">
-    <i class="fa-solid fa-square" style="color:{{ colors|index:forloop.counter0 }};"></i>
-    <p class="form-like-p">{{exp.label}}</p>
+  <div class="d-flex justify-content-start margin-bottom-small">
+    <div class="">
+      <i class="fa-solid fa-square margin-right-large" style="color:{{ colors|index:forloop.counter0 }};"></i>
+    </div>
+    <div>
+      <p class="margin-top-zero">{{exp.label}}</p>
+    </div>
   </div>
 {% endfor %}
 

@@ -16,20 +16,15 @@
 </div>
 
 {% for pred in model_predictions %}
-  <div id="{{ forloop.counter0|add:100 }}" class="pred">
-    <i class="fa-solid fa-square" style="color:{{ colors|index:forloop.counter0 }}"></i>
-    <div class="d-flex justify-content-between align-items-center border-bottom">
-      <div class="d-flex justify-content-between">
-        <p> {{ pred.label|title}} </p>
-        <p class="margin-left-small"> {{ pred.score | mul:100 | floatformat:0 }}%  </p>
+  <div id="{{ forloop.counter0|add:100 }}" class="d-flex align-items-center margin-bottom-small pred">
+    <div class=" margin-right-large">
+      <i class="fa-solid fa-square margin-top-zero" style="color:{{ colors|index:forloop.counter0 }}"></i>
+    </div>
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-center">
+        <p class="margin-top-zero margin-right-large"> {{ pred.label|title}} </p>
+        <p class="margin-top-zero"> {{ pred.score | mul:100 | floatformat:0 }}%  </p>
       </div>
-
-      {% if sample.image.url|slice == "woz" %}
-      <button id="b5" class="btn secondary" onclick="loadExplanation('{{ forloop.counter0|add:200 }}')">Explanation
-      </button>
-      {% else %}
-      <button class="btn secondary">Explanation</button>
-      {% endif %}
     </div>
     <div id="{{ forloop.counter0|add:300 }}" class="d-none d-flex align-items-center">
       <img class="fixed-height rounded" src="" alt="" id="{{ forloop.counter0|add:200 }}">

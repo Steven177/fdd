@@ -369,10 +369,9 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
   colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
 
-  if sample.expectation_set.count() == 0:
-    write_expectation = True
-  else:
-    write_expectation = False
+  model_predictions = Model_Prediction.objects.filter(sample=sample)
+  matches = Match.objects.filter(sample=sample)
+  expectations = Expectation.objects.filter(sample=sample)
 
   # POST automatic
   if request.method == "POST" and query_form.is_valid():
@@ -395,7 +394,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       url = image_result['thumbnail']
       title = image_result['title']
       urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(title))
-      image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(title), persona=persona, scenario=scenario)
+      image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(title), persona=persona, scenario=scenario, generated=True)
       image1.save()
 
     # DALLE
@@ -410,7 +409,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       if res.status_code == 200:
         with open(file_name,'wb') as f:
           shutil.copyfileobj(res.raw, f)
-          image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(sample.id + 1), persona=persona, scenario=scenario)
+          image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(sample.id + 1), persona=persona, scenario=scenario, generated=True)
           image2.save()
         print('Image sucessfully Downloaded: ',file_name)
       else:
@@ -418,6 +417,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
     return render(request, 'fdd_app/samples.html',
       {
+      'not_tested': not_tested,
       'write_expectation': write_expectation,
       'latest_persona': lastest_persona,
       'latest_scenario': latest_scenario,
@@ -429,13 +429,37 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       'p_and_s': p_and_s
       })
 
+  # POST Failure form
+  elif request.method == "POST" and 'failure_severity' in request.POST:
+    response = request.POST
+    failure_severities = response.getlist('failure_severity')
+    # failure_effects = response.getlist('failure_effects')
+    match_ids = response.getlist('match_id')
+
+    # Save failure severity
+    for idx, sev in enumerate(failure_severities):
+      match_id = match_ids[idx]
+      match = Match.objects.get(id=match_id)
+      if sev != "":
+        match.failure_severity = int(sev)
+        match.save()
+    """
+    # Save failure effects
+    for idx, eff in enumerate(failure_effects):
+      match_id = match_ids[idx]
+      match = Match.objects.get(id=match_id)
+      if eff != "":
+        match.failure_effects = eff
+        match.save()
+    """
+    sample.assessed = True
+    sample.save()
+    return redirect("/fdd_app/persona={}/scenario={}/sample={}/read_sample".format(persona_id, scenario_id, sample_id))
 
   # POST user (submit expectation)
   elif request.method == 'POST' and "expectation_submit" in request.POST:
-    # labels
     # ---------------------------
-    # SAVE LABELS of EXPECTATIO
-
+    # SAVE LABELS of EXPECTATION
     labels = request.POST.getlist("label")
     xs = request.POST.getlist("x")
     ys = request.POST.getlist("y")
@@ -463,20 +487,133 @@ def read_sample(request, persona_id, scenario_id, sample_id):
           )
         new_exp.save()
 
+    sample.labelled = True
+    sample.save()
+
     expectations = Expectation.objects.filter(sample=sample.id)
-    return redirect("/fdd_app/persona={}/scenario={}/sample={}/read_sample".format(persona_id, scenario_id, sample_id))
+
+    # ---------------------------
+    # MODEL PREDICTION
+    if not sample.tested:
+      model_prediction = make_prediction(sample.image.path) # AI model prediction
+      # pil_image_obj = Image.open(sample.image)
+      # model_prediction = predict(pil_image_obj)
+      # model_prediction = [{'score': 0.9308645725250244, 'label': 'person', 'box': {'xmin': 79, 'ymin': 13, 'xmax': 273, 'ymax': 183}}, {'score': 0.9893394112586975, 'label': 'tie', 'box': {'xmin': 132, 'ymin': 167, 'xmax': 162, 'ymax': 184}}]
+
+      for obj in model_prediction:
+        new_pred = Model_Prediction(sample=sample, label=obj['label'], score=obj['score'], xmin=obj['box']['xmin'], ymin=obj['box']['ymin'], xmax=obj['box']['xmax'], ymax=obj['box']['ymax'] )
+        new_pred.save()
+
+      model_predictions = Model_Prediction.objects.filter(sample=sample.id)
+
+      # ---------------------------
+      # COST
+
+      if len(expectations) > 0 and len(model_predictions) > 0:
+        l1_cost_mat = calculate_l1_loss(expectations, model_predictions, sample)
+        giou_cost_mat = generalized_box_iou_loss(expectations, model_predictions)
+        loss_box = calculate_box_loss(giou_cost_mat, l1_cost_mat)
+
+        # labels_exp, labels_pred = padd_labels(labels_exp, labels_pred)
+        loss_labels = calculate_class_loss(expectations, model_predictions)
+
+        loss_matching = calculate_matching_loss(loss_box, loss_labels)
+        # Hungarian algorithm
+        exp_ind, pred_ind = linear_sum_assignment(loss_matching)
+        matching_cost = loss_matching[exp_ind, pred_ind].sum()
+
+      else:
+        exp_ind = []
+        pred_ind = []
+      # ---------------------------
+      # MATCHES
+      for i, exp_idx in enumerate(exp_ind):
+        exp_idx = np.int64(exp_idx).item()
+        pred_idx = np.int64(pred_ind[i]).item()
+        exp = expectations[exp_idx]
+        pred = model_predictions[pred_idx]
+
+        # boxes need at least 0.2 IoU to be a match
+        iou = calculate_iou(exp, pred)
+
+        if iou >= 0.2:
+          new_match = Match(sample=sample, expectation=exp, exp_idx=exp_idx, model_prediction=pred, pred_idx=pred_idx)
+          new_match.save()
+
+      for exp_idx, exp in enumerate(expectations):
+        if len(Match.objects.filter(expectation=exp.id)) == 0:
+          new_match = Match(sample=sample, expectation=exp, exp_idx=exp_idx)
+          new_match.save()
+
+      for pred_idx, pred in enumerate(model_predictions):
+        if len(Match.objects.filter(model_prediction=pred.id)) == 0:
+          new_match = Match(sample=sample, model_prediction=pred, pred_idx=pred_idx)
+          new_match.save()
+
+      # ---------------------------
+      # ERROR ANALYSIS
+
+      for match in matches:
+        # Failing to detect
+        if len(model_predictions) == 0:
+          match.failing_to_detect = True
+          match.save()
+          sample.has_failure = True
+          sample.save()
 
 
+        # Missing detection
+        if match.model_prediction == None:
+          match.missing_detection = True
+          if check_if_indistribution(match.expectation.label):
+            match.indistribution = True
+          else:
+            match.outofdistribution = True
+          match.save()
+          sample.has_failure = True
+          sample.save()
 
+        # Unnecessary detection
+        elif match.expectation == None:
+          match.unnecessary_detection = True
+          match.critical_quality_score = check_quality_of_score(match.model_prediction.score)
+          match.save()
+          sample.has_failure = True
+          sample.save()
+
+        # False detection
+        elif match.expectation.label.lower() != match.model_prediction.label:
+          match.false_detection = True
+          if check_if_indistribution(match.expectation.label):
+            match.indistribution = True
+          else:
+            match.outofdistribution = True
+          match.critical_quality_box = check_quality_of_box(match.expectation, match.model_prediction)
+          match.critical_quality_score = check_quality_of_score(match.model_prediction.score)
+          match.save()
+          sample.has_failure = True
+          sample.save()
+
+        # True positive
+        else:
+          match.true_positive = True
+          match.critical_quality_box = check_quality_of_box(match.expectation, match.model_prediction)
+          match.critical_quality_score = check_quality_of_score(match.model_prediction.score)
+          match.save()
+
+        sample.tested = True
+        sample.save()
+    return redirect('/fdd_app/persona={}/scenario={}/sample={}/read_sample'.format(persona_id, scenario_id, sample_id))
+
+    """
     if request.POST['done_or_continue'][0] == "D":
       return redirect('/fdd_app/failure_book')
     elif request.POST['done_or_continue'][0] =="C":
       return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
-
+    """
   # GET sample
   else:
     return render(request, 'fdd_app/read_sample.html', {
-      'write_expectation': write_expectation,
       'latest_persona': lastest_persona,
       'latest_scenario': latest_scenario,
       'p_and_s': p_and_s,
@@ -487,7 +624,10 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       'sample': sample,
       'colors': colors,
       'personas': personas,
-      'ais': ais
+      'ais': ais,
+      'model_predictions': model_predictions,
+      'matches': matches,
+      'expectations': expectations
     })
 
 def update_sample(request, persona_id, scenario_id, sample_id):
@@ -577,9 +717,9 @@ def failure_exploration(request, persona_id, scenario_id, sample_id):
   else:
     print("Running GET failure exploration ...")
     print(sample.image.path)
-     # ---------------------------
+    # ---------------------------
     # MODEL PREDICTION
-    model_prediction = query(sample.image.path) # AI model prediction
+    model_prediction = make_prediction(sample.image.path) # AI model prediction
     # pil_image_obj = Image.open(sample.image)
     # model_prediction = predict(pil_image_obj)
     # model_prediction = [{'score': 0.9308645725250244, 'label': 'person', 'box': {'xmin': 79, 'ymin': 13, 'xmax': 273, 'ymax': 183}}, {'score': 0.9893394112586975, 'label': 'tie', 'box': {'xmin': 132, 'ymin': 167, 'xmax': 162, 'ymax': 184}}]
