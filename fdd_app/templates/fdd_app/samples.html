@@ -33,6 +33,7 @@
       <! -- Data probes-->
       <div class="col-8 margin-top-large">
         <div class="row whitebackground padding20px margin-bottom-small">
+          {% block model_dropdown %}{% include 'fdd_app/model_dropdown.html' %}{% endblock model_dropdown %}
           {% block query_form %}{% include 'fdd_app/query_form.html' %}{% endblock query_form %}
         </div>
 

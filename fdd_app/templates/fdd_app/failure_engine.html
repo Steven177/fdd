@@ -7,14 +7,6 @@
 
 <div id="failures" class="row justify-content-start">
 
-    {% if model_predictions|length == 0 and expectations|length > 0 %}
-      <div class="border margin-top-small padding-small">
-        <p class="tag error text-align-center">FTO</p>
-        <p class="text-align-center">The model did not make any prediction for this image. </p>
-        <br>
-      </div>
-    {% endif %}
-
     <table class="table">
       <thead>
         <tr>
@@ -51,27 +43,53 @@
           </td>
           <td>
             {% if match.missing_detection %}
-              <p class="tag error text-align-center">MD</p>
+              <div class="error-exp">
+                <p class="tag error text-align-center">MD</p>
+                <span class="error-exp-details"><strong>Missing Detection:</strong><br> The model did not provide a prediction for "{{match.expectation.label}}".</span>
+              </div>
             {% elif match.unnecessary_detection %}
-              <p class="tag error text-align-center">UD</p>
+              <div class="error-exp">
+                <p class="tag error text-align-center">UD</p>
+                <span class="error-exp-details"><strong>Unnecessary Detection: </strong><br> The model made a prediction for "{{match.model_prediction.label|title}}" that seems less important to the user.</span>
+              </div>
             {% elif match.true_positive %}
-              <p class="tag ok text-align-center">CD</p>
+
+            <div class="ok-exp">
+                <p class="tag ok text-align-center">CD</p>
+                <span class="ok-exp-details"><strong>Correct Detection: </strong><br> The model correctly predicted this object.</span>
+              </div>
             {% elif match.false_detection %}
-              <p class="tag error text-align-center">FD</p>
+              <div class="error-exp">
+                <p class="tag error text-align-center">FD</p>
+                <span class="error-exp-details"><strong>False Detection: </strong><br> The model predicted "{{match.model_prediction.label|title}}" instead of "{{match.expectation.label}}".</span>
+              </div>
             {% endif %}
           </td>
           <td>
             {% if match.indistribution %}
+            <div class="info-exp">
               <p class="tag info text-align-center">ID</p>
+              <span class="info-exp-details"><strong>In-distribution: </strong><br> "{{match.expectation.label}}" lies within the capabilities of the model.</span>
+            </div>
+
             {% elif match.outofdistribution %}
+              <div class="info-exp">
               <p class="tag info text-align-center">OOD</p>
+              <span class="info-exp-details"><strong>Out-of-distribution: </strong><br> "{{match.expectation.label}}" does not lie within the capabilities of the model.</span>
+            </div>
             {% endif %}
           </td>
           <td>
             {% if match.critical_quality_score %}
+              <div class="warning-exp">
                 <p class="tag warning text-align-center">CQS</p>
+                <span class="warning-exp-details"><strong>Critical quality of score: </strong><br> The certainty for prediction "{{match.model_prediction.label|title}}" is below 95%.</span>
+              </div>
             {% elif match.critical_quality_box %}
+              <div class="warning-exp">
                 <p class="tag warning text-align-center">CQB</p>
+                <span class="warning-exp-details"><strong>Critical quality of boxes:</strong> <br>The boxes of "{{match.expectation.label}}" and "{{match.model_prediction.label|title}}" don't quite overlap.</span>
+              </div>
             {% endif %}
           </td>
           <td>
@@ -91,14 +109,6 @@
 
 
 
-    {% if sample.has_failure %}
-      <div class="row">
-        <button type="submit" name="done_or_continue" value="C" class="btn primary margin-top-small margin-right margin-bottom-large" style="width: 30%">
-          Save
-        </button>
-      </div>
-      </form>
 
-    {% endif %}
 <! --  END MATCH -->
   </div> <! -- END FAILURE ANALYSIS-->

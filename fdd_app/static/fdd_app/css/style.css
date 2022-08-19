@@ -758,3 +758,105 @@ nav ul,nav li {
 .dz:hover {
     background-color: var(--lightpurple)  !important;
 }
+
+/* Explanations */
+.error-exp {
+  position: relative;
+  display: inline-block;
+}
+
+.error-exp .error-exp-details {
+  visibility: hidden;
+  width: 400px;
+  background-color: red;
+  color: #fff;
+  border-radius: 2px;
+  padding: 5px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 0%;
+  margin-bottom: 2px;
+}
+
+.error-exp:hover .error-exp-details {
+  visibility: visible;
+}
+
+.info-exp {
+  position: relative;
+  display: inline-block;
+}
+
+.info-exp .info-exp-details {
+  visibility: hidden;
+  width: 350px;
+  background-color: blue;
+  color: #fff;
+  border-radius: 2px;
+  padding: 5px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 0%;
+  margin-bottom: 2px;
+}
+
+.info-exp:hover .info-exp-details {
+  visibility: visible;
+}
+
+.warning-exp {
+  position: relative;
+  display: inline-block;
+}
+
+.warning-exp .warning-exp-details {
+  visibility: hidden;
+  width: 300px;
+  background-color: orange;
+  color: #fff;
+  border-radius: 2px;
+  padding: 5px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 0%;
+  margin-bottom: 2px;
+}
+
+.warning-exp:hover .warning-exp-details {
+  visibility: visible;
+}
+
+.ok-exp {
+  position: relative;
+  display: inline-block;
+}
+
+.ok-exp .ok-exp-details {
+  visibility: hidden;
+  width: 400px;
+  background-color: green;
+  color: #fff;
+  border-radius: 2px;
+  padding: 5px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 0%;
+  margin-bottom: 2px;
+}
+
+.ok-exp:hover .ok-exp-details {
+  visibility: visible;
+}
+

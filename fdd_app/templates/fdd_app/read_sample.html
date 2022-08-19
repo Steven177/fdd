@@ -32,6 +32,7 @@
 
       <div class="col-8 margin-top-large">
         <div class="row whitebackground padding20px margin-bottom-small">
+            {% block model_dropdown %}{% include 'fdd_app/model_dropdown.html' %}{% endblock model_dropdown %}
             {% block query_form %}{% include 'fdd_app/query_form.html' %}{% endblock query_form %}
         </div>
 
@@ -48,14 +49,34 @@
           </div>
         </div>
               <div class="row margin-top-large">
-                <div class="col-12">
-                  <h2 class="purple-color">Model Prediction</h2>
+                <h2 class="purple-color">Model Prediction</h2>
+                <div class="col-6">
                   {% block model_prediction %}{% include 'fdd_app/model_prediction.html' %}{% endblock model_prediction %}
+                </div>
+                <div class="col-6">
+                  {% if model_predictions|length == 0 and expectations|length > 0 %}
+                    <div class="error-exp">
+                      <p class="tag error text-align-center">FTO</p>
+                      <span class="error-exp-details"><strong>Failing to observe: </strong><br> The model was not able to detect any object.</span>
+                    </div>
+                  {% endif %}
                 </div>
               </div>
               <div class="row margin-top-large">
                 <h2 class="purple-color">Failure Engine</h2>
                 {% block failure_engine %}{% include 'fdd_app/failure_engine.html' %}{% endblock failure_engine %}
+                <h2 class="purple-color">Suggestion</h2>
+                {% block suggestion %}{% include 'fdd_app/suggestion.html' %}{% endblock suggestion %}
+
+                {% if sample.has_failure %}
+                  <div class="row">
+                    <button type="submit" name="done_or_continue" value="C" class="btn primary margin-top-small margin-right margin-bottom-large" style="width: 30%">
+                      Save
+                    </button>
+                  </div>
+                  </form>
+
+                {% endif %}
               </div>
             {% elif not sample.labelled %}
               {% block write_expectation %}{% include 'fdd_app/write_expectation.html' %}{% endblock write_expectation %}
