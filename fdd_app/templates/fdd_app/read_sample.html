@@ -55,9 +55,9 @@
                 </div>
                 <div class="col-6">
                   {% if model_predictions|length == 0 and expectations|length > 0 %}
-                    <div class="error-exp">
-                      <p class="tag error text-align-center">FTO</p>
-                      <span class="error-exp-details"><strong>Failing to observe: </strong><br> The model was not able to detect any object.</span>
+                    <div class="warning-exp">
+                      <p class="tag warning text-align-center">FTO</p>
+                      <span class="warning-exp-details"><strong>Failing to observe: </strong><br> The model was not able to detect any object.</span>
                     </div>
                   {% endif %}
                 </div>

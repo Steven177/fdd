@@ -1,0 +1,10 @@
+{% for p in personas %}
+  <div class="{% if p.id == persona.id %}myactive mycard hovershaddow{% else %}mycard hovershaddow{%endif%} margin-bottom-small position-relative d-flex">
+    <img class="thumb margin-right-small" src="{{p.image.url}}" alt="/media/personas/default_persona.jpeg">
+    <div>
+      <h5>{{p.name}}</h5>
+      <p>{{p.description}}</p>
+    </div>
+    <a class="stretched-link" href="/fdd_app/persona={{p.id}}/create_scenarios"></a>
+  </div>
+{% endfor %}

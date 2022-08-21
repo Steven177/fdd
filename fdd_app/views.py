@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.http import QueryDict
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
+from django.db.models import Q
 
 
 from .forms import PersonaForm, ScenarioForm, QueryForm
@@ -123,7 +124,7 @@ def file_upload(request, persona_id):
     pil_img = Image.open(s.image)
 
     b = T.functional.adjust_brightness(pil_img, np.random.randint(2, 3))
-    c = T.functional.adjust_contrast(pil_img, np.random.randint(1, 2))
+    c = T.functional.adjust_contrast(pil_img, np.random.randint(3, 4))
     g = T.functional.gaussian_blur(pil_img, kernel_size=(31, 27), sigma=(100))
     r = T.functional.rotate(pil_img, np.random.randint(20, 360))
     h = T.functional.adjust_brightness(pil_img, np.random.uniform(0.2, 0.6))
@@ -511,6 +512,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
       if len(expectations) > 0 and len(model_predictions) > 0:
         l1_cost_mat = calculate_l1_loss(expectations, model_predictions, sample)
+
         giou_cost_mat = generalized_box_iou_loss(expectations, model_predictions)
         loss_box = calculate_box_loss(giou_cost_mat, l1_cost_mat)
 
@@ -520,6 +522,8 @@ def read_sample(request, persona_id, scenario_id, sample_id):
         loss_matching = calculate_matching_loss(loss_box, loss_labels)
         # Hungarian algorithm
         exp_ind, pred_ind = linear_sum_assignment(loss_matching)
+        print("exp_ind {}".format(exp_ind))
+        print("pred_ind {}".format(pred_ind))
         matching_cost = loss_matching[exp_ind, pred_ind].sum()
 
       else:
@@ -535,6 +539,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
         # boxes need at least 0.2 IoU to be a match
         iou = calculate_iou(exp, pred)
+        print("iou {}".format(iou))
 
         if iou >= 0.2:
           new_match = Match(sample=sample, expectation=exp, exp_idx=exp_idx, model_prediction=pred, pred_idx=pred_idx)
@@ -850,11 +855,72 @@ def failure_exploration(request, persona_id, scenario_id, sample_id):
 # FAILURE BOOK
 ###################
 @csrf_exempt
-def failure_analysis(request):
-  # ENGINEERING CORNER
+def failure_analysis(request, persona_id):
   # [sample: {'expectation', 'model_prediction'}]
+  personas = Persona.objects.all().order_by("-id")
+  persona = Persona.objects.get(id=persona_id)
+
+  # ERRORS
+  matches_per_persona = Match.objects.filter(sample__persona__id__exact = persona_id)
+  len_matches = len(matches_per_persona)
+  len_CD = Match.objects.filter(sample__persona__id__exact=persona_id, true_positive=True).count()
+  len_FD = Match.objects.filter(sample__persona__id__exact=persona_id, false_detection=True).count()
+  len_MD = Match.objects.filter(sample__persona__id__exact=persona_id, missing_detection=True).count()
+  len_UD = Match.objects.filter(sample__persona__id__exact=persona_id, unnecessary_detection=True).count()
+
+  # WARNINGS
+  len_FTD= Match.objects.filter(sample__persona__id__exact=persona_id, failing_to_detect=True).count()
+  len_CQB = Match.objects.filter(sample__persona__id__exact=persona_id, critical_quality_box=True).count()
+  len_CQS = Match.objects.filter(sample__persona__id__exact=persona_id, critical_quality_score=True).count()
+  len_warnings = len_FTD + len_CQB + len_CQS
+  # INFOS
+  len_ID = Match.objects.filter(sample__persona__id__exact=persona_id, indistribution=True).count()
+  len_OOD = Match.objects.filter(sample__persona__id__exact=persona_id, outofdistribution=True).count()
+  len_infos = len_ID + len_OOD
+
+  print("############")
+  print(matches_per_persona)
+  print("############")
+  num_sev = 0
+  total_sev = 0
+
+  for m in matches_per_persona:
+    if m.failure_severity != 0:
+     num_sev += 1
+     total_sev += m.failure_severity
+
+  if num_sev != 0:
+    average_sev = total_sev / num_sev
+  else:
+    average_sev = 0
+
+  return render(request, 'fdd_app/failure_analysis.html',
+    {
+    'personas': personas,
+    'persona': persona,
+    'matches_per_persona': matches_per_persona,
+    'len_matches': len_matches,
+    'len_warnings': len_warnings,
+    'len_infos': len_infos,
+    'len_CD': len_CD,
+    'len_FD': len_FD,
+    'len_MD': len_MD,
+    'len_UD': len_UD,
+    'len_FTD': len_FTD,
+    'len_CQB': len_CQB,
+    'len_CQS': len_CQS,
+    'len_ID': len_ID,
+    'len_OOD': len_OOD,
+    'average_sev': average_sev
+    })
+
+
+
+def read_ai(request):
+  return render(request, 'fdd_app/read_ai.html')
+
+def data(request):
   colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
-  ais = Ai.objects.all()
   finetuning = []
   retraining = []
   samples = Sample.objects.all()
@@ -864,21 +930,11 @@ def failure_analysis(request):
     model_preds = sample.model_prediction_set.all()
     finetuning.append({'sample': sample, 'expectations': indist_exps, 'model_predictions': model_preds})
     retraining.append({'sample': sample, 'expectations': exps, 'model_predictions': model_preds})
-
-  # DESIGN CORNER
-
-  return render(request, 'fdd_app/failure_analysis.html',
+  return render(request, 'fdd_app/data.html',
     {
     'samples': samples,
     'finetuning': finetuning,
     'retraining': retraining,
     'colors': colors,
-    'ais': ais
     })
-
-
-
-def read_ai(request):
-  return render(request, 'fdd_app/read_ai.html')
-
 

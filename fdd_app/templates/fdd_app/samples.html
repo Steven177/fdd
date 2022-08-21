@@ -22,10 +22,8 @@
 </head>
 
 <body class="font greybackground">
-
   {% block sidebar2 %}{% include 'fdd_app/sidebar2.html' %}{% endblock sidebar2 %}
-
-  <{% block navbar %}{% include 'fdd_app/navbar.html' %}{% endblock navbar %}
+  {% block navbar %}{% include 'fdd_app/navbar.html' %}{% endblock navbar %}
 
   <div class="container">
     {% block p_and_s %}{% include 'fdd_app/p_and_s.html' %}{% endblock p_and_s %}
@@ -41,14 +39,14 @@
           {% for sa in samples %}
             <div class="col-3">
               <div class="d-flex">
+                <!--
                 <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sa.id}}/update_sample">
                   <i class="fa-solid fa-pen-to-square link-black"></i>
                 </a>
-                {% if sa.uploaded == False %}
+                -->
                 <a class="" href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sa.id}}/delete_sample">
                   <i class="fa-solid fa-trash-can link-black margin-left-small"></i>
                 </a>
-                {% endif %}
               </div>
               <a href="/fdd_app/persona={{persona.id}}/scenario={{scenario.id}}/sample={{sa.id}}/read_sample" class="">
                 <img id="{{sa.id}}" class="border-radius img-fluid library-img margin-bottom-small hovershaddow" src="{{sa.image.url}}" draggable="true">

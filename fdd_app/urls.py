@@ -22,9 +22,10 @@ urlpatterns = [
     path('persona=<int:persona_id>/scenario=<int:scenario_id>/sample=<int:sample_id>/delete_sample', views.delete_sample, name='delete_sample'),
     path('persona=<int:persona_id>/scenario=<int:scenario_id>/sample=<int:sample_id>/failure_exploration', views.failure_exploration, name='failure_exploration'),
 
-    path('failure_analysis', views.failure_analysis, name='failure_analysis'),
-
+    path('persona=<int:persona_id>/failure_analysis', views.failure_analysis, name='failure_analysis'),
     path('read_ai', views.read_ai, name='read_ai'),
+
+    path('data', views.data, name='data')
 
 ]
 

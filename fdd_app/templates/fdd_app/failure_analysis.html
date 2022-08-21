@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Failure Book</title>
+  <title>Failure Analysis</title>
     {% load static %}
     {% load mathfilters %}
     {% load index %}
+    {% load times %}
     <link rel="stylesheet" type="text/css" href="{% static 'fdd_app/css/style.css' %}">
 
     <! -- fonts -->
@@ -33,177 +34,278 @@
 
 
   <div class="container">
-    <ul class="nav nav-tabs margin-top-large">
-      <li class="nav-item">
-          <a href="#design_corner" class="nav-link active colorblack" data-bs-toggle="tab"><h2>Failure Analysis</h2></a>
-      </li>
-      <li class="nav-item">
-          <a href="#engineering_corner" class="nav-link colorblack" data-bs-toggle="tab"><h2>Labelled Data</h2></a>
-      </li>
-    </ul>
-    <div class="tab-content">
-      <! -- ENGINEERING CORNER  -->
-      <div class="tab-pane fade" id="design_corner">
-        <p>Canvas</p>
-      </div>
-    </div>
+    <div class="row margin-top-large">
 
-    <div class="tab-content">
-      <! -- ENGINEERING CORNER  -->
-      <div class="tab-pane fade" id="engineering_corner">
-        <ul class="nav nav-tabs" id="myTab2">
+
+    <! -- LEFT -->
+      <div class="col-4">
+        {% for p in personas %}
+          <div class="{% if p.id == persona.id %}myactive mycard hovershaddow{% else %}mycard hovershaddow{%endif%} margin-bottom-small position-relative d-flex">
+            <img class="thumb margin-right-small" src="{{p.image.url}}" alt="/media/personas/default_persona.jpeg">
+            <div>
+              <h5>{{p.name}}</h5>
+              <p>{{p.description}}</p>
+            </div>
+            <a class="stretched-link" href="/fdd_app/persona={{p.id}}/failure_analysis"></a>
+          </div>
+        {% endfor %}
+      </div>
+
+      <! -- RIGHT -->
+      <div class="col-8">
+        <ul class="nav nav-tabs">
           <li class="nav-item">
-              <a href="#finetuning" class="nav-link active colorblack" data-bs-toggle="tab">Finetuning</a>
+              <a href="#model1" class="nav-link active colorblack" data-bs-toggle="tab"><h5>DETR</h5></a>
           </li>
           <li class="nav-item">
-              <a href="#retraining" class="nav-link colorblack" data-bs-toggle="tab">Retraining</a>
+              <a href="#model2" class="nav-link colorblack" data-bs-toggle="tab"><h5>TBD</h5></a>
           </li>
         </ul>
 
         <div class="tab-content">
-
-          <! -- FINETUNING  -->
-          <div class="tab-pane fade show active" id="finetuning">
-            <button class="btn secondary margin-top-small">Export data & labels as csv</button>
-
-            {% for item in finetuning %}
-            <div class="row margin-top-small">
-              <! -- Model prediction -->
-              <div class="col-4">
-                <p><strong>Model Prediction</strong></p>
-                <div class="position-relative">
-                  <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
-
-                  {% for model_prediction in item.model_predictions %}
-                    <rect id="" class="box normalBox" x={{model_prediction.xmin}} y={{model_prediction.ymin}} width={{model_prediction.xmax|sub:model_prediction.xmin}} height={{model_prediction.ymax|sub:model_prediction.ymin}} style="stroke:{{colors|index:forloop.counter0 }};fill-opacity:0">
-                    </rect>
-                  {% endfor %}
-                  </svg>
-                  <img src="{{item.sample.image.url}}" class="border-radius">
-                </div>
-                  {% for model_prediction in item.model_predictions %}
-                    <i class="fa-solid fa-square" style="color: {{ colors|index:forloop.counter0 }}"></i>
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="d-flex justify-content-between">
-                        <p> {{ model_prediction.label|title}} </p>
-                      </div>
-                    </div>
-                  {% endfor %}
+          <! -- MODEL 1  -->
+          <div class="tab-pane active margin-top-small" id="model1">
+            <h2 class="purple-color">Disaggregated Failure Metrics</h2>
+            <div class="row">
+              <div class="d-flex align-items-center">
+                <p class="margin-right-small">Average failure severity:</p>
+                <p class="{% if average_sev > 5 %}red_sev{% elif average_sev == 0 %}grey_sev{%else%}orange_sev{%endif%}">{{average_sev|floatformat:1}}</p>
               </div>
-
-              <! -- User-centric ground truth -->
-              <div class="col-4">
-                <p><strong>User-centric ground truth</strong></p>
-                {% if item.expectations|length == 0 %}
-                      <h1>😔</h1>
-                      <p> Not labelled yet</p>
-                {% else %}
-                  <div class="position-relative">
-                    <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
-
-                        {% for expectation in item.expectations %}
-                          <rect id="" class="box normalBox" x={{expectation.xmin}} y={{expectation.ymin}} width={{expectation.xmax|sub:expectation.xmin}} height={{expectation.ymax|sub:expectation.ymin}} style="stroke:{{colors|index:forloop.counter0 }};fill-opacity:0">
-                          </rect>
-                        {% endfor %}
-                        </svg>
-                        <img src="{{item.sample.image.url}}" class="border-radius">
-                      </div>
-                        {% for expectation in item.expectations %}
-                          <i class="fa-solid fa-square" style="color: {{colors|index:forloop.counter0 }}"></i>
-                          <div class="d-flex justify-content-between align-items-center">
-                            <div class="d-flex justify-content-between">
-                              <p> {{ expectation.label|title}} </p>
-                            </div>
-                          </div>
-                        {% endfor %}
-                    {% endif %}
-              </div>
+              <! -- ERRORS  -->
               <div class="col-4">
 
-              </div>
-
-            </div>
-            {% endfor %}
-
-          </div> <! -- END FINETUNING  -->
-
-
-
-          <! -- RETRAINING  -->
-          <div class="tab-pane fade show" id="retraining">
-            <button class="btn secondary margin-top-small">Export data & labels as csv</button>
-
-
-            {% for item in retraining %}
-            <div class="row margin-top-small">
-              <! -- Model prediction -->
-              <div class="col-4">
-                <p><strong>Model Prediction</strong></p>
-                <div class="position-relative">
-                  <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
-
-                  {% for model_prediction in item.model_predictions %}
-                    <rect id="" class="box normalBox" x={{model_prediction.xmin}} y={{model_prediction.ymin}} width={{model_prediction.xmax|sub:model_prediction.xmin}} height={{model_prediction.ymax|sub:model_prediction.ymin}} style="stroke:{{colors|index:forloop.counter0 }};fill-opacity:0">
-                    </rect>
-                  {% endfor %}
-                  </svg>
-                  <img src="{{item.sample.image.url}}" class="border-radius">
-                </div>
-                  {% for model_prediction in item.model_predictions %}
-                    <i class="fa-solid fa-square" style="color: {{ colors|index:forloop.counter0 }}"></i>
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="d-flex justify-content-between">
-                        <p> {{ model_prediction.label|title}} </p>
-                      </div>
-                    </div>
-                  {% endfor %}
-              </div>
-
-              <! -- User-centric ground truth -->
-              <div class="col-4">
-                <p><strong>User-centric ground truth</strong></p>
-                 {% if item.expectations|length == 0 %}
-                      <h1>😔</h1>
-                      <p> Not labelled yet</p>
-                {% else %}
-                  <div class="position-relative">
-                    <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
-
-                    {% for expectation in item.expectations %}
-                      <rect id="" class="box normalBox" x={{expectation.xmin}} y={{expectation.ymin}} width={{expectation.xmax|sub:expectation.xmin}} height={{expectation.ymax|sub:expectation.ymin}} style="stroke:{{colors|index:forloop.counter0 }};fill-opacity:0">
-                      </rect>
-                    {% endfor %}
-                    </svg>
-                    <img src="{{item.sample.image.url}}" class="border-radius">
+                <div class="d-flex margin-bottom-small">
+                  <div class="ok-exp margin-right-small">
+                    <p class="tag ok text-align-center">CD</p>
+                    <span class="ok-exp-details"><strong>Correct Detection: </strong><br> The model correctly predicted this object.</span>
                   </div>
-                    {% for expectation in item.expectations %}
-                      <i class="fa-solid fa-square" style="color: {{colors|index:forloop.counter0 }}"></i>
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex justify-content-between">
-                          <p> {{ expectation.label|title}} </p>
-                        </div>
-                      </div>
+
+                  <div class="margin-right-small">
+                  {% if len_matches > 0 %}
+                    {% for m in matches_per_persona %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_CD%}
+                      green{%else%}grey{%endif%}"></i>
                     {% endfor %}
-                {% endif %}
+                  </div>
+                    <div class="">
+                      <p>{{len_CD| div:len_matches | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                  {% else %}
+                  </div>
+                    <div class="">
+                      <p>0%</p>
+                    </div>
+                  {% endif %}
+                  </div>
+
+                <div class="d-flex margin-bottom-small">
+                  <div class="error-exp margin-right-small"">
+                    <p class="tag error text-align-center">FD</p>
+                    <span class="error-exp-details"><strong>False Detection: </strong><br> The model predicted something else.</span>
+                  </div>
+
+                  <div class="margin-right-small">
+                  {% if len_matches > 0 %}
+                    {% for m in matches_per_persona %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_FD%}
+                      red{%else%}grey{%endif%}"></i>
+                    {% endfor %}
+                  </div>
+                    <div class="">
+                      <p>{{len_FD| div:len_matches | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                    {% else %}
+                  </div>
+                      <div class="">
+                        <p>0%</p>
+                      </div>
+                  {% endif %}
+                </div>
+
+                <div class="d-flex margin-bottom-small">
+                  <div class="error-exp margin-right-small"">
+                    <p class="tag error text-align-center">MD</p>
+                    <span class="error-exp-details"><strong>Missing Detection:</strong><br> The model did not provide a prediction for an object the user expected.</span>
+                  </div>
+
+                  <div class="margin-right-small">
+                  {% if len_matches > 0 %}
+                    {% for m in matches_per_persona %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_MD%}
+                      red{%else%}grey{%endif%}"></i>
+                    {% endfor %}
+                  </div>
+                    <div class="">
+                      <p>{{len_MD| div:len_matches | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                  {% else %}
+                  </div>
+                    <div class="">
+                      <p>0%</p>
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="d-flex margin-bottom-small">
+                  <div class="error-exp margin-right-small">
+                    <p class="tag error text-align-center">UD</p>
+                    <span class="error-exp-details"><strong>Unnecessary Detection: </strong><br> The model made a prediction for that seems less important to the user.</span>
+                  </div>
+
+                  <div class="margin-right-small">
+                  {% if len_matches > 0 %}
+                    {% for m in matches_per_persona %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_UD%}
+                      red{%else%}grey{%endif%}"></i>
+                    {% endfor %}
+                  </div>
+                    <div class="">
+                      <p>{{len_UD| div:len_matches | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                  {% else %}
+                  </div>
+                    <div class="">
+                      <p>0%</p>
+                    </div>
+                  {% endif %}
+                </div>
               </div>
+
+              <! -- WARNINGS  -->
               <div class="col-4">
+                <div class="d-flex margin-bottom-small">
+                  <div class="warning-exp margin-right-small">
+                    <p class="tag warning text-align-center">FTO</p>
+                    <span class="warning-exp-details"><strong>Failing to observe: </strong><br> The model was not able to detect any object.</span>
+                  </div>
+                  <div class="margin-right-small">
+                  {% if len_warnings > 0 %}
+                    {% for w in len_warnings|times %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_FTD%}
+                      orange{%else%}grey{%endif%}"></i>
+                    {% endfor %}
+                  </div>
+                    <div class="">
+                      <p>{{len_FTD| div:len_warnings | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                  {% else %}
+                  </div>
+                    <div class="">
+                      <p>0%</p>
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="d-flex margin-bottom-small">
+                  <div class="warning-exp margin-right-small">
+                    <p class="tag warning text-align-center">CQS</p>
+                    <span class="warning-exp-details"><strong>Critical quality of score: </strong><br> The certainty for a prediction is below 95%.</span>
+                  </div>
+                  <div class="margin-right-small">
+                  {% if len_warnings > 0 %}
+                    {% for w in len_warnings|times %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_CQS%}
+                      orange{%else%}grey{%endif%}"></i>
+                    {% endfor %}
+                  </div>
+                    <div class="">
+                      <p>{{len_CQS| div:len_warnings | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                  {% else %}
+                  </div>
+                    <div class="">
+                      <p>0%</p>
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="d-flex margin-bottom-small">
+                  <div class="warning-exp margin-right-small">
+                    <p class="tag warning text-align-center">CQB</p>
+                    <span class="warning-exp-details"><strong>Critical quality of boxes:</strong> <br>The boxes of between user expectation and model prediction don't quite overlap.</span>
+                  </div>
+                  <div class="margin-right-small">
+                  {% if len_warnings > 0 %}
+                    {% for w in len_warnings|times %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_CQB%}
+                      orange{%else%}grey{%endif%}"></i>
+                    {% endfor %}
+                  </div>
+                    <div class="">
+                      <p>{{len_CQB| div:len_warnings | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                  {% else %}
+                  </div>
+                    <div class="">
+                      <p>0%</p>
+                    </div>
+                  {% endif %}
+                </div>
 
               </div>
-
+              <! -- INFOS  -->
+              <div class="col-4">
+                <div class="d-flex margin-bottom-small">
+                  <div class="info-exp margin-right-small">
+                    <p class="tag info text-align-center">ID</p>
+                    <span class="info-exp-details"><strong>In-distribution: </strong><br> Object lies within the capabilities of the model.</span>
+                  </div>
+                  <div class="margin-right-small">
+                  {% if len_infos > 0 %}
+                    {% for i in len_infos|times %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_ID%}
+                      blue{%else%}grey{%endif%}"></i>
+                    {% endfor %}
+                  </div>
+                    <div class="">
+                      <p>{{len_ID| div:len_infos | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                  {% else %}
+                  </div>
+                    <div class="">
+                      <p>0%</p>
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="d-flex margin-bottom-small">
+                  <div class="info-exp margin-right-small">
+                    <p class="tag info text-align-center">OOD</p>
+                    <span class="info-exp-details"><strong>Out-of-distribution: </strong><br> Object does not lie within the capabilities of the model.</span>
+                  </div>
+                  <div class="margin-right-small">
+                  {% if len_infos > 0 %}
+                    {% for i in len_infos|times %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_OOD%}
+                      blue{%else%}grey{%endif%}"></i>
+                    {% endfor %}
+                  </div>
+                    <div class="">
+                      <p>{{len_OOD| div:len_infos | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                  {% else %}
+                  </div>
+                    <div class="">
+                      <p>0%</p>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
             </div>
-            {% endfor %}
 
+            <h2 class="purple-color">Failure Synthesis & Recovery</h2>
+            <p>canvas</p>
+          </div>
 
+          <! -- MODEL 2  -->
+          <div class="tab-pane" id="model2">
+            <p>TBSD</p>
 
+          </div>
+        </div>
 
-
-
-          </div> <! -- END RETRAINING  -->
-        </div> <! -- END Tab content  -->
-    </div> <! -- END ENGINEERING CORNER  -->
-  </div> <! -- End tab content  -->
-
-</div> <! -- Container -->
+      </div>
+    </div>
+  </div> <! -- Container -->
 
 </body>
 </html>
