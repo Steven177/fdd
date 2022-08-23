@@ -24,6 +24,10 @@
     <! -- jquery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
+    <! -- fabric-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js" integrity="sha512-1+czAStluVmzKLZD98uvRGNVbc+r9zLKV4KeAJmvikygfO71u3dtgo2G8+uB1JjCh2GVln0ofOpz9ZTxqJQX/w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.js" integrity="sha512-9SDRKbT29xuJwhBXLN21SuoCAnsqoxjglN180x4p65KXrVAD1/FT3OLmny24IVu0S7lNJ4Pnco7SNkwpWu3uPg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="lib/fabric.js"></script>
 
 </head>
 
@@ -96,7 +100,7 @@
                       <p>0%</p>
                     </div>
                   {% endif %}
-                  </div>
+                </div>
 
                 <div class="d-flex margin-bottom-small">
                   <div class="error-exp margin-right-small"">
@@ -171,6 +175,56 @@
                 </div>
               </div>
 
+
+              <! -- INFOS  -->
+              <div class="col-4">
+                <div class="d-flex margin-bottom-small">
+                  <div class="info-exp margin-right-small">
+                    <p class="tag info text-align-center">ID</p>
+                    <span class="info-exp-details"><strong>In-distribution: </strong><br> Object lies within the capabilities of the model.</span>
+                  </div>
+                  <div class="margin-right-small">
+                  {% if len_infos > 0 %}
+                    {% for i in len_infos|times %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_ID%}
+                      blue{%else%}grey{%endif%}"></i>
+                    {% endfor %}
+                  </div>
+                    <div class="">
+                      <p>{{len_ID| div:len_infos | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                  {% else %}
+                  </div>
+                    <div class="">
+                      <p>0%</p>
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="d-flex margin-bottom-small">
+                  <div class="info-exp margin-right-small">
+                    <p class="tag info text-align-center">OOD</p>
+                    <span class="info-exp-details"><strong>Out-of-distribution: </strong><br> Object does not lie within the capabilities of the model.</span>
+                  </div>
+                  <div class="margin-right-small">
+                  {% if len_infos > 0 %}
+                    {% for i in len_infos|times %}
+                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_OOD%}
+                      blue{%else%}grey{%endif%}"></i>
+                    {% endfor %}
+                  </div>
+                    <div class="">
+                      <p>{{len_OOD| div:len_infos | mul:100 |floatformat:0 }}%</p>
+                    </div>
+                  {% else %}
+                  </div>
+                    <div class="">
+                      <p>0%</p>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+
               <! -- WARNINGS  -->
               <div class="col-4">
                 <div class="d-flex margin-bottom-small">
@@ -194,7 +248,7 @@
                       <p>0%</p>
                     </div>
                   {% endif %}
-                </div>
+              </div>
 
                 <div class="d-flex margin-bottom-small">
                   <div class="warning-exp margin-right-small">
@@ -243,57 +297,34 @@
                 </div>
 
               </div>
-              <! -- INFOS  -->
-              <div class="col-4">
-                <div class="d-flex margin-bottom-small">
-                  <div class="info-exp margin-right-small">
-                    <p class="tag info text-align-center">ID</p>
-                    <span class="info-exp-details"><strong>In-distribution: </strong><br> Object lies within the capabilities of the model.</span>
-                  </div>
-                  <div class="margin-right-small">
-                  {% if len_infos > 0 %}
-                    {% for i in len_infos|times %}
-                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_ID%}
-                      blue{%else%}grey{%endif%}"></i>
-                    {% endfor %}
-                  </div>
-                    <div class="">
-                      <p>{{len_ID| div:len_infos | mul:100 |floatformat:0 }}%</p>
-                    </div>
-                  {% else %}
-                  </div>
-                    <div class="">
-                      <p>0%</p>
-                    </div>
-                  {% endif %}
-                </div>
-                <div class="d-flex margin-bottom-small">
-                  <div class="info-exp margin-right-small">
-                    <p class="tag info text-align-center">OOD</p>
-                    <span class="info-exp-details"><strong>Out-of-distribution: </strong><br> Object does not lie within the capabilities of the model.</span>
-                  </div>
-                  <div class="margin-right-small">
-                  {% if len_infos > 0 %}
-                    {% for i in len_infos|times %}
-                      <i class="fa-solid fa-square margin-top-zero {%if forloop.counter <= len_OOD%}
-                      blue{%else%}grey{%endif%}"></i>
-                    {% endfor %}
-                  </div>
-                    <div class="">
-                      <p>{{len_OOD| div:len_infos | mul:100 |floatformat:0 }}%</p>
-                    </div>
-                  {% else %}
-                  </div>
-                    <div class="">
-                      <p>0%</p>
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
             </div>
 
+            <p id="card" class="d-none">{{card}}</p>
             <h2 class="purple-color">Failure Synthesis & Recovery</h2>
-            <p>canvas</p>
+            <div class="d-flex margin-bottom-small">
+              <button id="group" class="btn secondary margin-right-small">Group</button>
+              <button id="ungroup" class="btn secondary margin-right-small">Ungroup</button>
+              <button id="delete_item" class="btn secondary margin-right-small"><i class="fa-solid fa-trash-can link-black"></i></button>
+              <a id="download" class="btn secondary" download="myImage.jpg" href="" onclick="download_img(this);"><i class="fa-solid fa-download"></i></a>
+            </div>
+            <div class="d-flex margin-bottom-small">
+              <button id="add_group_name" class="btn primary margin-right-small">Add group name</button>
+              <button id="add_rec" class="btn primary_gold margin-right-small">Add failure recovery <div class="rec-exp">
+                <i class="fa-solid fa-circle-info"></i>
+                <span class="rec-exp-details"><strong>Common failure recoveries</strong><br>  1. Communicate quality of output <br> 2. Show N-best options <br> 3. Hand-over control to the user <br> 4. Leverage implicit feedback <br> 5. Request explicit feedback <br> 6. Let user make correction <br> 7. Provide local explanation <br> 8. Provide global explanantion </span>
+              </div>
+            </button>
+
+
+            </div>
+
+            <canvas id="c" width="1000" height="1000"></canvas>
+
+            {% for m in matches_per_persona %}
+              <img id="exp_{{m.id}}" class="d-none" src="{{m.sample.image.url}}" >
+              <img id="pred_{{m.id}}" class="d-none" src="{{m.sample.image.url}}" >
+            {% endfor %}
+
           </div>
 
           <! -- MODEL 2  -->
@@ -301,8 +332,11 @@
             <p>TBSD</p>
 
           </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
       </div>
     </div>
   </div> <! -- Container -->
@@ -316,3 +350,4 @@
 <script src="{% static 'fdd_app/js/slider.js' %}"></script>
 <script src="{% static 'fdd_app/js/explanation.js' %}"></script>
 <script src="{% static 'fdd_app/js/hide.js' %}"></script>
+<script src="{% static 'fdd_app/js/canvas.js' %}"></script>

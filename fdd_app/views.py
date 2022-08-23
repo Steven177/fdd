@@ -894,6 +894,41 @@ def failure_analysis(request, persona_id):
   else:
     average_sev = 0
 
+  card = {}
+  for m in matches_per_persona:
+    if m.expectation != None:
+      exp_label = m.expectation.label
+      exp_box = {"xmin": m.expectation.xmin, "ymin": m.expectation.ymin, "xmax": m.expectation.xmax, "ymax": m.expectation.ymax}
+    else:
+      exp_label = ""
+      exp_box = ""
+
+    if m.model_prediction != None:
+      pred_label = m.model_prediction.label
+      pred_box = {"xmin": m.model_prediction.xmin, "ymin": m.model_prediction.ymin, "xmax": m.model_prediction.xmax, "ymax": m.model_prediction.ymax}
+    else:
+      pred_label = ""
+      pred_box = ""
+
+    card[m.id] = {
+    "exp_label": exp_label,
+    "exp_box": exp_box,
+    "pred_label":pred_label,
+    "pred_box": pred_box,
+    "tp": m.true_positive,
+    "fd": m.false_detection,
+    "md": m.missing_detection,
+    "ud": m.unnecessary_detection,
+    "ftd": m.failing_to_detect,
+    "cqs": m.critical_quality_score,
+    "cqb": m.critical_quality_box,
+    "id": m.indistribution,
+    "ood": m.outofdistribution,
+    "sev": m.failure_severity
+    }
+  card = json.dumps(card, indent = 4)
+
+
   return render(request, 'fdd_app/failure_analysis.html',
     {
     'personas': personas,
@@ -911,7 +946,8 @@ def failure_analysis(request, persona_id):
     'len_CQS': len_CQS,
     'len_ID': len_ID,
     'len_OOD': len_OOD,
-    'average_sev': average_sev
+    'average_sev': average_sev,
+    'card': card
     })
 
 

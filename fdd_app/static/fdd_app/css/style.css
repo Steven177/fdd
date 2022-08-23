@@ -19,6 +19,10 @@
   --darkgrey:  grey;
 }
 
+#c {
+
+}
+
 #id_name {
   width:  100%;
 }
@@ -349,6 +353,11 @@ a.disabled {
 /* buttons */
 .primary {
   background-color: var(--purple) !important;
+  color:  var(--white) !important;
+}
+
+.primary_gold {
+  background-color: var(--gold) !important;
   color:  var(--white) !important;
 }
 
@@ -906,4 +915,30 @@ nav ul,nav li {
 .ok-exp:hover .ok-exp-details {
   visibility: visible;
 }
+
+.rec-exp {
+  position: relative;
+  display: inline-block;
+}
+
+.rec-exp-details {
+  visibility: hidden;
+  width: 400px;
+  background-color: var(--gold);
+  color: #fff;
+  border-radius: 2px;
+  padding: 10px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: -100%;
+  margin-bottom: 6px;
+}
+
+.rec-exp:hover .rec-exp-details {
+  visibility: visible;
+}
+
 
