@@ -27,31 +27,18 @@
 </head>
 
 <body class="font greybackground">
-  {% block sidebar3 %}{% include 'fdd_app/sidebar3.html' %}{% endblock sidebar3 %}
 
   {% block navbar %}{% include 'fdd_app/navbar.html' %}{% endblock navbar %}
 
-
   <div class="container">
-    <ul class="nav nav-tabs margin-top-large">
-      <li class="nav-item">
-          <a href="#design_corner" class="nav-link active colorblack" data-bs-toggle="tab"><h2>Failure Analysis</h2></a>
-      </li>
-      <li class="nav-item">
-          <a href="#engineering_corner" class="nav-link colorblack" data-bs-toggle="tab"><h2>Labelled Data</h2></a>
-      </li>
-    </ul>
-    <div class="tab-content">
-      <! -- ENGINEERING CORNER  -->
-      <div class="tab-pane fade" id="design_corner">
-        <p>Canvas</p>
-      </div>
-    </div>
+    <form>
+      <input class="btn primary margin-top-small" type="button" value="Back" onclick="history.back()">
+    </form>
 
-    <div class="tab-content">
+
       <! -- ENGINEERING CORNER  -->
-      <div class="tab-pane fade" id="engineering_corner">
-        <ul class="nav nav-tabs" id="myTab2">
+      <div class="tab-pane margin-top-small" id="">
+        <ul class="nav nav-tabs" id="">
           <li class="nav-item">
               <a href="#finetuning" class="nav-link active colorblack" data-bs-toggle="tab">Finetuning</a>
           </li>
@@ -61,16 +48,23 @@
         </ul>
 
         <div class="tab-content">
-
           <! -- FINETUNING  -->
           <div class="tab-pane fade show active" id="finetuning">
-            <button class="btn secondary margin-top-small">Export data & labels as csv</button>
+            <button class="btn secondary margin-top-small margin-bottom-small">Export data & labels as csv</button>
 
+            <div class="row">
+              <div class="col-6">
+                <p><strong>Model Prediction</strong></p>
+              </div>
+              <div class="col-6">
+                <p><strong>User-centric ground truth</strong></p>
+              </div>
+            </div>
             {% for item in finetuning %}
             <div class="row margin-top-small">
               <! -- Model prediction -->
-              <div class="col-4">
-                <p><strong>Model Prediction</strong></p>
+              <div class="col-6">
+
                 <div class="position-relative">
                   <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
 
@@ -81,19 +75,24 @@
                   </svg>
                   <img src="{{item.sample.image.url}}" class="border-radius">
                 </div>
-                  {% for model_prediction in item.model_predictions %}
-                    <i class="fa-solid fa-square" style="color: {{ colors|index:forloop.counter0 }}"></i>
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="d-flex justify-content-between">
-                        <p> {{ model_prediction.label|title}} </p>
+                  {% for pred in item.model_predictions %}
+                    <div id="{{ forloop.counter0|add:100 }}" class="d-flex align-items-center margin-bottom-small pred">
+                      <div class=" margin-right-large">
+                        <i class="fa-solid fa-square margin-top-zero" style="color:{{ colors|index:forloop.counter0 }}"></i>
                       </div>
-                    </div>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <p class="margin-top-zero margin-right-large"> {{ pred.label|title}} </p>
+                          <p class="margin-top-zero"> {{ pred.score | mul:100 | floatformat:0 }}%  </p>
+                        </div>
+                      </div>
+                  </div>
                   {% endfor %}
               </div>
 
               <! -- User-centric ground truth -->
-              <div class="col-4">
-                <p><strong>User-centric ground truth</strong></p>
+              <div class="col-6">
+
                 {% if item.expectations|length == 0 %}
                       <h1>😔</h1>
                       <p> Not labelled yet</p>
@@ -108,17 +107,19 @@
                         </svg>
                         <img src="{{item.sample.image.url}}" class="border-radius">
                       </div>
-                        {% for expectation in item.expectations %}
-                          <i class="fa-solid fa-square" style="color: {{colors|index:forloop.counter0 }}"></i>
-                          <div class="d-flex justify-content-between align-items-center">
-                            <div class="d-flex justify-content-between">
-                              <p> {{ expectation.label|title}} </p>
+                        {% for exp in item.expectations %}
+                          <div class="d-flex justify-content-start margin-bottom-small">
+                            <div class="">
+                              <i class="fa-solid fa-square margin-right-large" style="color:{{ colors|index:forloop.counter0 }};"></i>
+                            </div>
+                            <div>
+                              <p class="margin-top-zero">{{exp.label}}</p>
                             </div>
                           </div>
                         {% endfor %}
                     {% endif %}
               </div>
-              <div class="col-4">
+              <div class="col-6">
 
               </div>
 
@@ -131,14 +132,22 @@
 
           <! -- RETRAINING  -->
           <div class="tab-pane fade show" id="retraining">
-            <button class="btn secondary margin-top-small">Export data & labels as csv</button>
+            <button class="btn secondary margin-top-small margin-bottom-small">Export data & labels as csv</button>
 
+            <div class="row">
+              <div class="col-6">
+                <p><strong>Model Prediction</strong></p>
+              </div>
+              <div class="col-6">
+                <p><strong>User-centric ground truth</strong></p>
+              </div>
+            </div>
 
             {% for item in retraining %}
             <div class="row margin-top-small">
               <! -- Model prediction -->
-              <div class="col-4">
-                <p><strong>Model Prediction</strong></p>
+              <div class="col-6">
+
                 <div class="position-relative">
                   <svg class="position-absolute" width="{{item.sample.image.width}}" height="{{item.sample.image.height}}" xmlns="http://www.w3.org/2000/svg">
 
@@ -149,19 +158,24 @@
                   </svg>
                   <img src="{{item.sample.image.url}}" class="border-radius">
                 </div>
-                  {% for model_prediction in item.model_predictions %}
-                    <i class="fa-solid fa-square" style="color: {{ colors|index:forloop.counter0 }}"></i>
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="d-flex justify-content-between">
-                        <p> {{ model_prediction.label|title}} </p>
+                  {% for pred in item.model_predictions %}
+                    <div id="{{ forloop.counter0|add:100 }}" class="d-flex align-items-center margin-bottom-small pred">
+                      <div class=" margin-right-large">
+                        <i class="fa-solid fa-square margin-top-zero" style="color:{{ colors|index:forloop.counter0 }}"></i>
                       </div>
-                    </div>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <p class="margin-top-zero margin-right-large"> {{ pred.label|title}} </p>
+                          <p class="margin-top-zero"> {{ pred.score | mul:100 | floatformat:0 }}%  </p>
+                        </div>
+                      </div>
+                  </div>
                   {% endfor %}
               </div>
 
               <! -- User-centric ground truth -->
-              <div class="col-4">
-                <p><strong>User-centric ground truth</strong></p>
+              <div class="col-6">
+
                  {% if item.expectations|length == 0 %}
                       <h1>😔</h1>
                       <p> Not labelled yet</p>
@@ -176,27 +190,24 @@
                     </svg>
                     <img src="{{item.sample.image.url}}" class="border-radius">
                   </div>
-                    {% for expectation in item.expectations %}
-                      <i class="fa-solid fa-square" style="color: {{colors|index:forloop.counter0 }}"></i>
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex justify-content-between">
-                          <p> {{ expectation.label|title}} </p>
-                        </div>
-                      </div>
-                    {% endfor %}
+                     {% for exp in item.expectations %}
+                          <div class="d-flex justify-content-start margin-bottom-small">
+                            <div class="">
+                              <i class="fa-solid fa-square margin-right-large" style="color:{{ colors|index:forloop.counter0 }};"></i>
+                            </div>
+                            <div>
+                              <p class="margin-top-zero">{{exp.label}}</p>
+                            </div>
+                          </div>
+                        {% endfor %}
                 {% endif %}
               </div>
-              <div class="col-4">
+              <div class="col-6">
 
               </div>
 
             </div>
             {% endfor %}
-
-
-
-
-
 
           </div> <! -- END RETRAINING  -->
         </div> <! -- END Tab content  -->

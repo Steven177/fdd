@@ -175,6 +175,7 @@ def check_quality_of_score(score, threshold=0.95):
 
 
 def call_google_api(q):
+  print(os.environ['GOOGLE_API_TOKEN'])
   params = {
   "api_key": os.environ['GOOGLE_API_TOKEN'],
   "engine": "google",
@@ -185,8 +186,10 @@ def call_google_api(q):
   "hl": "en",
   "tbm": "isch"
   }
-
+  print("starting search")
   search = GoogleSearch(params)
+  print("search {}".format(search))
+  print("search get dict {}".format(search.get_dict()))
   return search.get_dict()
 
 

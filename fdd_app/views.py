@@ -319,17 +319,7 @@ def samples(request, persona_id, scenario_id):
       else:
         print('Image Couldn\'t be retrieved')
 
-    return render(request, 'fdd_app/samples.html',
-      {
-      'latest_persona': lastest_persona,
-      'latest_scenario': latest_scenario,
-      'query_form': query_form,
-      'samples': samples,
-      'persona': persona,
-      'scenario': scenario,
-      'ais': ais,
-      'p_and_s': p_and_s
-      })
+    return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
 
   # GET samples
   else:
@@ -376,6 +366,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
   # POST automatic
   if request.method == "POST" and query_form.is_valid():
+    print("Starting")
 
     # Google API
     qf = query_form.save(commit=False)
@@ -384,6 +375,8 @@ def read_sample(request, persona_id, scenario_id, sample_id):
     qf.save()
 
     query = Query.objects.latest('id')
+
+
     results = call_google_api(query.input_query)
 
     image_results = results['images_results']
@@ -398,10 +391,12 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(title), persona=persona, scenario=scenario, generated=True)
       image1.save()
 
+
     # DALLE
     client = replicate.Client(api_token=os.environ['REPLICATE_API_TOKEN'])
     model = client.models.get("kuprel/min-dalle")
     generated_image = model.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
+
     for url in generated_image:
       sample = Sample.objects.latest('id')
       file_name = 'media/images/{}.jpg'.format(sample.id + 1)
@@ -416,19 +411,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       else:
         print('Image Couldn\'t be retrieved')
 
-    return render(request, 'fdd_app/samples.html',
-      {
-      'not_tested': not_tested,
-      'write_expectation': write_expectation,
-      'latest_persona': lastest_persona,
-      'latest_scenario': latest_scenario,
-      'query_form': query_form,
-      'samples': samples,
-      'persona': persona,
-      'scenario': scenario,
-      'ais': ais,
-      'p_and_s': p_and_s
-      })
+    return redirect('/fdd_app/persona={}/scenario={}/sample={}/read_sample'.format(persona_id, scenario_id, sample_id))
 
   # POST Failure form
   elif request.method == "POST" and 'failure_severity' in request.POST:
@@ -860,6 +843,8 @@ def failure_analysis(request, persona_id):
   personas = Persona.objects.all().order_by("-id")
   persona = Persona.objects.get(id=persona_id)
 
+  latest_scenario = Scenario.objects.latest('id')
+
   # ERRORS
   matches_per_persona = Match.objects.filter(sample__persona__id__exact = persona_id)
   len_matches = len(matches_per_persona)
@@ -931,6 +916,7 @@ def failure_analysis(request, persona_id):
 
   return render(request, 'fdd_app/failure_analysis.html',
     {
+    'latest_scenario': latest_scenario,
     'personas': personas,
     'persona': persona,
     'matches_per_persona': matches_per_persona,
