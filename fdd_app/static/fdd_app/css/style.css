@@ -19,8 +19,8 @@
   --darkgrey:  grey;
 }
 
-#c {
-
+.no-border {
+  border:  none;
 }
 
 #id_name {

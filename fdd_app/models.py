@@ -71,6 +71,14 @@ class Match(models.Model):
   failure_severity = models.IntegerField(default=0, blank=True)
   failure_effects = models.CharField(max_length=200, blank=True)
 
+class Suggestion(models.Model):
+  sample = models.ForeignKey(Sample, on_delete=models.CASCADE, blank=True, default=None)
+  match = models.ForeignKey(Match, on_delete=models.CASCADE, blank=True)
+  name = models.CharField(max_length=500, blank=True)
+  challenge = models.BooleanField(default=False, blank=True)
+  guide = models.BooleanField(default=False, blank=True)
+  challenge_again = models.BooleanField(default=False, blank=True)
+
 """
 class Failure(models.Model):
   # samples = models.ManyToManyField(Sample, blank=True)

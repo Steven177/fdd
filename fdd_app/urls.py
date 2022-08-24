@@ -12,6 +12,7 @@ urlpatterns = [
     path('persona=<int:persona_id>/create_scenarios', views.create_scenarios, name='create_scenarios'),
 
     path('persona=<int:persona_id>/upload/', views.file_upload, name='file_upload'),
+    path('persona=<int:persona_id>/scenario=<int:scenario_id>/sample=<int:sample_id>/augmentations', views.augmentations, name='augmentations'),
 
     path('persona=<int:persona_id>/scenario=<int:scenario_id>/update_scenario', views.update_scenario, name='update_scenario'),
     path('persona=<int:persona_id>/scenario=<int:scenario_id>/delete_scenario', views.delete_scenario, name='delete_scenario'),

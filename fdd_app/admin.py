@@ -9,6 +9,7 @@ from .models import Ai
 from .models import Persona
 from .models import Scenario
 from .models import Query
+from .models import Suggestion
 
 admin.site.register(Sample)
 admin.site.register(Expectation)
@@ -18,4 +19,5 @@ admin.site.register(Ai)
 admin.site.register(Persona)
 admin.site.register(Scenario)
 admin.site.register(Query)
+admin.site.register(Suggestion)
 

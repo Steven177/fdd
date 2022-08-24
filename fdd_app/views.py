@@ -18,7 +18,7 @@ from django.db.models import Q
 from .forms import PersonaForm, ScenarioForm, QueryForm
 #from .forms import FailureForm
 
-from .models import Sample, Expectation, Model_Prediction, Match, Ai, Persona, Scenario, Query
+from .models import Sample, Expectation, Model_Prediction, Match, Ai, Persona, Scenario, Query, Suggestion
 
 from .utils import *
 from .ai import *
@@ -118,48 +118,6 @@ def file_upload(request, persona_id):
     scenario = Scenario.objects.get(id=scenario_id)
 
     Sample.objects.create(persona=persona, scenario=scenario, image=my_file, uploaded=True)
-
-    # AUGMENTATIONS
-    s = Sample.objects.latest('id')
-    pil_img = Image.open(s.image)
-
-    b = T.functional.adjust_brightness(pil_img, np.random.randint(2, 3))
-    c = T.functional.adjust_contrast(pil_img, np.random.randint(3, 4))
-    g = T.functional.gaussian_blur(pil_img, kernel_size=(31, 27), sigma=(100))
-    r = T.functional.rotate(pil_img, np.random.randint(20, 360))
-    h = T.functional.adjust_brightness(pil_img, np.random.uniform(0.2, 0.6))
-
-    # b
-    b_file = augment_image(b)
-    b_new = Sample(image=b_file)
-    b_new.persona = persona
-    b_new.scenario = scenario
-    b_new.save()
-    # c
-    c_file = augment_image(c)
-    c_new = Sample(image=c_file)
-    c_new.persona = persona
-    c_new.scenario = scenario
-    c_new.save()
-    # g
-    g_file = augment_image(g)
-    g_new = Sample(image=g_file)
-    g_new.persona = persona
-    g_new.scenario = scenario
-    g_new.save()
-    # g
-    r_file = augment_image(r)
-    r_new = Sample(image=r_file)
-    r_new.persona = persona
-    r_new.scenario = scenario
-    r_new.save()
-    # g
-    h_file = augment_image(h)
-    h_new = Sample(image=h_file)
-    h_new.persona = persona
-    h_new.scenario = scenario
-    h_new.save()
-
 
     # Sample.objects.latest('id').delete()
     return redirect('/fdd_app/persona={}/create_scenarios'.format(persona_id, scenario_id))
@@ -303,8 +261,10 @@ def samples(request, persona_id, scenario_id):
 
     # DALLE
     client = replicate.Client(api_token=os.environ['REPLICATE_API_TOKEN'])
-    model = client.models.get("kuprel/min-dalle")
-    generated_image = model.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
+    model = replicate.models.get("stability-ai/stable-diffusion")
+    generated_image = model.predict(prompt=query.input_query)
+    # model = client.models.get("kuprel/min-dalle")
+    # generated_image = model.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
     for url in generated_image:
       sample = Sample.objects.latest('id')
       file_name = 'media/images/{}.jpg'.format(sample.id + 1)
@@ -364,9 +324,10 @@ def read_sample(request, persona_id, scenario_id, sample_id):
   matches = Match.objects.filter(sample=sample)
   expectations = Expectation.objects.filter(sample=sample)
 
+  suggestions = Suggestion.objects.filter(sample=sample)
+
   # POST automatic
   if request.method == "POST" and query_form.is_valid():
-    print("Starting")
 
     # Google API
     qf = query_form.save(commit=False)
@@ -391,9 +352,10 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(title), persona=persona, scenario=scenario, generated=True)
       image1.save()
 
-
     # DALLE
     client = replicate.Client(api_token=os.environ['REPLICATE_API_TOKEN'])
+    # model = replicate.models.get("stability-ai/stable-diffusion")
+    # generated_image = model.predict(prompt=query.input_query)
     model = client.models.get("kuprel/min-dalle")
     generated_image = model.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
 
@@ -403,8 +365,18 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       res = requests.get(url, stream = True)
 
       if res.status_code == 200:
+        # creating a image object (main image)
+        print("--------")
+        print(res)
+
         with open(file_name,'wb') as f:
+          print("--------")
+          print(f)
+          print("--------")
           shutil.copyfileobj(res.raw, f)
+          #img = Image.open("../media/images/{}.jpg".format(sample.id + 1))
+          #newsize = (256, 256)
+          #img = img.resize(newsize)
           image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(sample.id + 1), persona=persona, scenario=scenario, generated=True)
           image2.save()
         print('Image sucessfully Downloaded: ',file_name)
@@ -438,9 +410,94 @@ def read_sample(request, persona_id, scenario_id, sample_id):
     """
     sample.assessed = True
     sample.save()
+
+    # ---------------------------
+    # SUGGESTION ENGINE
+    print("#####################")
+    print("matches")
+    print(matches)
+
+    for match in matches:
+      print(match)
+      # ID
+      if match.true_positive:
+        print("True positive")
+        name1 = "Small {}.".format(match.expectation.label)
+        name2 = "{} at night.".format(match.expectation.label.capitalize())
+        name3 = "Black and white {}.".format(match.expectation.label)
+        name4 = "Many {}s.".format(match.expectation.label)
+        Suggestion.objects.create(sample=sample, match=match, name=name1).save()
+        Suggestion.objects.create(sample=sample, match=match, name=name2).save()
+        Suggestion.objects.create(sample=sample, match=match, name=name3).save()
+        Suggestion.objects.create(sample=sample, match=match, name=name4).save()
+
+      # challenge again
+      elif match.false_detection and match.indistribution or match.missing_detection and match.indistribution:
+        print(" in here ######################")
+        image_captioner = replicate.models.get("salesforce/blip")
+        path = "woz1copy.jpeg"
+        print(path)
+        print(os.getcwd())
+        print(match.sample.image.url)
+        path = os.getcwd() + match.sample.image.url
+        output = image_captioner.predict(image= Image.open(match.sample.image))
+        print(output)
+
+        for o in output:
+          print(o)
+          print(o["text"])
+          print(o["text"].split(": ")[1])
+
+      # OOD
+      elif match.outofdistribution:
+        print("check related concepts")
+        # These code snippets use an open-source library. http://unirest.io/python
+        url = "https://wordsapiv1.p.rapidapi.com/words/{}".format(match.expectation.label)
+
+        headers = {
+          "X-RapidAPI-Key": "6bf3309e23msh79190f0c21fe370p1f4e06jsn31b53a07fffb",
+          "X-RapidAPI-Host": "wordsapiv1.p.rapidapi.com"
+        }
+        response = requests.request("GET", url, headers=headers)
+        print(response.text)
+        print("###########")
+        print("###########")
+
+        response = json.loads(response.text)
+        if "results" in response:
+          for result in response["results"]:
+            print(result)
+            if "synonyms" in result:
+              synonyms = result["synonyms"]
+              print(synonyms)
+              for s in synonyms:
+                if check_if_indistribution(s):
+                  n = "{} is out of distribution but try {}".format(match.expectation.label.capitalize(), s)
+                  sugg = Suggestion.objects.create(sample=sample, match=match, name=n)
+                  sugg.save()
+            if "typeOf" in result:
+              higher_level_objects = result["typeOf"]
+              print(higher_level_objects)
+              for h in higher_level_objects:
+                if check_if_indistribution(h):
+                  print(h)
+                  n = "{} is out of distribution but try {}".format(match.expectation.label.capitalize(), h)
+                  sugg = Suggestion.objects.create(sample=sample, match=match, name=n)
+                  sugg.save()
+
+            if "hasTypes" in result:
+              lower_level_objects = result["hasTypes"]
+              print(lower_level_objects)
+              for l in lower_level_objects:
+                if check_if_indistribution(l):
+                  n = "{} is out of distribution but try {}".format(match.expectation.label.capitalize(), l)
+                  sugg = Suggestion.objects.create(sample=sample, match=match, name=n)
+                  sugg.save()
+            break
+
     return redirect("/fdd_app/persona={}/scenario={}/sample={}/read_sample".format(persona_id, scenario_id, sample_id))
 
-  # POST user (submit expectation)
+   # POST user (submit expectation)
   elif request.method == 'POST' and "expectation_submit" in request.POST:
     # ---------------------------
     # SAVE LABELS of EXPECTATION
@@ -593,6 +650,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
         sample.save()
     return redirect('/fdd_app/persona={}/scenario={}/sample={}/read_sample'.format(persona_id, scenario_id, sample_id))
 
+
     """
     if request.POST['done_or_continue'][0] == "D":
       return redirect('/fdd_app/failure_book')
@@ -602,6 +660,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
   # GET sample
   else:
     return render(request, 'fdd_app/read_sample.html', {
+      'suggestions': suggestions,
       'latest_persona': lastest_persona,
       'latest_scenario': latest_scenario,
       'p_and_s': p_and_s,
@@ -959,4 +1018,51 @@ def data(request):
     'retraining': retraining,
     'colors': colors,
     })
+
+def augmentations(request, persona_id, scenario_id, sample_id):
+  print("OKAY")
+  # AUGMENTATIONS
+  persona = Persona.objects.get(id=persona_id)
+  scenario = Scenario.objects.get(id=scenario_id)
+  sample = Sample.objects.get(id=sample_id)
+  pil_img = Image.open(sample.image)
+
+  b = T.functional.adjust_brightness(pil_img, np.random.randint(2, 3))
+  c = T.functional.adjust_contrast(pil_img, np.random.randint(3, 4))
+  g = T.functional.gaussian_blur(pil_img, kernel_size=(31, 27), sigma=(100))
+  r = T.functional.rotate(pil_img, np.random.randint(20, 360))
+  h = T.functional.adjust_brightness(pil_img, np.random.uniform(0.2, 0.6))
+
+  # b
+  b_file = augment_image(b)
+  b_new = Sample(image=b_file)
+  b_new.persona = persona
+  b_new.scenario = scenario
+  b_new.save()
+  # c
+  c_file = augment_image(c)
+  c_new = Sample(image=c_file)
+  c_new.persona = persona
+  c_new.scenario = scenario
+  c_new.save()
+  # g
+  g_file = augment_image(g)
+  g_new = Sample(image=g_file)
+  g_new.persona = persona
+  g_new.scenario = scenario
+  g_new.save()
+  # g
+  r_file = augment_image(r)
+  r_new = Sample(image=r_file)
+  r_new.persona = persona
+  r_new.scenario = scenario
+  r_new.save()
+  # g
+  h_file = augment_image(h)
+  h_new = Sample(image=h_file)
+  h_new.persona = persona
+  h_new.scenario = scenario
+  h_new.save()
+
+  return redirect("/fdd_app/persona={}/scenario={}/sample={}/read_sample".format(persona_id, scenario_id, sample_id))
 
