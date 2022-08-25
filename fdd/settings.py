@@ -20,7 +20,7 @@ from django.core.management.utils import get_random_secret_key
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ["SECRET_KEY"]
+DJANGO_SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
@@ -127,29 +127,18 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'fdd_pp/static'),
-]
-
-# STATIC_ROOT = BASE_DIR / "staticfiles"
-# STATIC_URL = '/static/'
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
     # Add to this list all the locations containing your static files
 )
 
-
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "fdd_pp/static"),)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -157,7 +146,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 API_TOKEN=os.environ.get('API_TOKEN')
 GOOGLE_API_TOKEN=os.environ.get('GOOGLE_API_TOKEN')
 REPLICATE_API_TOKEN=os.environ.get('REPLICATE_API_TOKEN')
-SECRET_KEY=os.environ.get('SECRET_KEY')
+DJANGO_SECRET_KEY=os.environ.get('DJANGO_SECRET_KEY')
 WORDS_API=os.environ.get('WORDS_API')
 
 
