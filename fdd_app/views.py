@@ -455,7 +455,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
         url = "https://wordsapiv1.p.rapidapi.com/words/{}".format(match.expectation.label)
 
         headers = {
-          "X-RapidAPI-Key": "6bf3309e23msh79190f0c21fe370p1f4e06jsn31b53a07fffb",
+          "X-RapidAPI-Key": WORDS_API,
           "X-RapidAPI-Host": "wordsapiv1.p.rapidapi.com"
         }
         response = requests.request("GET", url, headers=headers)
