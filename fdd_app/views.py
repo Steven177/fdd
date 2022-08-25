@@ -145,7 +145,7 @@ def create_scenarios(request, persona_id):
     scenario = Scenario.objects.earliest('id')
     samples_per_scenario = []
     for s in scenarios:
-      samples = Sample.objects.filter(scenario=s, uploaded=True)
+      samples = Sample.objects.filter(scenario=s, uploaded=True).order_by("-id")
       samples_per_scenario.append({'scenario': s, 'samples': samples})
     return render(request, 'fdd_app/create_scenarios.html',
       {
@@ -181,7 +181,7 @@ def update_scenario(request, persona_id, scenario_id):
 
   samples_per_scenario = []
   for s in scenarios:
-    samples = Sample.objects.filter(scenario=s)
+    samples = Sample.objects.filter(scenario=s).order_by("-id")
     samples_per_scenario.append({'scenario': s, 'samples': samples})
 
   scenario_form = ScenarioForm(request.POST or None, instance = scenario)
@@ -230,7 +230,7 @@ def samples(request, persona_id, scenario_id):
     s = p.scenario_set.all().order_by('-id')
     p_and_s.append({'persona': p, 'scenarios': s})
 
-  samples = Sample.objects.filter(scenario=scenario)
+  samples = Sample.objects.filter(scenario=scenario).order_by("-id")
 
   ais = Ai.objects.all()
 
@@ -316,7 +316,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
     s = p.scenario_set.all().order_by("-id")
     p_and_s.append({'persona': p, 'scenarios': s})
 
-  samples = Sample.objects.filter(scenario=scenario)
+  samples = Sample.objects.filter(scenario=scenario).order_by("-id")
 
   colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
 
@@ -433,6 +433,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
       # challenge again
       elif match.false_detection and match.indistribution or match.missing_detection and match.indistribution:
+        """
         print(" in here ######################")
         image_captioner = replicate.models.get("salesforce/blip")
         path = "woz1copy.jpeg"
@@ -447,7 +448,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
           print(o)
           print(o["text"])
           print(o["text"].split(": ")[1])
-
+        """
       # OOD
       elif match.outofdistribution:
         print("check related concepts")
@@ -455,23 +456,24 @@ def read_sample(request, persona_id, scenario_id, sample_id):
         url = "https://wordsapiv1.p.rapidapi.com/words/{}".format(match.expectation.label)
 
         headers = {
-          "X-RapidAPI-Key": WORDS_API,
+          "X-RapidAPI-Key": os.environ.get('WORDS_API'),
           "X-RapidAPI-Host": "wordsapiv1.p.rapidapi.com"
         }
         response = requests.request("GET", url, headers=headers)
-        print(response.text)
+        print("RESPONSE:TEXT {}".format(response.text))
         print("###########")
         print("###########")
 
         response = json.loads(response.text)
         if "results" in response:
           for result in response["results"]:
-            print(result)
+            print("RESULTS {}".format(result))
             if "synonyms" in result:
               synonyms = result["synonyms"]
-              print(synonyms)
+              print("SYNONYMS {}".format(synonyms))
               for s in synonyms:
                 if check_if_indistribution(s):
+                  print(s)
                   n = "{} is out of distribution but try {}".format(match.expectation.label.capitalize(), s)
                   sugg = Suggestion.objects.create(sample=sample, match=match, name=n)
                   sugg.save()
@@ -490,10 +492,10 @@ def read_sample(request, persona_id, scenario_id, sample_id):
               print(lower_level_objects)
               for l in lower_level_objects:
                 if check_if_indistribution(l):
+                  print(l)
                   n = "{} is out of distribution but try {}".format(match.expectation.label.capitalize(), l)
                   sugg = Suggestion.objects.create(sample=sample, match=match, name=n)
                   sugg.save()
-            break
 
     return redirect("/fdd_app/persona={}/scenario={}/sample={}/read_sample".format(persona_id, scenario_id, sample_id))
 
@@ -727,7 +729,7 @@ def failure_exploration(request, persona_id, scenario_id, sample_id):
     s = p.scenario_set.all().order_by("-id")
     p_and_s.append({'persona': p, 'scenarios': s})
 
-  samples = Sample.objects.filter(scenario=scenario)
+  samples = Sample.objects.filter(scenario=scenario).order_by("-id")
 
   colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
 
@@ -1004,7 +1006,7 @@ def data(request):
   colors = ["green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua", "green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua","green", "blue", "red", "yellow", "purple", "fuchsia", "olive", "navy", "teal", "aqua"]
   finetuning = []
   retraining = []
-  samples = Sample.objects.all()
+  samples = Sample.objects.all().order_by("-id")
   for sample in samples:
     indist_exps = sample.expectation_set.filter(indist=True)
     exps = sample.expectation_set.all()

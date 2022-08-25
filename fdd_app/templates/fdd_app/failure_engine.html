@@ -99,6 +99,11 @@
               <input type="range" class="slider" name="failure_severity" id="failure_severity_id{{forloop.counter}}" value="1" min="1" max="7" oninput="failure_severity_output{{forloop.counter}}.value = failure_severity_id{{forloop.counter}}.value">
               <output name="failure_severity_output{{forloop.counter}}" id="failure_severity_output_id{{forloop.counter}}">1</output>
               <input value = "{{match.id}}" type="hidden" name="match_id">
+            {% else %}
+              <form id="{{match.id}}" class="failure_severity_form" action="" method="POST">
+                {% csrf_token %}
+                <input type="range" class="slider d-none" name="failure_severity" id="failure_severity_id{{forloop.counter}}" value="1" min="1" max="7" oninput="failure_severity_output{{forloop.counter}}.value = failure_severity_id{{forloop.counter}}.value">
+                <input value = "{{match.id}}" type="hidden" name="match_id">
             {% endif %}
           </td>
 
