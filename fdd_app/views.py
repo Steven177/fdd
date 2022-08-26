@@ -6,6 +6,7 @@ from scipy.optimize import linear_sum_assignment
 from serpapi import GoogleSearch
 import urllib.request
 import torchvision.transforms as T
+from io import BytesIO
 
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
 from django.http import HttpResponse
@@ -23,8 +24,6 @@ from .models import Sample, Expectation, Model_Prediction, Match, Ai, Persona, S
 from .utils import *
 
 from .ai import *
-from .dalle import *
-from .creds import *
 # from .seed import *
 
 import replicate
@@ -35,7 +34,6 @@ import urllib.request
 
 # PERSONA
 ###################
-
 def create_persona(request):
   persona_form = PersonaForm(request.POST, request.FILES)
   # POST
@@ -212,6 +210,7 @@ def delete_scenario(request, persona_id, scenario_id):
   scenario.delete()
   return redirect('/fdd_app/persona={}/create_scenarios'.format(persona_id))
 
+
 # SAMPLES
 ###################
 @csrf_exempt
@@ -240,7 +239,6 @@ def samples(request, persona_id, scenario_id):
 
   # POST automatic
   if request.method == "POST" and query_form.is_valid():
-
     # Google API
     qf = query_form.save(commit=False)
     qf.persona = persona
@@ -248,8 +246,8 @@ def samples(request, persona_id, scenario_id):
     qf.save()
 
     query = Query.objects.latest('id')
-    results = call_google_api(query.input_query)
 
+    results = call_google_api(query.input_query)
     image_results = results['images_results']
 
     random_idx = np.random.randint(0, np.floor(len(image_results)/4))
@@ -258,29 +256,44 @@ def samples(request, persona_id, scenario_id):
     for image_result in image_results:
       url = image_result['thumbnail']
       title = image_result['title']
-      urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(title))
-      image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(title), persona=persona, scenario=scenario)
+      latest_sample = Sample.objects.latest("id")
+      urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(latest_sample.id))
+      image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(latest_sample.id), persona=persona, scenario=scenario, generated=True)
       image1.save()
 
     # DALLE
-    client = replicate.Client(api_token=os.environ['REPLICATE_API_TOKEN'])
+    # client = replicate.Client(api_token=os.environ['REPLICATE_API_TOKEN'])
+
     model = replicate.models.get("stability-ai/stable-diffusion")
     generated_image = model.predict(prompt=query.input_query)
-    # model = client.models.get("kuprel/min-dalle")
-    # generated_image = model.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
-    for url in generated_image:
-      sample = Sample.objects.latest('id')
-      file_name = 'media/images/{}.jpg'.format(sample.id + 1)
-      res = requests.get(url, stream = True)
 
-      if res.status_code == 200:
-        with open(file_name,'wb') as f:
-          shutil.copyfileobj(res.raw, f)
-          image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(sample.id + 1), persona=persona, scenario=scenario)
-          image2.save()
-        print('Image sucessfully Downloaded: ',file_name)
-      else:
-        print('Image Couldn\'t be retrieved')
+    # min_dalle = replicate.models.get("kuprel/min-dalle")
+    # generated_image = min_dalle.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
+
+    #img = Image.open(output_path)
+    #img = img.resize((256, 256))
+    #img.save("resized.png")
+
+    for url in generated_image:
+      latest_sample = Sample.objects.latest('id')
+
+      # img = Image.open(urlopen(url))
+      # img = Image.open(requests.get(url, stream=True).raw)
+      #response = requests.get(url)
+      # img = Image.open(BytesIO(response.content))
+
+      #response = requests.get(url)
+      #img = Image.open(url)
+
+      response = requests.get(url)
+      image_bytes = io.BytesIO(response.content)
+      img = Image.open(image_bytes)
+
+      img = img.resize((256, 256))
+      img.save("media/images/{}.jpg".format(latest_sample.id + 1))
+
+      image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(latest_sample.id + 1), persona=persona, scenario=scenario, generated=True)
+      image2.save()
 
     return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
 
@@ -298,7 +311,8 @@ def samples(request, persona_id, scenario_id):
       'p_and_s': p_and_s,
       })
 
-
+# READ_SAMPLE
+###################
 @csrf_exempt
 def read_sample(request, persona_id, scenario_id, sample_id):
   lastest_persona = Persona.objects.latest('id')
@@ -340,7 +354,6 @@ def read_sample(request, persona_id, scenario_id, sample_id):
     query = Query.objects.latest('id')
 
     results = call_google_api(query.input_query)
-    print("results {}".format(results))
     image_results = results['images_results']
 
     random_idx = np.random.randint(0, np.floor(len(image_results)/4))
@@ -350,30 +363,24 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       url = image_result['thumbnail']
       title = image_result['title']
       latest_sample = Sample.objects.latest("id")
-      print("+++++++++++++++++")
-      print(latest_sample)
-      print("+++++++++++++++++")
       urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(latest_sample.id))
       image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(latest_sample.id), persona=persona, scenario=scenario, generated=True)
       image1.save()
 
     # DALLE
-    print("DALLE")
     # client = replicate.Client(api_token=os.environ['REPLICATE_API_TOKEN'])
+
     model = replicate.models.get("stability-ai/stable-diffusion")
-    generated_image = model.predict(prompt=query.input_query, width=256, height=256)
+    generated_image = model.predict(prompt=query.input_query)
+
     # min_dalle = replicate.models.get("kuprel/min-dalle")
-    print("model")
     # generated_image = min_dalle.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
-    from io import BytesIO
+
     #img = Image.open(output_path)
     #img = img.resize((256, 256))
     #img.save("resized.png")
-    print(generated_image)
-    from io import BytesIO
 
     for url in generated_image:
-      print(url)
       latest_sample = Sample.objects.latest('id')
 
       # img = Image.open(urlopen(url))
@@ -410,6 +417,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       if sev != "":
         match.failure_severity = int(sev)
         match.save()
+
     """
     # Save failure effects
     for idx, eff in enumerate(failure_effects):
@@ -424,13 +432,9 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
     # ---------------------------
     # SUGGESTION ENGINE
-    print("#####################")
-    print("matches")
-    print(matches)
 
     for match in matches:
-      print(match)
-      # ID
+      # CHALLENGE
       if match.true_positive:
         random = np.random.randint(0,3)
         if random == 0:
@@ -443,7 +447,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
           name = "Many {}s".format(match.expectation.label)
         Suggestion.objects.create(sample=sample, match=match, name=name, challenge=True).save()
 
-      # challenge again
+      # REPEAT
       elif match.false_detection and match.indistribution or match.missing_detection and match.indistribution:
         """
         print(" in here ######################")
@@ -468,8 +472,18 @@ def read_sample(request, persona_id, scenario_id, sample_id):
           print(o)
           print(o["text"])
           print(o["text"].split(": ")[1])
+
+        # crop
+        left = 10
+        top = 10
+        right = 200
+        bottom = 200
+        pil_image_obj = Image.open("img.jpeg")
+        im = pil_image_obj.crop([left, top, right, bottom])
+        im.show()
+
         """
-      # OOD
+      # GUIDE
       elif match.outofdistribution:
         # These code snippets use an open-source library. http://unirest.io/python
         url = "https://wordsapiv1.p.rapidapi.com/words/{}".format(match.expectation.label)
@@ -479,26 +493,19 @@ def read_sample(request, persona_id, scenario_id, sample_id):
           "X-RapidAPI-Host": "wordsapiv1.p.rapidapi.com"
         }
         response = requests.request("GET", url, headers=headers)
-        print("RESPONSE:TEXT {}".format(response.text))
-        print("###########")
-        print("###########")
 
         response = json.loads(response.text)
         if "results" in response:
           for result in response["results"]:
-            print("RESULTS {}".format(result))
             if "synonyms" in result:
               synonyms = result["synonyms"]
-              print("SYNONYMS {}".format(synonyms))
               for s in synonyms:
                 if check_if_indistribution(s):
-                  print(s)
                   n = "{}".format(s)
                   sugg = Suggestion.objects.create(sample=sample, match=match, name=n, guide=True, expectation_label=match.expectation.label)
                   sugg.save()
             if "typeOf" in result:
               higher_level_objects = result["typeOf"]
-              print(higher_level_objects)
               for h in higher_level_objects:
                 if check_if_indistribution(h):
                   n = "{}".format(h)
@@ -507,10 +514,8 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
             if "hasTypes" in result:
               lower_level_objects = result["hasTypes"]
-              print(lower_level_objects)
               for l in lower_level_objects:
                 if check_if_indistribution(l):
-                  print(l)
                   n = "{}".format(l)
                   sugg = Suggestion.objects.create(sample=sample, match=match, name=n, guide=True, expectation_label=match.expectation.label)
                   sugg.save()
@@ -518,7 +523,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
     return redirect("/fdd_app/persona={}/scenario={}/sample={}/read_sample".format(persona_id, scenario_id, sample_id))
 
-   # POST user (submit expectation)
+  # POST user (submit expectation)
   elif request.method == 'POST' and "expectation_submit" in request.POST:
     # ---------------------------
     # SAVE LABELS of EXPECTATION
@@ -600,7 +605,6 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
         # boxes need at least 0.2 IoU to be a match
         iou = calculate_iou(exp, pred)
-        print("iou {}".format(iou))
 
         if iou >= 0.2:
           new_match = Match(sample=sample, expectation=exp, exp_idx=exp_idx, model_prediction=pred, pred_idx=pred_idx)
@@ -626,7 +630,6 @@ def read_sample(request, persona_id, scenario_id, sample_id):
           match.save()
           sample.has_failure = True
           sample.save()
-
 
         # Missing detection
         if match.model_prediction == None:
@@ -724,9 +727,9 @@ def delete_sample(request, persona_id, scenario_id, sample_id):
     sample.delete()
     return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
 
+
 # FAILURE EXPLORATION
 ###################
-
 def failure_exploration(request, persona_id, scenario_id, sample_id):
   sample = Sample.objects.get(id=sample_id)
   expectations = Expectation.objects.filter(sample=sample)
@@ -791,7 +794,6 @@ def failure_exploration(request, persona_id, scenario_id, sample_id):
     # pil_image_obj = Image.open(sample.image)
     # model_prediction = predict(pil_image_obj)
     # model_prediction = [{'score': 0.9308645725250244, 'label': 'person', 'box': {'xmin': 79, 'ymin': 13, 'xmax': 273, 'ymax': 183}}, {'score': 0.9893394112586975, 'label': 'tie', 'box': {'xmin': 132, 'ymin': 167, 'xmax': 162, 'ymax': 184}}]
-    print(model_prediction)
 
     for obj in model_prediction:
       new_pred = Model_Prediction(sample=sample, label=obj['label'], score=obj['score'], xmin=obj['box']['xmin'], ymin=obj['box']['ymin'], xmax=obj['box']['xmax'], ymax=obj['box']['ymax'] )
