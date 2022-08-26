@@ -186,10 +186,8 @@ def call_google_api(q):
   "hl": "en",
   "tbm": "isch"
   }
-  print("starting search")
   search = GoogleSearch(params)
-  print("search {}".format(search))
-  print("search get dict {}".format(search.get_dict()))
+
   return search.get_dict()
 
 

@@ -78,6 +78,7 @@ class Suggestion(models.Model):
   challenge = models.BooleanField(default=False, blank=True)
   guide = models.BooleanField(default=False, blank=True)
   challenge_again = models.BooleanField(default=False, blank=True)
+  expectation_label = models.CharField(max_length=200, blank=True)
 
 """
 class Failure(models.Model):

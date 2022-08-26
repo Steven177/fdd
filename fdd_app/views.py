@@ -339,7 +339,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
 
     results = call_google_api(query.input_query)
-
+    print("results {}".format(results))
     image_results = results['images_results']
 
     random_idx = np.random.randint(0, np.floor(len(image_results)/4))
@@ -348,8 +348,12 @@ def read_sample(request, persona_id, scenario_id, sample_id):
     for image_result in image_results:
       url = image_result['thumbnail']
       title = image_result['title']
-      urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(title))
-      image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(title), persona=persona, scenario=scenario, generated=True)
+      latest_sample = Sample.objects.latest("id")
+      print("+++++++++++++++++")
+      print(latest_sample)
+      print("+++++++++++++++++")
+      urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(latest_sample.id))
+      image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(latest_sample.id), persona=persona, scenario=scenario, generated=True)
       image1.save()
 
     # DALLE
@@ -421,27 +425,33 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       print(match)
       # ID
       if match.true_positive:
-        print("True positive")
-        name1 = "Small {}.".format(match.expectation.label)
-        name2 = "{} at night.".format(match.expectation.label.capitalize())
-        name3 = "Black and white {}.".format(match.expectation.label)
-        name4 = "Many {}s.".format(match.expectation.label)
-        Suggestion.objects.create(sample=sample, match=match, name=name1).save()
-        Suggestion.objects.create(sample=sample, match=match, name=name2).save()
-        Suggestion.objects.create(sample=sample, match=match, name=name3).save()
-        Suggestion.objects.create(sample=sample, match=match, name=name4).save()
+        random = np.random.randint(0,3)
+        if random == 0:
+          name = "A very small {}".format(match.expectation.label)
+        elif random == 1:
+          name = "A {} at night".format(match.expectation.label.capitalize())
+        elif random == 2:
+          name = "A black and white of a {}".format(match.expectation.label)
+        else:
+          name = "Many {}s".format(match.expectation.label)
+        Suggestion.objects.create(sample=sample, match=match, name=name, challenge=True).save()
 
       # challenge again
       elif match.false_detection and match.indistribution or match.missing_detection and match.indistribution:
         """
         print(" in here ######################")
-        image_captioner = replicate.models.get("salesforce/blip")
-        path = "woz1copy.jpeg"
-        print(path)
         print(os.getcwd())
         print(match.sample.image.url)
         path = os.getcwd() + match.sample.image.url
-        output = image_captioner.predict(image= Image.open(match.sample.image))
+        # BLIB
+        image_captioner = replicate.models.get("salesforce/blip")
+        output = image_captioner.predict(image="img.jpeg")
+
+        #clip_prefix = replicate.models.get("rmokady/clip_prefix_caption")
+        #output = clip_caption.predict(image="")
+        #clip_caption = replicate.models.get("j-min/clip-caption-reward")
+        #output = clip_prefix.predict(image="...")
+
         print(output)
 
         for o in output:
@@ -451,7 +461,6 @@ def read_sample(request, persona_id, scenario_id, sample_id):
         """
       # OOD
       elif match.outofdistribution:
-        print("check related concepts")
         # These code snippets use an open-source library. http://unirest.io/python
         url = "https://wordsapiv1.p.rapidapi.com/words/{}".format(match.expectation.label)
 
@@ -474,17 +483,16 @@ def read_sample(request, persona_id, scenario_id, sample_id):
               for s in synonyms:
                 if check_if_indistribution(s):
                   print(s)
-                  n = "{} is out of distribution but try {}".format(match.expectation.label.capitalize(), s)
-                  sugg = Suggestion.objects.create(sample=sample, match=match, name=n)
+                  n = "{}".format(s)
+                  sugg = Suggestion.objects.create(sample=sample, match=match, name=n, guide=True, expectation_label=match.expectation.label)
                   sugg.save()
             if "typeOf" in result:
               higher_level_objects = result["typeOf"]
               print(higher_level_objects)
               for h in higher_level_objects:
                 if check_if_indistribution(h):
-                  print(h)
-                  n = "{} is out of distribution but try {}".format(match.expectation.label.capitalize(), h)
-                  sugg = Suggestion.objects.create(sample=sample, match=match, name=n)
+                  n = "{}".format(h)
+                  sugg = Suggestion.objects.create(sample=sample, match=match, name=n, guide=True, expectation_label=match.expectation.label)
                   sugg.save()
 
             if "hasTypes" in result:
@@ -493,9 +501,10 @@ def read_sample(request, persona_id, scenario_id, sample_id):
               for l in lower_level_objects:
                 if check_if_indistribution(l):
                   print(l)
-                  n = "{} is out of distribution but try {}".format(match.expectation.label.capitalize(), l)
-                  sugg = Suggestion.objects.create(sample=sample, match=match, name=n)
+                  n = "{}".format(l)
+                  sugg = Suggestion.objects.create(sample=sample, match=match, name=n, guide=True, expectation_label=match.expectation.label)
                   sugg.save()
+            break
 
     return redirect("/fdd_app/persona={}/scenario={}/sample={}/read_sample".format(persona_id, scenario_id, sample_id))
 

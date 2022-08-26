@@ -43,8 +43,8 @@
             </div>
           </div>
           <div class="col-6">
-            <h2 class="purple-color">User Expectation</h2>
             {% if sample.labelled and not sample.assessed %}
+              <h2 class="purple-color">User Expectation</h2>
               {% block read_expectation %}{% include 'fdd_app/read_expectation.html' %}{% endblock read_expectation %}
           </div>
         </div>
@@ -86,15 +86,14 @@
                     </button>
                   </div>
                   </form>
-
               </div>
 
 
             {% elif not sample.labelled %}
               {% block write_expectation %}{% include 'fdd_app/write_expectation.html' %}{% endblock write_expectation %}
             {% else %}
-              {% block read_expectation2 %}{% include 'fdd_app/read_expectation.html' %}{% endblock read_expectation2 %}
-              <h2 class="purple-color">Suggestion</h2>
+
+              <h2 class="purple-color">Suggestions</h2>
                 {% block suggestion %}{% include 'fdd_app/suggestion.html' %}{% endblock suggestion %}
             {% endif %}
           </div>

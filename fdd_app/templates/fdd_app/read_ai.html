@@ -28,13 +28,7 @@
 
 </head>
 <body class="font">
-  <! -- NAVBAR -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-      <img class="logo" src="../../../media/logo/xploreai.png" alt="XploreAI">
-    </div>
-  </nav>
-  <! -- END NAVBAR -->
+  {% block navbar %}{% include 'fdd_app/navbar.html' %}{% endblock navbar %}
 
   <div class="container">
     <form>
@@ -46,7 +40,7 @@
       <! -- TASK  -->
       <h2 class="purple-color margin-top-large">The Task of Object Detection</h2>
       <div class="col-8">
-        <img class="maxwidth100prozent" src="../../media/task/task_2.png" alt="object detection">
+        <img class="maxwidth100prozent" src="{% static 'task/task_2.png' %}" " alt="object detection">
       </div>
       <div class="col-4">
         <p>With object detection machines can create visual understanding. </p>
@@ -315,49 +309,49 @@
           </div>
           <div class="carousel-inner">
             <div class="carousel-item active">
-              <img src="../../../media/limitations/blur.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <img src="{% static 'limitations/blur.jpg' %}" class="d-block w-100 img-fluid min-height" alt="...">
               <div class="carousel-caption d-none d-md-block darkbackground">
                 <h3>Blur</h3>
                 <p>Blurry images or rapid movement between frames due to motion can lead to errors. </p>
               </div>
             </div>
             <div class="carousel-item">
-              <img src="../../../media/limitations/clutter.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <img src="{% static 'limitations/clutter.jpg' %}" class="d-block w-100 img-fluid min-height" alt="...">
               <div class="carousel-caption d-none d-md-block darkbackground">
                 <h3>Clutter</h3>
                 <p>Computer vision systems tend to struggle with cluttered images.</p>
               </div>
             </div>
             <div class="carousel-item">
-              <img src="../../../media/limitations/lighting.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <img src="{% static 'limitations/lighting.jpg' %}" class="d-block w-100 img-fluid min-height" alt="...">
               <div class="carousel-caption d-none d-md-block darkbackground">
                 <h3>Lighting</h3>
                 <p>Poor lighting or high contrast illumination (e.g. nighttime) may lead to wrong predictions.</p>
               </div>
             </div>
             <div class="carousel-item">
-              <img src="../../../media/limitations/object_size.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <img src="{% static 'limitations/object_size.jpg' %}" class="d-block w-100 img-fluid min-height" alt="...">
               <div class="carousel-caption d-none d-md-block darkbackground">
                 <h3>Object size</h3>
                 <p>If objects become very small, the vision system may struggle to detect it. </p>
               </div>
             </div>
             <div class="carousel-item">
-              <img src="../../../media/limitations/occlusion.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <img src="{% static 'limitations/occlusion.jpg' %}" class="d-block w-100 img-fluid min-height" alt="...">
               <div class="carousel-caption d-none d-md-block darkbackground">
                 <h3>Occlusions</h3>
                 <p>Partially occluded objects may not be detected.</p>
               </div>
             </div>
             <div class="carousel-item">
-              <img src="../../../media/limitations/resolution.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <img src="{% static 'limitations/resolution.jpg' %}" class="d-block w-100 img-fluid min-height" alt="...">
               <div class="carousel-caption d-none d-md-block darkbackground">
                 <h3>Resolution</h3>
                 <p>Images of low resolution could lead to errors.</p>
               </div>
             </div>
             <div class="carousel-item">
-              <img src="../../../media/limitations/similar.jpg" class="d-block w-100 img-fluid min-height" alt="...">
+              <img src="{% static 'limitations/similar.jpg' %}" class="d-block w-100 img-fluid min-height" alt="...">
               <div class="carousel-caption d-none d-md-block darkbackground">
                 <h3>Similar objects</h3>
                 <p>Objects that are similar in shape can be difficult to distinguish for the computer vision system.</p>

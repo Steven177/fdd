@@ -372,7 +372,8 @@ for (var key in card) {
   })
 
   var failure_card = new fabric.Group([grey_card, exp_vis, pred_vis, sev, exp, pred, error, ID, OOD, FTD, CQS, CQB], {
-  })
+  top: 100,
+  left: 100})
 
   canvas.add(failure_card)
 }
