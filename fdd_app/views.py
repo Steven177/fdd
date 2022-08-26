@@ -21,6 +21,7 @@ from .forms import PersonaForm, ScenarioForm, QueryForm
 from .models import Sample, Expectation, Model_Prediction, Match, Ai, Persona, Scenario, Query, Suggestion
 
 from .utils import *
+
 from .ai import *
 from .dalle import *
 from .creds import *
@@ -29,6 +30,8 @@ from .creds import *
 import replicate
 import requests
 import shutil
+import urllib.request
+
 
 # PERSONA
 ###################
@@ -328,7 +331,6 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
   # POST automatic
   if request.method == "POST" and query_form.is_valid():
-
     # Google API
     qf = query_form.save(commit=False)
     qf.persona = persona
@@ -336,7 +338,6 @@ def read_sample(request, persona_id, scenario_id, sample_id):
     qf.save()
 
     query = Query.objects.latest('id')
-
 
     results = call_google_api(query.input_query)
     print("results {}".format(results))
@@ -357,35 +358,41 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       image1.save()
 
     # DALLE
-    client = replicate.Client(api_token=os.environ['REPLICATE_API_TOKEN'])
-    # model = replicate.models.get("stability-ai/stable-diffusion")
-    # generated_image = model.predict(prompt=query.input_query)
-    model = client.models.get("kuprel/min-dalle")
-    generated_image = model.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
+    print("DALLE")
+    # client = replicate.Client(api_token=os.environ['REPLICATE_API_TOKEN'])
+    model = replicate.models.get("stability-ai/stable-diffusion")
+    generated_image = model.predict(prompt=query.input_query, width=256, height=256)
+    # min_dalle = replicate.models.get("kuprel/min-dalle")
+    print("model")
+    # generated_image = min_dalle.predict(text=query.input_query, grid_size=1, temperature=1, progressive_outputs=False)
+    from io import BytesIO
+    #img = Image.open(output_path)
+    #img = img.resize((256, 256))
+    #img.save("resized.png")
+    print(generated_image)
+    from io import BytesIO
 
     for url in generated_image:
-      sample = Sample.objects.latest('id')
-      file_name = 'media/images/{}.jpg'.format(sample.id + 1)
-      res = requests.get(url, stream = True)
+      print(url)
+      latest_sample = Sample.objects.latest('id')
 
-      if res.status_code == 200:
-        # creating a image object (main image)
-        print("--------")
-        print(res)
+      # img = Image.open(urlopen(url))
+      # img = Image.open(requests.get(url, stream=True).raw)
+      #response = requests.get(url)
+      # img = Image.open(BytesIO(response.content))
 
-        with open(file_name,'wb') as f:
-          print("--------")
-          print(f)
-          print("--------")
-          shutil.copyfileobj(res.raw, f)
-          #img = Image.open("../media/images/{}.jpg".format(sample.id + 1))
-          #newsize = (256, 256)
-          #img = img.resize(newsize)
-          image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(sample.id + 1), persona=persona, scenario=scenario, generated=True)
-          image2.save()
-        print('Image sucessfully Downloaded: ',file_name)
-      else:
-        print('Image Couldn\'t be retrieved')
+      #response = requests.get(url)
+      #img = Image.open(url)
+
+      response = requests.get(url)
+      image_bytes = io.BytesIO(response.content)
+      img = Image.open(image_bytes)
+
+      img = img.resize((256, 256))
+      img.save("media/images/{}.jpg".format(latest_sample.id + 1))
+
+      image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(latest_sample.id + 1), persona=persona, scenario=scenario, generated=True)
+      image2.save()
 
     return redirect('/fdd_app/persona={}/scenario={}/sample={}/read_sample'.format(persona_id, scenario_id, sample_id))
 
@@ -451,6 +458,9 @@ def read_sample(request, persona_id, scenario_id, sample_id):
         #output = clip_caption.predict(image="")
         #clip_caption = replicate.models.get("j-min/clip-caption-reward")
         #output = clip_prefix.predict(image="...")
+
+        with open(filename, "rb") as f:
+          data = f.read()
 
         print(output)
 
@@ -545,7 +555,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
     expectations = Expectation.objects.filter(sample=sample.id)
 
     # ---------------------------
-    # MODEL PREDICTION
+    # MODEL PREDICTION 1
     if not sample.tested:
       model_prediction = make_prediction(sample.image.path) # AI model prediction
       # pil_image_obj = Image.open(sample.image)
