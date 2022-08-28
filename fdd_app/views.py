@@ -239,6 +239,7 @@ def samples(request, persona_id, scenario_id):
 
   # POST automatic
   if request.method == "POST" and query_form.is_valid():
+    latest_sample = Sample.objects.latest('id')
     # Google API
     qf = query_form.save(commit=False)
     qf.persona = persona
@@ -257,8 +258,8 @@ def samples(request, persona_id, scenario_id):
       url = image_result['thumbnail']
       title = image_result['title']
       latest_sample = Sample.objects.latest("id")
-      urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(latest_sample.id))
-      image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(latest_sample.id), persona=persona, scenario=scenario, generated=True)
+      urllib.request.urlretrieve(url, 'media/images/google{}.jpg'.format(latest_sample.id))
+      image1 = Sample.objects.create(image='../media/images/google{}.jpg'.format(latest_sample.id), persona=persona, scenario=scenario, generated=True)
       image1.save()
 
     # DALLE
@@ -290,10 +291,11 @@ def samples(request, persona_id, scenario_id):
       img = Image.open(image_bytes)
 
       img = img.resize((256, 256))
-      img.save("media/images/{}.jpg".format(latest_sample.id + 1))
+      img.save("media/images/nn{}.jpg".format(latest_sample.id + 1))
 
-      image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(latest_sample.id + 1), persona=persona, scenario=scenario, generated=True)
+      image2 = Sample.objects.create(image='../media/images/nn{}.jpg'.format(latest_sample.id + 1), persona=persona, scenario=scenario, generated=True)
       image2.save()
+
 
     return redirect('/fdd_app/persona={}/scenario={}/samples'.format(persona_id, scenario_id))
 
@@ -345,6 +347,7 @@ def read_sample(request, persona_id, scenario_id, sample_id):
 
   # POST automatic
   if request.method == "POST" and query_form.is_valid():
+    latest_sample = Sample.objects.latest('id')
     # Google API
     qf = query_form.save(commit=False)
     qf.persona = persona
@@ -363,8 +366,8 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       url = image_result['thumbnail']
       title = image_result['title']
       latest_sample = Sample.objects.latest("id")
-      urllib.request.urlretrieve(url, 'media/images/{}.jpg'.format(latest_sample.id))
-      image1 = Sample.objects.create(image='../media/images/{}.jpg'.format(latest_sample.id), persona=persona, scenario=scenario, generated=True)
+      urllib.request.urlretrieve(url, 'media/images/google{}.jpg'.format(latest_sample.id))
+      image1 = Sample.objects.create(image='../media/images/google{}.jpg'.format(latest_sample.id), persona=persona, scenario=scenario, generated=True)
       image1.save()
 
     # DALLE
@@ -396,9 +399,9 @@ def read_sample(request, persona_id, scenario_id, sample_id):
       img = Image.open(image_bytes)
 
       img = img.resize((256, 256))
-      img.save("media/images/{}.jpg".format(latest_sample.id + 1))
+      img.save("media/images/nn{}.jpg".format(latest_sample.id + 1))
 
-      image2 = Sample.objects.create(image='../media/images/{}.jpg'.format(latest_sample.id + 1), persona=persona, scenario=scenario, generated=True)
+      image2 = Sample.objects.create(image='../media/images/nn{}.jpg'.format(latest_sample.id + 1), persona=persona, scenario=scenario, generated=True)
       image2.save()
 
     return redirect('/fdd_app/persona={}/scenario={}/sample={}/read_sample'.format(persona_id, scenario_id, sample_id))
